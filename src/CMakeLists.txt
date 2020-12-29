@@ -1,0 +1,6 @@
+add_subdirectory(3D-reconstruction)
+#add_subdirectory(CUDA)
+#add_subdirectory(Log)
+#add_subdirectory(Networking)
+#add_subdirectory(Pipeline)
+#add_subdirectory(Utils)
