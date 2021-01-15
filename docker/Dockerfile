@@ -1,0 +1,364 @@
+FROM nvidia/cuda:11.1-devel-ubuntu20.04
+
+ENV TZ=Europe/Minsk
+ENV NVIDIA_DRIVER_CAPABILITIES=all
+
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
+    && echo $TZ > /etc/timezone \
+    && apt-get -y update \ 
+    && apt-get install -y \
+        apt-utils \
+        software-properties-common \
+    && add-apt-repository "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /" \
+    && apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub \
+    && apt-get -y update \
+    && apt-get install -y \
+        autoconf \
+        build-essential \
+        zlib1g-dev \
+        git \
+        gcc-9 \
+        g++-9 \
+        clang-9 \
+        zip \
+        unzip \
+        pkg-config \
+        wget \
+        libcutensor1 \
+        libcutensor-dev \
+        libpng-dev \
+        libvulkan1 \
+        libvulkan-dev \
+        libjpeg-turbo8-dev \
+        libmetis-dev \
+        libtiff-dev \
+        libxxf86vm1 \
+        libatlas-base-dev \
+        libsuitesparse-dev \
+        libxxf86vm-dev \
+        libxi-dev \
+        libxrandr-dev \
+        graphviz \
+        liblz4-1 \
+        liblz4-dev \
+        libopenexr-dev \
+        libssl-dev \
+        libsasl2-dev \
+        bzip2 \
+        libzstd-dev \
+        libpthread-stubs0-dev \
+        libpthread-workqueue-dev \
+        libpthread-workqueue0 \
+        libgmp-dev \
+        libgmp3-dev \
+        libmpfrc++-dev \
+        libsuperlu-dev \
+        libfftw3-dev \
+        libzip-dev \
+        libbz2-dev \
+        libbzrtp-dev \
+    && ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1 \
+    && rm /usr/bin/gcc \
+    && rm /usr/bin/g++ \
+    && ln -s /usr/bin/gcc-9 /usr/bin/gcc \
+    && ln -s /usr/bin/g++-9 /usr/bin/g++ \
+    && ln -s /usr/bin/clang++-9 /usr/bin/clang++ \
+    && ln -s /usr/bin/clang-9 /usr/bin/clang \
+    && apt purge -y \
+        libeigen3-dev \
+        libgoogle-glog-dev \
+        libgflags-dev \
+        cmake \
+    && rm -rf /var/lib/apt/lists/*
+    
+
+RUN cd /opt \
+    && wget https://cmake.org/files/v3.19/cmake-3.19.3.tar.gz \
+    && tar -xzvf cmake-3.19.3.tar.gz \
+    && rm cmake-3.19.3.tar.gz \
+    && cd cmake-3.19.3 \
+    && ./bootstrap \
+    && make install -j`nproc` \
+    && rm -rf /opt/cmake-3.19.3
+    
+RUN cd /opt \
+    && git clone https://github.com/gflags/gflags.git --branch=v2.2.2 \
+    && cd gflags \
+    && git submodule init \
+    && git submodule update \
+    && mkdir build \
+    && cd build \
+    && cmake \
+        -DCMAKE_CXX_STANDARD=17 \
+        -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd" \
+        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd" \
+        -DCMAKE_BUILD_TYPE=RELEASE \
+        -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/gflags \
+        -DBUILD_SHARED_LIBS=ON \
+        -DBUILD_STATIC_LIBS=OFF \
+        -DBUILD_TESTING=OFF \
+        -DBUILD_gflags_LIB=ON \
+        -DBUILD_gflags_nothreads_LIB=OFF \
+        .. \
+    && make -j`nproc` \
+    && make install \
+    && rm -rf /opt/gflags
+
+RUN cd /opt \
+    && git clone https://github.com/google/glog.git --branch=v0.4.0 \
+    && cd glog \
+    && git submodule init \
+    && git submodule update \
+    && sed -i -e 's/2.2.0/2.2.0 PATHS \/var\/3DReconstructionEnv\/gflags\/lib\/cmake\/gflags NO_DEFAULT_PATH/' CMakeLists.txt \
+    && mkdir build \
+    && cd build \
+    && cmake \
+        -DCMAKE_CXX_STANDARD=17 \
+        -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd" \
+        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd" \
+        -DCMAKE_BUILD_TYPE=RELEASE \
+        -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/glog \
+        -DWITH_GFLAGS=ON \
+        -DWITH_THREADS=ON \
+        .. \
+    && make -j`nproc` \
+    && make install \
+    && rm -rf /opt/glog
+    
+RUN cd /opt \
+    && git clone https://github.com/edenhill/librdkafka.git --branch=v1.5.3 \
+    && cd librdkafka \
+    && git submodule init \
+    && git submodule update \
+    && mkdir build \
+    && cd build \
+    && cmake \
+        -DCMAKE_CXX_STANDARD=17 \
+        -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+        -DCMAKE_BUILD_TYPE=RELEASE \
+        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -fPIC -std=gnu++17 -fopenmp -fopenmp-simd" \
+        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd" \
+        -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/librdkafka \
+        -DRDKAFKA_BUILD_EXAMPLES=OFF \
+        -DRDKAFKA_BUILD_TESTS=OFF \
+        .. \
+    && make -j`nproc` \
+    && make install \
+    && rm -r /opt/librdkafka
+
+RUN cd /opt \
+    && mkdir boost_lib \
+    && mkdir -p /var/3DReconstructionEnv/boost \
+    && cd boost_lib \
+    && wget https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.gz \
+    && tar -xzvf boost_1_75_0.tar.gz \
+    && rm boost_1_75_0.tar.gz \
+    && cd boost_1_75_0 \
+    && ./bootstrap.sh --prefix=/var/3DReconstructionEnv/boost \
+    && ./b2 install cxxflags="-fPIC -Ofast -march=native -mtune=native -std=gnu++17 -fopenmp -fopenmp-simd" \
+    && rm -r /opt/boost_lib
+   
+    
+RUN cd /opt \
+    && git clone https://gitlab.com/libeigen/eigen.git --branch=3.3.9 \
+    && cd eigen \
+    && git submodule init \
+    && git submodule update \
+    && sed -i -e 's/-std=c++11/-std=gnu++17/' CMakeLists.txt \
+    && sed -i -e '/CMAKE_CXX_STANDARD/s/11/17/' CMakeLists.txt \
+    && sed -i -e '/CMAKE_CXX_EXTENSIONS/s/OFF/ON/' CMakeLists.txt \
+    && sed -i -e '/EIGEN_CUDA_COMPUTE_ARCH/s/30/86/' CMakeLists.txt \
+    && mkdir build \
+    && cd build \
+    && cmake \
+        -DCMAKE_BUILD_TYPE=RELEASE \
+        -DCMAKE_CXX_STANDARD=17 \
+        -DBOOST_INCLUDEDIR=/var/3DReconstructionEnv/boost/include \
+        -DBOOST_LIBRARYDIR=/var/3DReconstructionEnv/boost/lib \
+        -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd" \
+        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd" \
+        -DEIGEN_CUDA_COMPUTE_ARCH=86 \
+        -DCUDA_NVCC_FLAGS="-gencode arch=compute_86,code=[sm_86,compute_86]" \
+        -DBUILD_TESTING=OFF \
+        -DEIGEN_TEST_CXX11=ON \
+        -DEIGEN_BUILD_BTL=OFF \
+        -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/eigen \
+        .. \
+    && make -j`nproc` \
+    && make install \
+    && rm -rf /opt/eigen
+        
+RUN cd /opt \
+    && git clone https://ceres-solver.googlesource.com/ceres-solver --branch=2.0.0 \
+    && cd ceres-solver \
+    && git submodule init \
+    && git submodule update \
+    && mkdir build \
+    && cd build \
+    && cmake \
+        -DCMAKE_BUILD_TYPE=RELEASE \
+        -DCMAKE_CXX_STANDARD=17 \
+        -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+        -DEigen3_DIR=/var/3DReconstructionEnv/eigen/share/eigen3/cmake \
+        -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/ceres \
+        -DBUILD_SHARED_LIBS=ON \
+        -DBUILD_TESTING=OFF \
+        -DBUILD_EXAMPLES=OFF \
+        -DBUILD_BENCHMARKS=OFF \
+        -Dgflags_DIR=/var/3DReconstructionEnv/gflags/lib/cmake/gflags \
+        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -fPIC -std=gnu++17 -fopenmp -fopenmp-simd" \
+        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd" \
+        -Dglog_DIR=/var/3DReconstructionEnv/glog \
+        .. \
+    && make -j`nproc` \
+    && make install \
+    && rm -rf /opt/ceres-solver
+     
+RUN cd /opt \
+    && mkdir opencv_lib \
+    && cd opencv_lib \
+    && git clone https://github.com/opencv/opencv.git --branch=4.5.1 \
+    && git clone https://github.com/opencv/opencv_contrib.git --branch=4.5.1 \
+    && cd opencv \
+    && mkdir build \
+    && cd build \
+    && cmake \
+        -DBUILD_EXAMPLES=OFF \
+        -DBUILD_PERF_TESTS=OFF \
+        -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_CXX_STANDARD=17 \
+        -DENABLE_CXX11=ON \
+        -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -fPIC" \
+        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC" \
+        -DBUILD_TESTS=OFF \
+        -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs \
+        -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/opencv \
+        -DCMAKE_BUILD_TYPE=RELEASE \
+        -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
+        -DWITH_CUDA=ON \
+        -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda \
+        -DENABLE_FAST_MATH=ON \
+        -DCUDA_FAST_MATH=ON \
+        -DWITH_CUBLAS=ON \
+        -DWITH_CUFFT=ON \
+        -DWITH_EIGEN=ON \
+        -DWITH_VULKAN=ON \
+        -DBUILD_opencv_python3=OFF \
+        -DBUILD_opencv_python_tests=OFF \
+        -DBUILD_opencv_python_bindings_generator=OFF \
+        -DBUILD_opencv_optflow=OFF \
+        -DBUILD_opencv_aruco=OFF \
+        -DBUILD_opencv_dnn=OFF \
+        -DBUILD_opencv_apps=OFF \
+        -DWITH_OPENMP=ON \
+        -DWITH_IPP=ON \
+        -DWITH_OPENEXR=ON \
+        -DWITH_OPENGL=OFF \
+        -DWITH_QT=OFF \
+        -DWITH_TBB=ON \
+        -DWITH_V4L=ON \
+        -DWITH_QUIRC=OFF \
+        -DBUILD_opencv_ml=OFF \
+        -DBUILD_opencv_bioinspired=OFF \
+        -DBUILD_opencv_rapid=OFF \
+        -DBUILD_IPP_IW=ON \
+        -DOPENCV_ENABLE_NONFREE=ON \
+        -DCUDA_ARCH_BIN=8.6 \
+        -DCUDA_ARCH_PTX=8.6 \
+        -DENABLE_PRECOMPILED_HEADERS=OFF \
+        -DEigen3_DIR=/var/3DReconstructionEnv/eigen/share/eigen3/cmake \
+        -DGLOG_DIR=/var/3DReconstructionEnv/glog \
+        -DGLOG_INCLUDE_DIR=/var/3DReconstructionEnv/glog/include \
+        -DGLOG_LIBRARY=/var/3DReconstructionEnv/glog/lib/libglog.so \
+        -DGlog_LIBS=/var/3DReconstructionEnv/glog/lib/libglog.so \
+        -Dgflags_DIR=/var/3DReconstructionEnv/gflags/lib/cmake/gflags \
+        -DCeres_DIR=/var/3DReconstructionEnv/ceres/lib/cmake/Ceres \
+        .. \
+    && make -j`nproc` \
+    && make install \
+    && rm -rf /opt/opencv_lib
+    
+RUN cd /opt \
+    && git clone https://github.com/openMVG/openMVG.git --branch=v1.6 \
+    && cd openMVG \
+    && git submodule init \
+    && git submodule update \
+    && mkdir build \
+    && cd build \
+    && cmake \
+        -DCMAKE_BUILD_TYPE=RELEASE \
+        -DCMAKE_CXX_FLAGS="-Ofast -fopenmp -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp-simd" \
+        -DCMAKE_C_FLAGS="-Ofast -fopenmp -march=native -mtune=native -fPIC -fopenmp-simd" \
+        -DOpenMVG_BUILD_DOC=OFF \
+        -DOpenMVG_BUILD_EXAMPLES=OFF \
+        -DOpenMVG_BUILD_GUI_SOFTWARES=OFF \
+        -DOpenMVG_BUILD_SOFTWARES=OFF \
+        -DOpenMVG_BUILD_SHARED=ON \
+        -DEigen3_DIR=/var/3DReconstructionEnv/eigen/share/eigen3/cmake \
+        -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/openMVG \
+        -DEIGEN_INCLUDE_DIR_HINTS=/var/3DReconstructionEnv/eigen/include \
+        ../src/ \
+    && make -j`nproc` \
+    && make install \
+    && rm -rf /opt/openMVG
+    
+RUN cd /opt \
+    && git clone https://github.com/CGAL/cgal.git --branch=v5.2 \
+    && cd cgal \
+    && git submodule init \
+    && git submodule update \
+    && mkdir build \
+    && cd build \
+    && cmake \
+        -DBoost_INCLUDE_DIR=/var/3DReconstructionEnv/boost/include/ \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCGAL_HEADER_ONLY=OFF \
+        -DCMAKE_CXX_STANDARD=17 \
+        -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd" \
+        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd" \
+        -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/CGAL \
+        -DEigen3_DIR=/var/3DReconstructionEnv/eigen/share/eigen3/cmake \
+        .. \
+    && make -j`nproc` \
+    && make install \
+    && rm -rf /opt/cgal
+    
+RUN cd /var/3DReconstructionEnv \
+    && git clone https://github.com/cdcseacave/VCG.git --branch=v1.0.1 vcglib
+    
+RUN cd /opt \
+    && git clone https://github.com/cdcseacave/openMVS.git --branch=v1.1.1 \
+    && cd openMVS \
+    && sed -i -e '/FIND_PACKAGE(OpenCV/s/)/\ PATHS \/var\/3DReconstructionEnv\/opencv NO_DEFAULT_PATH)/' CMakeLists.txt \
+    && sed -i -e '/FIND_PACKAGE(Eige/s/n/n3/' CMakeLists.txt \
+    && sed -i -e '/FIND_PACKAGE(Eigen3/s/)/\ PATHS \/var\/3DReconstructionEnv\/eigen NO_DEFAULT_PATH)/' CMakeLists.txt \
+    && sed -i -e 's/EIGEN_FOUND/EIGEN3_FOUND/' CMakeLists.txt \
+    && sed -i -e 's/EIGEN_INCLUDE_DIRS/EIGEN3_INCLUDE_DIRS/' CMakeLists.txt \
+    && mkdir build_mvs \
+    && cd build_mvs \
+    && cmake \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBOOST_INCLUDEDIR=/var/3DReconstructionEnv/boost/include \
+        -DBOOST_LIBRARYDIR=/var/3DReconstructionEnv/boost/lib \
+        -DVCG_ROOT=/var/3DReconstructionEnv/vcglib \
+        -DOpenMVS_USE_BREAKPAD=OFF \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DCMAKE_CXX_STANDARD=17 \
+        -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd" \
+        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd" \
+        -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/openMVS \
+        -DCGAL_ROOT=/var/3DReconstructionEnv/CGAL/lib/cmake/CGAL \
+        .. \
+    && make -j`nproc` \
+    && make install \
+    && rm -rf /opt/openMVS
+    
+    
+WORKDIR /opt
