@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.1-devel-ubuntu20.04
+FROM nvidia/cuda:11.2.0-devel-ubuntu20.04
 
 ENV TZ=Europe/Minsk
 ENV NVIDIA_DRIVER_CAPABILITIES=all
@@ -73,13 +73,13 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
     
 
 RUN cd /opt \
-    && wget https://cmake.org/files/v3.19/cmake-3.19.3.tar.gz \
-    && tar -xzvf cmake-3.19.3.tar.gz \
-    && rm cmake-3.19.3.tar.gz \
-    && cd cmake-3.19.3 \
+    && wget https://cmake.org/files/v3.19/cmake-3.19.4.tar.gz \
+    && tar -xzvf cmake-3.19.4.tar.gz \
+    && rm cmake-3.19.4.tar.gz \
+    && cd cmake-3.19.4 \
     && ./bootstrap \
     && make install -j`nproc` \
-    && rm -rf /opt/cmake-3.19.3
+    && rm -rf /opt/cmake-3.19.4
     
 RUN cd /opt \
     && git clone https://github.com/gflags/gflags.git --branch=v2.2.2 \
@@ -351,10 +351,12 @@ RUN cd /opt \
         -DBUILD_SHARED_LIBS=OFF \
         -DCMAKE_CXX_STANDARD=17 \
         -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+        -DOpenMVS_USE_CUDA=ON \
         -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd" \
         -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd" \
         -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/openMVS \
         -DCGAL_ROOT=/var/3DReconstructionEnv/CGAL/lib/cmake/CGAL \
+        -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs \
         .. \
     && make -j`nproc` \
     && make install \
