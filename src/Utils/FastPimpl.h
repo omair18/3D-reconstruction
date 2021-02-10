@@ -1,7 +1,7 @@
 /**
  * @file FastPimpl.h.
  *
- * Declares the stacktrace dumper class
+ * Declares the fast "Pointer to IMPLementation" class
  */
 
 #ifndef FAST_PIMPL_H
@@ -18,22 +18,47 @@
 namespace Utils
 {
 
+/**
+ * @class FastPimpl
+ *
+ * @brief
+ *
+ * @tparam T Type of implementation
+ * @tparam Size Size of type T in bytes
+ * @tparam Alignment Alignment of type T in bytes
+ */
 template<class T, std::size_t Size, std::size_t Alignment>
 class FastPimpl
 {
 public:
+
+    /**
+     *
+     * @tparam Args
+     * @param args
+     */
     template<class...Args>
     explicit FastPimpl(Args &&...args)
     {
         new (Ptr()) T(std::forward<Args>(args)...);
     }
 
+    /**
+     *
+     * @param fastPimpl
+     * @return
+     */
     FastPimpl &operator=(FastPimpl &&fastPimpl) noexcept
     {
         *Ptr() = std::move(*fastPimpl);
         return *this;
     }
 
+    /**
+     *
+     * @param fastPimpl
+     * @return
+     */
     FastPimpl &operator=(const FastPimpl &fastPimpl)
     {
         Ptr()->~T();
@@ -41,32 +66,55 @@ public:
         return *this;
     }
 
+    /**
+     *
+     * @return
+     */
     T* operator->() noexcept
     {
         return Ptr();
     }
 
+    /**
+     *
+     * @return
+     */
     const T* operator->() const noexcept
     {
         return Ptr();
     }
 
+    /**
+     *
+     * @return
+     */
     T& operator*() noexcept
     {
         return *Ptr();
     }
 
+    /**
+     *
+     * @return
+     */
     const T& operator*() const noexcept
     {
         return *Ptr();
     }
 
+    /**
+     *
+     */
     ~FastPimpl() noexcept
     {
         validate<sizeof(T), alignof(T)>();
         Ptr()->~T();
     }
 
+    /**
+     *
+     * @return
+     */
     T* Ptr()
     {
         return reinterpret_cast<T*>(&m_data);
@@ -74,8 +122,14 @@ public:
 
 private:
 
+    ///
     std::aligned_storage<Size, Alignment> m_data;
 
+    /**
+     *
+     * @tparam ActualSize
+     * @tparam ActualAlignment
+     */
     template<std::size_t ActualSize, std::size_t ActualAlignment>
     static void validate() noexcept
     {

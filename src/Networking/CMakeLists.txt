@@ -1,10 +1,12 @@
 set(NETWORKING_LIB_HEADERS
     HttpServer.h
-        )
+    KafkaConsumer.h
+    KafkaProducer.h)
 
 set(NETWORKING_LIB_CPPS
     HttpServer.cpp
-        )
+    KafkaConsumer.cpp
+    KafkaProducer.cpp)
 
 source_group("Header Files" FILES ${NETWORKING_LIB_HEADERS})
 source_group("Source Files" FILES ${NETWORKING_LIB_CPPS})

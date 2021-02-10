@@ -66,8 +66,10 @@ Log::Logger::RecordStream Log::Logger::CreateRecordSteam() const
 
 bool Log::Logger::InitSink()
 {
-    typedef boost::log::sinks::synchronous_sink< boost::log::sinks::text_file_backend > fileSink_t;
-    auto pSink = boost::make_shared<fileSink_t>();
+    typedef boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend> fileSink_t;
+    auto pSink = boost::make_shared<fileSink_t>(
+            //boost::log::keywords::
+            );
 
     {
         auto backend = pSink->locked_backend();

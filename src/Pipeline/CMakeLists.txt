@@ -1,10 +1,8 @@
 set(PIPELINE_LIB_HEADERS
-    ModelDataset.h
-        )
+    ModelDataset.h)
 
 set(PIPELINE_LIB_CPPS
-    ModelDataset.cpp
-        )
+    ModelDataset.cpp)
 
 source_group("Header Files" FILES ${PIPELINE_LIB_HEADERS})
 source_group("Source Files" FILES ${PIPELINE_LIB_CPPS})

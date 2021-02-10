@@ -1,10 +1,8 @@
 set(LOG_LIB_HEADERS
-        Logger.h
-        )
+        Logger.h)
 
 set(LOG_LIB_CPPS
-        Logger.cpp
-        )
+        Logger.cpp)
 
 source_group("Header Files" FILES ${LOG_LIB_HEADERS})
 source_group("Source Files" FILES ${LOG_LIB_CPPS})

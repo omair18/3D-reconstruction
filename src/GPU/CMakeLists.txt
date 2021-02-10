@@ -1,10 +1,8 @@
 set(GPU_LIB_HEADERS
-    GpuManager.h
-        )
+    GpuManager.h)
 
 set(GPU_LIB_CPPS
-    GpuManager.cu
-        )
+    GpuManager.cu)
 
 source_group("Header Files" FILES ${CONFIG_LIB_HEADERS})
 source_group("Source Files" FILES ${CONFIG_LIB_CPPS})
