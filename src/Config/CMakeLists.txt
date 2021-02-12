@@ -1,5 +1,4 @@
 set(CONFIG_LIB_HEADERS
-        IConfig.h
         JsonConfig.h)
 
 set(CONFIG_LIB_CPPS

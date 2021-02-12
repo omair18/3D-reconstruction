@@ -59,8 +59,8 @@ JsonConfig::JsonConfig(const std::filesystem::path& path)
 
 }
 
-JsonConfig::JsonConfig(const boost::json::value& node) :
-value_(std::make_shared<boost::json::value>(node))
+JsonConfig::JsonConfig(const boost::json::value& object) :
+value_(std::make_shared<boost::json::value>(object))
 {
 
 }
@@ -153,18 +153,17 @@ void JsonConfig::AddNodeVecVecVecInt(const std::string &key, const std::vector<s
     value_->as_object()[key] = array;
 }
 
-void JsonConfig::AddObject(const std::shared_ptr<IConfig> &node)
+void JsonConfig::AddObject(const std::shared_ptr<JsonConfig> &object)
 {
     if (value_->is_array())
     {
-        auto json = boost::json::parse(node->Dump());
+        auto json = boost::json::parse(object->Dump());
         value_->as_array().push_back(json);
     }
     else
     {
-        LOG_ERROR() << "Node is not array" << node->Dump();
+        LOG_ERROR() << "Node is not array" << object->Dump();
     }
-
 }
 
 std::string JsonConfig::Dump()
@@ -185,9 +184,8 @@ void JsonConfig::FromJsonString(const std::string &jsonString)
 
 }
 
-void JsonConfig::FromVectorConfigs(const std::vector<std::shared_ptr<IConfig>> &configs)
+void JsonConfig::FromVectorConfigs(const std::vector<std::shared_ptr<JsonConfig>> &configs)
 {
-    value_ = std::make_shared<boost::json::value>();
     value_->emplace_array();
 
     for (const auto & config : configs)
@@ -205,9 +203,9 @@ void JsonConfig::FromVectorConfigs(const std::vector<std::shared_ptr<IConfig>> &
 
 }
 
-std::vector<std::shared_ptr<IConfig>> JsonConfig::GetObjects()
+std::vector<std::shared_ptr<JsonConfig>> JsonConfig::GetObjects()
 {
-    std::vector<std::shared_ptr<IConfig>> result;
+    std::vector<std::shared_ptr<JsonConfig>> result;
 
     if(value_->is_object())
     {
@@ -240,21 +238,26 @@ bool JsonConfig::IsNull() const
     return value_->is_null();
 }
 
+bool JsonConfig::Contains(const std::string &key)
+{
+    return value_->as_object().contains(key);
+}
+
 void JsonConfig::Save(std::ofstream &stream)
 {
     stream << Dump();
 }
 
-void JsonConfig::SetNode(const std::string &id, std::shared_ptr<IConfig> node)
+void JsonConfig::SetNode(const std::string &key, const std::shared_ptr<JsonConfig>& object)
 {
     try
     {
-        auto json = boost::json::parse(node->Dump());
-        value_->as_object()[id] = json;
+        auto json = boost::json::parse(object->Dump());
+        value_->as_object()[key] = json;
     }
     catch (std::exception& ex)
     {
-        LOG_ERROR() << "Failed to set node " << node->Dump() << " to " << id;
+        LOG_ERROR() << "Failed to set node " << object->Dump() << " to " << key;
     }
 }
 
@@ -268,7 +271,7 @@ bool JsonConfig::ToBool()
     }
     catch (std::exception& e)
     {
-        LOG_ERROR() << "Failed to convert value " << value_ << " to bool: " << e.what();
+        LOG_ERROR() << "Failed to convert value " << (*value_) << " to bool: " << e.what();
         return result;
     }
 }
@@ -278,12 +281,12 @@ double JsonConfig::ToDouble()
     double result = 0;
     try
     {
-        result = value_->as_double();
+        result = value_->to_number<double>();
         return result;
     }
     catch (std::exception& e)
     {
-        LOG_ERROR() << "Failed to convert value " << value_ << " to double: " << e.what();
+        LOG_ERROR() << "Failed to convert value " << (*value_) << " to double: " << e.what();
         return result;
     }
 }
@@ -298,7 +301,7 @@ float JsonConfig::ToFloat()
     }
     catch (std::exception& e)
     {
-        LOG_ERROR() << "Failed to convert value " << value_ << " to float: " << e.what();
+        LOG_ERROR() << "Failed to convert value " << (*value_) << " to float: " << e.what();
         return result;
     }
 }
@@ -313,7 +316,7 @@ std::int32_t JsonConfig::ToInt()
     }
     catch (std::exception& e)
     {
-        LOG_ERROR() << "Failed to convert value " << value_ << " to int32_t: " << e.what();
+        LOG_ERROR() << "Failed to convert value " << (*value_) << " to int32_t: " << e.what();
         return result;
     }
 }
@@ -328,7 +331,7 @@ std::string JsonConfig::ToString()
     }
     catch (std::exception& e)
     {
-        LOG_ERROR() << "Failed to convert value " << value_ << " to string: " << e.what();
+        LOG_ERROR() << "Failed to convert value " << (*value_) << " to string: " << e.what();
         return result;
     }
 }
@@ -342,13 +345,13 @@ std::vector<float> JsonConfig::ToVectorFloat()
         result.reserve(array.size());
         for(auto& number : array)
         {
-            result.push_back(number.as_double());
+            result.push_back(number.to_number<float>());
         }
         return result;
     }
     catch (std::exception& e)
     {
-        LOG_ERROR() << "Failed to convert value " << value_ << " to vector<float>: " << e.what();
+        LOG_ERROR() << "Failed to convert value " << (*value_) << " to vector<float>: " << e.what();
         return result;
     }
 }
@@ -362,13 +365,13 @@ std::vector<int> JsonConfig::ToVectorInt()
         result.reserve(array.size());
         for(auto& number : array)
         {
-            result.push_back(number.as_double());
+            result.push_back(number.to_number<int>());
         }
         return result;
     }
     catch (std::exception& e)
     {
-        LOG_ERROR() << "Failed to convert value " << value_ << " to int32_t: " << e.what();
+        LOG_ERROR() << "Failed to convert value " << (*value_) << " to vector<int>: " << e.what();
         return result;
     }
 }
@@ -388,7 +391,7 @@ std::vector<std::string> JsonConfig::ToVectorString()
     }
     catch (std::exception& e)
     {
-        LOG_ERROR() << "Failed to convert value " << value_ << " to vector<string>: " << e.what();
+        LOG_ERROR() << "Failed to convert value " << (*value_) << " to vector<string>: " << e.what();
         return result;
     }
 }
@@ -414,7 +417,7 @@ std::vector<std::vector<double>> JsonConfig::ToVectorVectorDouble()
     }
     catch (std::exception& ex)
     {
-        LOG_ERROR() << "Failed to convert value " << value_ << " to vector<vector<double>>: " << ex.what();
+        LOG_ERROR() << "Failed to convert value " << (*value_) << " to vector<vector<double>>: " << ex.what();
     }
     return result;
 
@@ -441,7 +444,7 @@ std::vector<std::vector<int>> JsonConfig::ToVectorVectorInt()
     }
     catch (std::exception& ex)
     {
-        LOG_ERROR() << "Failed to convert value " << value_ << " to vector<vector<int>>: " << ex.what();
+        LOG_ERROR() << "Failed to convert value " << (*value_) << " to vector<vector<int>>: " << ex.what();
     }
     return result;
 }
@@ -474,7 +477,7 @@ std::vector<std::vector<std::vector<int>>> JsonConfig::ToVectorVectorVectorInt()
     }
     catch (std::exception& ex)
     {
-        LOG_ERROR() << "Failed to convert value " << value_ << " to vector<vector<vector<int>>>: " << ex.what();
+        LOG_ERROR() << "Failed to convert value " << (*value_) << " to vector<vector<vector<int>>>: " << ex.what();
     }
     return result;
 }
@@ -490,34 +493,33 @@ std::wstring JsonConfig::ToWString()
     }
     catch (std::exception& e)
     {
-        LOG_ERROR() << "Failed to convert value " << value_ << " to int32_t: " << e.what();
+        LOG_ERROR() << "Failed to convert value " << (*value_) << " to int32_t: " << e.what();
         return result;
     }
 }
 
-std::shared_ptr<IConfig> JsonConfig::operator[](const std::string &id)
+std::shared_ptr<JsonConfig> JsonConfig::operator[](const std::string &key)
 {
     try
     {
-        return std::make_shared<JsonConfig>(value_->at(id));
+        return std::make_shared<JsonConfig>(value_->at(key));
     }
     catch (std::exception& ex)
     {
-        LOG_ERROR() << "operator [] has got a wrong argument: " << id;
+        LOG_ERROR() << "operator [] has got a wrong argument: " << key;
         return nullptr;
     }
-
 }
 
-std::shared_ptr<IConfig> JsonConfig::operator[](const std::string &id) const
+std::shared_ptr<JsonConfig> JsonConfig::operator[](const std::string &key) const
 {
     try
     {
-        return std::make_shared<JsonConfig>(value_->at(id));
+        return std::make_shared<JsonConfig>(value_->at(key));
     }
     catch (std::exception& ex)
     {
-        LOG_ERROR() << "operator [] has got a wrong argument: " << id;
+        LOG_ERROR() << "operator [] has got a wrong argument: " << key;
         return nullptr;
     }
 }

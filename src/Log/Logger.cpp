@@ -38,7 +38,7 @@ bool Log::Logger::Init()
     }
     else
     {
-
+        std::clog << "Failed to initialize logger." << std::endl;
     }
     return initialized;
 }

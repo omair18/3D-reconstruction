@@ -21,7 +21,8 @@ namespace Utils
 /**
  * @class FastPimpl
  *
- * @brief
+ * @brief A template class for Fast PIMPL. It is used to avoid dynamic memory allocation and make the object of
+ * class T cache-friendly.
  *
  * @tparam T Type of implementation
  * @tparam Size Size of type T in bytes
@@ -33,9 +34,10 @@ class FastPimpl
 public:
 
     /**
+     * @brief This constructor uses placement-new to create T-class object at data_.
      *
-     * @tparam Args
-     * @param args
+     * @tparam Args - variadic template param of arguments of T-class constructor.
+     * @param args - Arguments of T-class constructor.
      */
     template<class...Args>
     explicit FastPimpl(Args &&...args)
@@ -44,20 +46,22 @@ public:
     }
 
     /**
+     * @brief Operator = for R-value param. Moves data from other object to current.
      *
-     * @param fastPimpl
-     * @return
+     * @param fastPimpl - R-value reference for other FastPimpl object.
+     * @return L-value reference to current FastPimpl object.
      */
-    FastPimpl &operator=(FastPimpl &&fastPimpl) noexcept
+    FastPimpl &operator=(FastPimpl&& fastPimpl) noexcept
     {
         *Ptr() = std::move(*fastPimpl);
         return *this;
     }
 
     /**
+     * @brief Operator = for L-value param. Destroys current data and creates a copy of other object's data.
      *
-     * @param fastPimpl
-     * @return
+     * @param fastPimpl - L-value reference for other FastPimpl object.
+     * @return L-value reference to current FastPimpl object.
      */
     FastPimpl &operator=(const FastPimpl &fastPimpl)
     {
@@ -67,8 +71,9 @@ public:
     }
 
     /**
+     * @brief Provides access to data_ as T-class pointer.
      *
-     * @return
+     * @return Pointer to T-class object at data_.
      */
     T* operator->() noexcept
     {
@@ -76,8 +81,9 @@ public:
     }
 
     /**
+     * @brief Provides access to data_ as T-class constant pointer.
      *
-     * @return
+     * @return Constant pointer to T-class object at data_.
      */
     const T* operator->() const noexcept
     {
@@ -85,8 +91,9 @@ public:
     }
 
     /**
+     * @brief Provides access to data_ as T-class object.
      *
-     * @return
+     * @return L-value reference to object from data_.
      */
     T& operator*() noexcept
     {
@@ -94,8 +101,9 @@ public:
     }
 
     /**
+     * @brief Provides access to data_ as T-class constant object.
      *
-     * @return
+     * @return Constant L-value reference to object from data_.
      */
     const T& operator*() const noexcept
     {
@@ -103,7 +111,7 @@ public:
     }
 
     /**
-     *
+     * @brief Destroys T-class object at data_.
      */
     ~FastPimpl() noexcept
     {
@@ -112,23 +120,27 @@ public:
     }
 
     /**
+     * @brief Provides access to data_ as T-class pointer.
      *
-     * @return
+     * @return Pointer to T-class object at data_.
      */
     T* Ptr()
     {
-        return reinterpret_cast<T*>(&m_data);
+        return reinterpret_cast<T*>(&data_);
     }
 
 private:
 
-    ///
-    std::aligned_storage<Size, Alignment> m_data;
+    /// Aligned memory segment for placing data.
+    std::aligned_storage<Size, Alignment> data_;
 
     /**
+     * @brief Compares Size and Alignment template params with real size and alignment of T-class at compile time.
+     * If there is a value mismatch, there will be a compilation error. Error information will contain correct values
+     * of size and alignment.
      *
-     * @tparam ActualSize
-     * @tparam ActualAlignment
+     * @tparam ActualSize - Real size of T-class object.
+     * @tparam ActualAlignment - Real alignment of T-class object.
      */
     template<std::size_t ActualSize, std::size_t ActualAlignment>
     static void validate() noexcept
