@@ -1,13 +1,13 @@
 #include <opencv2/core/cuda.hpp>
 
-#include "NvidiaImageDecoder.h"
+#include "NvJPEGDecoder.h"
 #include "Logger.h"
 
 #define CHECK_NVJPEG(status)                                                    \
     {                                                                           \
         if (status != NVJPEG_STATUS_SUCCESS)                                    \
         {                                                                       \
-             LOG_ERROR("NVJPEG error %d", (int)(status));                       \
+             LOG_ERROR() << "NVJPEG error " << (int)(status);                   \
              return;                                                            \
         }                                                                       \
     }
@@ -16,12 +16,12 @@
     {                                                                           \
         if (status != cudaSuccess)                                              \
         {                                                                       \
-            LOG_ERROR("CUDA Runtime error %d", (int)(status));                  \
+            LOG_ERROR() << "CUDA Runtime error " << (int)(status);              \
             return;                                                             \
         }                                                                       \
     }
 
-NvidiaImageDecoder::NvidiaImageDecoder() :
+NvJPEGDecoder::NvJPEGDecoder() :
 m_initialized(false)
 {
     m_bufferSize = 0;
@@ -29,7 +29,7 @@ m_initialized(false)
     InitDecoder();
 }
 
-NvidiaImageDecoder::~NvidiaImageDecoder()
+NvJPEGDecoder::~NvJPEGDecoder()
 {
     nvjpegDecodeParamsDestroy(m_decodeParams);
     nvjpegJpegStreamDestroy(m_jpegStream);
@@ -51,24 +51,24 @@ NvidiaImageDecoder::~NvidiaImageDecoder()
     }
 }
 
-void NvidiaImageDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::Mat &decodedData)
+void NvJPEGDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::Mat &decodedData)
 {
     cv::cuda::GpuMat decodedImage;
     DecodeInternal(data, size, decodedImage);
     decodedImage.download(decodedData);
 }
 
-void NvidiaImageDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::cuda::GpuMat &decodedData)
+void NvJPEGDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::cuda::GpuMat &decodedData)
 {
     cv::cuda::GpuMat decodedImage;
     DecodeInternal(data, size, decodedImage);
     decodedData = decodedImage.clone();
 }
 
-void NvidiaImageDecoder::InitDecoder()
+void NvJPEGDecoder::InitDecoder()
 {
     cudaStreamCreateWithFlags(&m_cudaStream, cudaStreamNonBlocking);
-#if CUDART_VERSION >= 11000
+
     nvjpegStatus_t status = nvjpegCreateEx(nvjpegBackend_t::NVJPEG_BACKEND_HARDWARE, nullptr,
                                            nullptr, NVJPEG_FLAGS_DEFAULT, &m_handle);
     m_hardwareBackendAvailable = true;
@@ -77,21 +77,17 @@ void NvidiaImageDecoder::InitDecoder()
         m_hardwareBackendAvailable = false;
         status = nvjpegCreateEx(nvjpegBackend_t::NVJPEG_BACKEND_HYBRID, nullptr,
                                 nullptr, NVJPEG_FLAGS_DEFAULT, &m_handle);
-        LOG_WARNING("Failed to created nvidia decoder with hardware backend. Creating with default backend");
+        LOG_WARNING() << "Failed to created nvidia decoder with hardware backend. Creating with default backend";
     }
-#else
-    nvjpegStatus_t status = nvjpegCreateEx(nvjpegBackend_t::NVJPEG_BACKEND_HYBRID, nullptr,
-                   nullptr, NVJPEG_FLAGS_DEFAULT, &m_handle);
-#endif
     if (status != nvjpegStatus_t::NVJPEG_STATUS_SUCCESS)
     {
-        LOG_ERROR("Failed to create nvidia decoder.");
+        LOG_ERROR() << "Failed to create nvidia decoder.";
     }
     else
     {
         CHECK_NVJPEG(nvjpegJpegStateCreate(m_handle, &m_state));
     }
-#if CUDART_VERSION >= 11000
+
     if(m_hardwareBackendAvailable)
     {
         CHECK_NVJPEG(nvjpegDecoderCreate(m_handle, nvjpegBackend_t::NVJPEG_BACKEND_HARDWARE, &m_decoder));
@@ -100,9 +96,6 @@ void NvidiaImageDecoder::InitDecoder()
     {
         CHECK_NVJPEG(nvjpegDecoderCreate(m_handle, nvjpegBackend_t::NVJPEG_BACKEND_HYBRID, &m_decoder));
     }
-#else
-    CHECK_NVJPEG(nvjpegDecoderCreate(m_handle, nvjpegBackend_t::NVJPEG_BACKEND_HYBRID, &m_decoder));
-#endif
     CHECK_NVJPEG(nvjpegDecoderStateCreate(m_handle, m_decoder, &m_decoupledState));
     CHECK_NVJPEG(nvjpegBufferPinnedCreate(m_handle, nullptr, &m_pinnedBuffer));
     CHECK_NVJPEG(nvjpegBufferDeviceCreate(m_handle, nullptr, &m_deviceBuffer));
@@ -115,7 +108,7 @@ void NvidiaImageDecoder::InitDecoder()
     m_initialized = true;
 }
 
-void NvidiaImageDecoder::AllocateBuffer(int width, int height, int channels)
+void NvJPEGDecoder::AllocateBuffer(int width, int height, int channels)
 {
     size_t imageSize = width * height * channels;
     if(imageSize > m_bufferSize)
@@ -130,7 +123,7 @@ void NvidiaImageDecoder::AllocateBuffer(int width, int height, int channels)
     }
 }
 
-void NvidiaImageDecoder::DecodeInternal(const unsigned char *data, unsigned long long int size, cv::cuda::GpuMat &outputImage)
+void NvJPEGDecoder::DecodeInternal(const unsigned char *data, unsigned long long int size, cv::cuda::GpuMat &outputImage)
 {
     unsigned int channels;
     unsigned int width;
@@ -155,7 +148,7 @@ void NvidiaImageDecoder::DecodeInternal(const unsigned char *data, unsigned long
     outputImage = cv::cuda::GpuMat(height, width, CV_8UC3, m_imageBuffer.channel[0]);
 }
 
-bool NvidiaImageDecoder::IsInitialized()
+bool NvJPEGDecoder::IsInitialized()
 {
     return m_initialized;
 }

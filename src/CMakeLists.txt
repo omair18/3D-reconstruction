@@ -1,6 +1,7 @@
 add_subdirectory(Service)
 add_subdirectory(Config)
 #add_subdirectory(GPU)
+add_subdirectory(Decoding)
 add_subdirectory(Log)
 #add_subdirectory(Networking)
 #add_subdirectory(Pipeline)

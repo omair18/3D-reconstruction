@@ -12,6 +12,5 @@ add_executable(Service ${3D_RECONSTRUCTION_EXE_HEADERS} ${3D_RECONSTRUCTION_EXE_
 
 target_link_libraries(Service
     utils
-    log
-    )
+    log)
 

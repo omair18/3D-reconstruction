@@ -7,8 +7,26 @@
 #ifndef JSON_CONFIG_H
 #define JSON_CONFIG_H
 
-#include <bits/fs_fwd.h>
+#include <vector>
 
+// forward declaration for std::filesystem::path
+namespace std
+{
+    _GLIBCXX_BEGIN_NAMESPACE_VERSION
+
+    namespace filesystem
+    {
+#if _GLIBCXX_USE_CXX11_ABI
+        inline namespace __cxx11 __attribute__((__abi_tag__ ("cxx11"))) { }
+#endif
+        _GLIBCXX_BEGIN_NAMESPACE_CXX11
+            class path;
+        _GLIBCXX_END_NAMESPACE_CXX11
+    }
+    _GLIBCXX_END_NAMESPACE_VERSION
+}
+
+// forward declaration for boost::json::value
 namespace boost
 {
     namespace json
@@ -88,7 +106,7 @@ public:
      * @param key - Key value.
      * @param val - Value of float to add.
      */
-    void AddNodeFloat(const std::string &key, float val);
+    void AddNodeFloat(const std::string& key, float val);
 
     /**
      * @brief Adds int value-param with key key-param. If current JsonConfig is no an object,
@@ -97,7 +115,7 @@ public:
      * @param key - Key value.
      * @param val - Value of integer to add.
      */
-    void AddNodeInt(const std::string &key, int val);
+    void AddNodeInt(const std::string& key, int val);
 
     /**
      * @brief Adds string value-param with key key-param. If current JsonConfig is no an object,
@@ -106,7 +124,7 @@ public:
      * @param key - Key value.
      * @param value - Value of string to add.
      */
-    void AddNodeString(const std::string &key, const std::string &value);
+    void AddNodeString(const std::string& key, const std::string &value);
 
     /**
      * @brief Adds vector&lt;float&gt; value-param with key key-param. If current JsonConfig is no an object,
@@ -115,7 +133,7 @@ public:
      * @param key - Key value.
      * @param val - Array of float values to add.
      */
-    void AddNodeVecFloat(const std::string &key, const std::vector<float> &val);
+    void AddNodeVecFloat(const std::string& key, const std::vector<float>& val);
 
     /**
      * @brief Adds vector&lt;int&gt; value-param with key key-param. If current JsonConfig is no an object,
@@ -124,7 +142,7 @@ public:
      * @param key - Key value.
      * @param val - Array of integral values to add.
      */
-    void AddNodeVecInt(const std::string &key, const std::vector<int> &val);
+    void AddNodeVecInt(const std::string& key, const std::vector<int>& val);
 
     /**
      * @brief Adds vector&lt;vector&lt;int&gt;&gt; value-param with key key-param.
@@ -133,7 +151,7 @@ public:
      * @param key - Key value.
      * @param val - 2D-array of integral values to add.
      */
-    void AddNodeVecVecInt(const std::string &key, const std::vector<std::vector<int>> &val);
+    void AddNodeVecVecInt(const std::string& key, const std::vector<std::vector<int>>& val);
 
     /**
      * @brief Adds vector&lt;vector&lt;vector&lt;int&gt&gt;&gt; value-param with key key-param.
@@ -142,7 +160,7 @@ public:
      * @param key - Key value.
      * @param val - 3D-array of integral values to add.
      */
-    void AddNodeVecVecVecInt(const std::string &key, const std::vector<std::vector<std::vector<int>>> &val);
+    void AddNodeVecVecVecInt(const std::string& key, const std::vector<std::vector<std::vector<int>>>& val);
 
     /**
      * @brief Converts object from object-param to JSON value and adds it to array.
@@ -167,7 +185,7 @@ public:
      *
      * @param jsonString - String with JSON value.
      */
-    void FromJsonString(const std::string &jsonString);
+    void FromJsonString(const std::string& jsonString);
 
     /**
      * @brief Initializes current JsonConfig instance with array of JSON values from configs-param.
@@ -177,7 +195,7 @@ public:
      *
      * @param configs - Vector of JSON values.
      */
-    void FromVectorConfigs(const std::vector<std::shared_ptr<JsonConfig>> &configs);
+    void FromVectorConfigs(const std::vector<std::shared_ptr<JsonConfig>>& configs);
 
     /**
      * @brief Converts current JSON object/array to vector of all nodes it has.
@@ -213,7 +231,7 @@ public:
      *
      * @param stream - Output data stream.
      */
-    void Save(std::ofstream &stream);
+    void Save(std::ofstream& stream);
 
     /**
      * @brief Converts value at node-param to JSON value and sets it to current object at node id-param.
@@ -222,7 +240,7 @@ public:
      * @param key - Key for adding a new node.
      * @param object - JSON value for adding to current JSON object with key key-param.
      */
-    void SetNode(const std::string &key, const std::shared_ptr<JsonConfig>& object);
+    void SetNode(const std::string& key, const std::shared_ptr<JsonConfig>& object);
 
     /**
      * @brief Converts value at current node to bool. If the value at current node is not a bool,
@@ -330,7 +348,7 @@ public:
      * @param key - Key of the node to access.
      * @return A pointer to key-param node or nullptr.
      */
-    std::shared_ptr<JsonConfig> operator[] (const std::string & key);
+    std::shared_ptr<JsonConfig> operator[] (const std::string& key);
 
     /**
      * @brief Provides access to node at current JSON value with key key-param as a pointer.
@@ -339,7 +357,7 @@ public:
      * @param key - Key of the node to access.
      * @return A pointer to key-param node or nullptr.
      */
-    std::shared_ptr<JsonConfig> operator[] (const std::string & key) const;
+    std::shared_ptr<JsonConfig> operator[] (const std::string& key) const;
 
 private:
 

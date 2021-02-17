@@ -1,8 +1,10 @@
 set(CONFIG_LIB_HEADERS
-        JsonConfig.h)
+        JsonConfig.h
+        JsonConfigManager.h)
 
 set(CONFIG_LIB_CPPS
-        JsonConfig.cpp)
+        JsonConfig.cpp
+        JsonConfigManager.cpp)
 
 source_group("Header Files" FILES ${CONFIG_LIB_HEADERS})
 source_group("Source Files" FILES ${CONFIG_LIB_CPPS})

@@ -1,12 +1,14 @@
-#pragma once
+#ifndef NVJPEG_DECODER_H
+#define NVJPEG_DECODER_H
+
 #include <nvjpeg.h>
 
 #include "IImageDecoder.h"
 
-class NvidiaImageDecoder final : public IImageDecoder
+class NvJPEGDecoder final : public IImageDecoder
 {
 public:
-    NvidiaImageDecoder();
+    NvJPEGDecoder();
 
     void Decode(const unsigned char* data, unsigned long long size, cv::Mat& decodedData) override;
 
@@ -14,7 +16,7 @@ public:
 
     bool IsInitialized() override;
 
-    ~NvidiaImageDecoder() override;
+    ~NvJPEGDecoder() override;
 
 private:
     void DecodeInternal(const unsigned char* data, unsigned long long size, cv::cuda::GpuMat& outputImage);
@@ -34,8 +36,8 @@ private:
     cudaStream_t m_cudaStream;
     nvjpegImage_t m_imageBuffer;
     size_t m_bufferSize;
-#if CUDART_VERSION >= 11000
     bool m_hardwareBackendAvailable;
-#endif
     bool m_initialized;
 };
+
+#endif // NVJPEG_DECODER_H

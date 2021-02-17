@@ -1,4 +1,6 @@
-#pragma once
+#ifndef OPENCV_IMAGE_DECODER_H
+#define OPENCV_IMAGE_DECODER_H
+
 #include "IImageDecoder.h"
 
 class OpenCVImageDecoder final : public IImageDecoder
@@ -15,3 +17,4 @@ public:
     bool IsInitialized() override;
 };
 
+#endif // OPENCV_IMAGE_DECODER_H

@@ -65,7 +65,7 @@ value_(std::make_shared<boost::json::value>(object))
 
 }
 
-void JsonConfig::AddNodeBool(const std::string &key, bool value)
+void JsonConfig::AddNodeBool(const std::string& key, bool value)
 {
     try
     {
@@ -77,7 +77,7 @@ void JsonConfig::AddNodeBool(const std::string &key, bool value)
     }
 }
 
-void JsonConfig::AddNodeFloat(const std::string &key, float value)
+void JsonConfig::AddNodeFloat(const std::string& key, float value)
 {
     try
     {
@@ -89,7 +89,7 @@ void JsonConfig::AddNodeFloat(const std::string &key, float value)
     }
 }
 
-void JsonConfig::AddNodeInt(const std::string &key, int value)
+void JsonConfig::AddNodeInt(const std::string& key, int value)
 {
     try
     {
@@ -101,7 +101,7 @@ void JsonConfig::AddNodeInt(const std::string &key, int value)
     }
 }
 
-void JsonConfig::AddNodeString(const std::string &key, const std::string &value)
+void JsonConfig::AddNodeString(const std::string& key, const std::string& value)
 {
     try
     {
@@ -113,19 +113,19 @@ void JsonConfig::AddNodeString(const std::string &key, const std::string &value)
     }
 }
 
-void JsonConfig::AddNodeVecFloat(const std::string &key, const std::vector<float> &value)
+void JsonConfig::AddNodeVecFloat(const std::string& key, const std::vector<float>& value)
 {
     boost::json::array array(value.begin(), value.end());
     value_->as_object()[key] = array;
 }
 
-void JsonConfig::AddNodeVecInt(const std::string &key, const std::vector<int> &value)
+void JsonConfig::AddNodeVecInt(const std::string& key, const std::vector<int>& value)
 {
     boost::json::array array(value.begin(), value.end());
     value_->as_object()[key] = array;
 }
 
-void JsonConfig::AddNodeVecVecInt(const std::string &key, const std::vector<std::vector<int>>& value)
+void JsonConfig::AddNodeVecVecInt(const std::string& key, const std::vector<std::vector<int>>& value)
 {
     boost::json::array array;
     array.reserve(value.size());
@@ -136,7 +136,7 @@ void JsonConfig::AddNodeVecVecInt(const std::string &key, const std::vector<std:
     value_->as_object()[key] = array;
 }
 
-void JsonConfig::AddNodeVecVecVecInt(const std::string &key, const std::vector<std::vector<std::vector<int>>> &value)
+void JsonConfig::AddNodeVecVecVecInt(const std::string& key, const std::vector<std::vector<std::vector<int>>>& value)
 {
     boost::json::array array;
     array.reserve(value.size());
@@ -153,7 +153,7 @@ void JsonConfig::AddNodeVecVecVecInt(const std::string &key, const std::vector<s
     value_->as_object()[key] = array;
 }
 
-void JsonConfig::AddObject(const std::shared_ptr<JsonConfig> &object)
+void JsonConfig::AddObject(const std::shared_ptr<JsonConfig>& object)
 {
     if (value_->is_array())
     {
@@ -171,7 +171,7 @@ std::string JsonConfig::Dump()
     return boost::json::serialize(*value_);
 }
 
-void JsonConfig::FromJsonString(const std::string &jsonString)
+void JsonConfig::FromJsonString(const std::string& jsonString)
 {
     try
     {
@@ -184,7 +184,7 @@ void JsonConfig::FromJsonString(const std::string &jsonString)
 
 }
 
-void JsonConfig::FromVectorConfigs(const std::vector<std::shared_ptr<JsonConfig>> &configs)
+void JsonConfig::FromVectorConfigs(const std::vector<std::shared_ptr<JsonConfig>>& configs)
 {
     value_->emplace_array();
 
@@ -238,17 +238,17 @@ bool JsonConfig::IsNull() const
     return value_->is_null();
 }
 
-bool JsonConfig::Contains(const std::string &key)
+bool JsonConfig::Contains(const std::string& key)
 {
     return value_->as_object().contains(key);
 }
 
-void JsonConfig::Save(std::ofstream &stream)
+void JsonConfig::Save(std::ofstream& stream)
 {
     stream << Dump();
 }
 
-void JsonConfig::SetNode(const std::string &key, const std::shared_ptr<JsonConfig>& object)
+void JsonConfig::SetNode(const std::string& key, const std::shared_ptr<JsonConfig>& object)
 {
     try
     {
@@ -511,7 +511,7 @@ std::shared_ptr<JsonConfig> JsonConfig::operator[](const std::string &key)
     }
 }
 
-std::shared_ptr<JsonConfig> JsonConfig::operator[](const std::string &key) const
+std::shared_ptr<JsonConfig> JsonConfig::operator[](const std::string& key) const
 {
     try
     {

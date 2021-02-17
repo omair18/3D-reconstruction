@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CUDA_STANDARD 17)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
-set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -g -G -gencode arch=compute_86,code=[sm_86,compute_86] -std=c++17")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_86,code=[sm_86,compute_86] -std=c++17")
 set(CUDA_VERBOSE_BUILD ON)
 
 #set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Ofast  -fopenmp -fopenmp-simd -march=native -mtune=native")
@@ -29,11 +29,14 @@ find_package(OpenCV COMPONENTS opencv_core REQUIRED PATHS ${LIBRARIES_PATH}/open
 
 find_library(NVJPEG_LIBRARY nvjpeg ${CUDA_TOOLKIT_ROOT_DIR}/lib64)
 
+find_library(NVJPEG2K_LIBRARY nvjpeg2k ${CUDA_TOOLKIT_ROOT_DIR}/lib64)
+
 message("CXX compiler -- " ${CMAKE_CXX_COMPILER})
 message("C compiler -- " ${CMAKE_C_COMPILER})
 message("CUDA compiler -- " ${CMAKE_CUDA_COMPILER})
 
 message("-- Found NvJPEG: " ${NVJPEG_LIBRARY})
+message("-- Found NvJPEG2000: " ${NVJPEG2K_LIBRARY})
 
 add_subdirectory(src)
 add_subdirectory(test)

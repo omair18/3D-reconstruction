@@ -1,4 +1,5 @@
-#pragma once
+#ifndef INTERFACE_IMAGE_DECODER_H
+#define INTERFACE_IMAGE_DECODER_H
 
 namespace cv
 {
@@ -23,3 +24,5 @@ public:
 
     virtual ~IImageDecoder() = default;
 };
+
+#endif // INTERFACE_IMAGE_DECODER_H
