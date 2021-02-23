@@ -40,3 +40,5 @@ message("-- Found NvJPEG2000: " ${NVJPEG2K_LIBRARY})
 
 add_subdirectory(src)
 add_subdirectory(test)
+
+file(COPY web DESTINATION ${PROJECT_BINARY_DIR}/bin)

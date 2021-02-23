@@ -1,6 +1,6 @@
 #include <iostream>
 #include <tuple>
-
+#include <boost/static_string.hpp>
 
 int main()
 {

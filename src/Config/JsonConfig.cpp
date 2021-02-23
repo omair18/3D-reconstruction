@@ -245,7 +245,53 @@ bool JsonConfig::Contains(const std::string& key)
 
 void JsonConfig::Save(std::ofstream& stream)
 {
-    stream << Dump();
+    const std::string spacer = "    ";
+    int nestedLevel = 0;
+    auto jsonString = Dump();
+    for (auto character : jsonString)
+    {
+        switch (character)
+        {
+            case '{':
+            case '[':
+            {
+                ++nestedLevel;
+                stream << character << std::endl;
+                for(int i = 0; i < nestedLevel; ++i)
+                {
+                    stream << spacer;
+                }
+            } break;
+            case '}':
+            case ']':
+            {
+                stream << std::endl;
+                --nestedLevel;
+                for(int i = 0; i < nestedLevel; ++i)
+                {
+                    stream << spacer;
+                }
+                stream << character;
+            } break;
+            case ':':
+            {
+                stream <<": ";
+            } break;
+            case ',':
+            {
+                stream << ", " << std::endl;
+                for(int i = 0; i < nestedLevel; ++i)
+                {
+                    stream << spacer;
+                }
+            } break;
+            default:
+            {
+                stream << character;
+            } break;
+        }
+
+    }
 }
 
 void JsonConfig::SetNode(const std::string& key, const std::shared_ptr<JsonConfig>& object)

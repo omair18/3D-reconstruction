@@ -1,10 +1,13 @@
 set(CONFIG_LIB_HEADERS
         JsonConfig.h
-        JsonConfigManager.h)
+        JsonConfigManager.h
+        ConfigNodes.h
+        DefaultJsonConfigGenerator.h)
 
 set(CONFIG_LIB_CPPS
         JsonConfig.cpp
-        JsonConfigManager.cpp)
+        JsonConfigManager.cpp
+        DefaultJsonConfigGenerator.cpp)
 
 source_group("Header Files" FILES ${CONFIG_LIB_HEADERS})
 source_group("Source Files" FILES ${CONFIG_LIB_CPPS})
@@ -13,8 +16,9 @@ add_library(config SHARED ${CONFIG_LIB_HEADERS} ${CONFIG_LIB_CPPS})
 
 target_link_libraries(config
         PUBLIC
-        stdc++fs
+
         PRIVATE
+        stdc++fs
         log
         Boost::json)
 

@@ -1,14 +1,11 @@
-#ifndef HTTP_SERVER_H
-#define HTTP_SERVER_H
-
+#ifndef HTTPS_SERVER_H
+#define HTTPS_SERVER_H
 
 class HttpServer
 {
 public:
 
-private:
-    int port_;
 };
 
 
-#endif //HTTP_SERVER_H
+#endif // HTTPS_SERVER_H

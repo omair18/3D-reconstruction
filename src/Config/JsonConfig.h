@@ -227,7 +227,7 @@ public:
     bool Contains(const std::string& key);
 
     /**
-     * @brief Puts current JSON value to ostream as string.
+     * @brief Puts current JSON value to ostream as string in a human-readable format.
      *
      * @param stream - Output data stream.
      */

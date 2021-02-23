@@ -1,14 +1,19 @@
-#include "StackTraceDumper.h"
-#include "Logger.h"
+#include <iostream>
 
-int main(int argc, char** argv, char** env)
+#include "ServiceSDK.h"
+
+int main(int argc, char** argv)
 {
-    LOGGER_INIT();
-
-    Utils::StackTraceDumper::ProcessSignal(SIGABRT);
-    Utils::StackTraceDumper::ProcessSignal(SIGSEGV);
-
-    LOGGER_FREE();
-
-    return 0;
+    int exitCode = EXIT_SUCCESS;
+    Service::ServiceSDK serviceSdk(argc, argv);
+    try
+    {
+        serviceSdk.Initialize();
+    }
+    catch (std::exception& exception)
+    {
+        std::clog << exception.what() << std::endl;
+        exitCode = EXIT_FAILURE;
+    }
+    return exitCode;
 }

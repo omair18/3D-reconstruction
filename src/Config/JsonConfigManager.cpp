@@ -14,7 +14,7 @@ namespace Config
 void JsonConfigManager::ReadSettings(const std::filesystem::path & folderPath)
 {
     LOG_TRACE() << "Read settings from folder " << folderPath;
-    m_folderPath = folderPath.string();
+    folderPath_ = folderPath.string();
     std::filesystem::directory_iterator fileList(folderPath);
 
     for (auto const &filename : fileList)
@@ -23,7 +23,7 @@ void JsonConfigManager::ReadSettings(const std::filesystem::path & folderPath)
         {
             LOG_TRACE() << "Read file: " << filename.path();
             auto config = std::make_shared<JsonConfig>(filename.path());
-            m_configList[filename.path().filename().stem().string()] = config;
+            configList_[filename.path().filename().stem().string()] = config;
         }
         catch (std::exception& ex)
         {
@@ -39,7 +39,7 @@ void JsonConfigManager::ReadSettingsFromFile(const std::filesystem::path& filePa
     try
     {
         auto config = std::make_shared<JsonConfig>(filePath);
-        m_configList[filePath.stem().string()] = config;
+        configList_[filePath.stem().string()] = config;
     }
     catch (std::exception& ex)
     {
@@ -51,8 +51,8 @@ std::shared_ptr<JsonConfig> JsonConfigManager::GetConfig(const std::string& name
 {
     try
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        return m_configList.at(name);
+        std::lock_guard<std::mutex> lock(mutex_);
+        return configList_.at(name);
     }
     catch (std::exception& e)
     {
@@ -66,8 +66,8 @@ void JsonConfigManager::SetConfig(const std::string & name, const std::shared_pt
 {
     try
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_configList[name] = config;
+        std::lock_guard<std::mutex> lock(mutex_);
+        configList_[name] = config;
     }
     catch (std::exception& e)
     {
@@ -95,12 +95,12 @@ void JsonConfigManager::Save(const std::string& key)
 {
     try
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        std::filesystem::path path(m_folderPath);
+        std::lock_guard<std::mutex> lock(mutex_);
+        std::filesystem::path path(folderPath_);
         path /= (key + jsonExtension);
         std::ofstream outputFile(path, std::ios::out);
 
-        m_configList[key]->Save(outputFile);
+        configList_[key]->Save(outputFile);
     }
     catch (std::exception& ex)
     {
@@ -110,16 +110,16 @@ void JsonConfigManager::Save(const std::string& key)
 
 void JsonConfigManager::SaveAll()
 {
-    SaveAll(m_configList);
+    SaveAll(configList_);
 }
 
 
 void JsonConfigManager::SaveAll(const std::map<std::string, std::shared_ptr<JsonConfig>>& configsMap)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<std::mutex> lock(mutex_);
     for (const auto &config : configsMap)
     {
-        std::filesystem::path path(m_folderPath);
+        std::filesystem::path path(folderPath_);
         path /= (config.first + jsonExtension);
         std::ofstream outputFile(path, std::ios::out);
 
@@ -129,16 +129,26 @@ void JsonConfigManager::SaveAll(const std::map<std::string, std::shared_ptr<Json
 
 std::vector<std::string> JsonConfigManager::GetConfigNames()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<std::mutex> lock(mutex_);
     std::vector<std::string> configNames;
-    configNames.reserve(m_configList.size());
+    configNames.reserve(configList_.size());
 
-    for(const auto & [key, value]: m_configList)
+    for(const auto & [key, value]: configList_)
     {
         configNames.push_back(key);
     }
 
     return configNames;
+}
+
+bool JsonConfigManager::ConfigExists(const std::string &configName)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    auto directoryJsonFiles = GetJsonFiles(folderPath_);
+
+    return std::any_of(directoryJsonFiles.begin(), directoryJsonFiles.end(), [configName](const auto& filePath) {
+        return filePath.stem().string() == configName;
+    });
 }
 
 }

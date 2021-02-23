@@ -72,11 +72,19 @@ public:
     void ReadSettingsFromFile(const std::filesystem::path& filePath);
 
     /**
-     * @brief Provides access to config with key name-param in m_configList. If there is no such key in map,
+     * @brief
+     *
+     * @param configName
+     * @return
+     */
+    bool ConfigExists(const std::string& configName);
+
+    /**
+     * @brief Provides access to config with key name-param in configList_. If there is no such key in map,
      * returns nullptr and puts a record in a log file with ERROR severity.
      *
      * @param name - Key of config in configs map.
-     * @return Pointer to config in m_configList with key name-param. Returns nullptr in failure case.
+     * @return Pointer to config in configList_ with key name-param. Returns nullptr in failure case.
      */
     std::shared_ptr<JsonConfig> GetConfig(const std::string& name);
 
@@ -96,21 +104,21 @@ public:
     void SetConfig(const std::string& name, const std::shared_ptr<JsonConfig>& config);
 
     /**
-    * @brief Saves configs by given name to file m_folderPath/key.json. In failure case does nothing and puts
+    * @brief Saves configs by given name to file folderPath_/key.json. In failure case does nothing and puts
     * a record in log file with ERROR severity.
     *
-    * @param key - Key of config in m_configList.
+    * @param key - Key of config in configList_.
     */
     void Save(const std::string& key);
 
     /**
-    * @brief Saves all configs from m_configList to files at m_folderPath.
+    * @brief Saves all configs from configList_ to files at folderPath_.
     *
     */
     void SaveAll();
 
     /**
-    * @brief Saves all configs from given map to files at m_folderPath.
+    * @brief Saves all configs from given map to files at folderPath_.
     *
     * @param configsMap - Map of configs to save.
     */
@@ -132,13 +140,13 @@ private:
     std::vector<std::filesystem::path> GetJsonFiles(const std::filesystem::path& folderName);
 
     /// Container for configs' names and pointers to them.
-    std::map<std::string, std::shared_ptr<JsonConfig>> m_configList;
+    std::map<std::string, std::shared_ptr<JsonConfig>> configList_;
 
     /// Mutex to provide thread-safety.
-    std::mutex m_mutex;
+    std::mutex mutex_;
 
     /// Path of folder to save configs.
-    std::string m_folderPath;
+    std::string folderPath_;
 };
 
 }

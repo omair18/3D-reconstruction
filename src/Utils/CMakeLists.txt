@@ -1,11 +1,11 @@
 set(UTILS_LIB_HEADERS
         FastPimpl.h
         StackTraceDumper.h
-        )
+        UUIDGenerator.h)
 
 set(UTILS_LIB_CPPS
         StackTraceDumper.cpp
-        )
+        UUIDGenerator.cpp)
 
 source_group("Header Files" FILES ${UTILS_LIB_HEADERS})
 source_group("Source Files" FILES ${UTILS_LIB_CPPS})
