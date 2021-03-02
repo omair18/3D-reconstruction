@@ -48,9 +48,7 @@ namespace Config
                 const inline static std::string HTTPS = "HTTPS";
                 const inline static std::string HTTP_AND_HTTPS = "HTTP_AND_HTTPS";
                 const inline static std::string UseDhParams = "useDhParams";
-                const inline static std::string CertificatePath = "certificatePath";
-                const inline static std::string PublicKeyPath = "publicKeyPath";
-                const inline static std::string DhParamsPath = "dhParamsPath";
+                const inline static std::string WebFolderPath = "webFolderPath";
             }
 
             const inline static std::string Pipeline = "pipeline";
@@ -62,7 +60,7 @@ namespace Config
                 const inline static std::string Output = "output";
             }
 
-            const inline static std::string Queue = "queue";
+            const inline static std::string Queues = "queues";
             namespace QueueConfig
             {
                 constexpr const static std::string& Name = PipelineConfig::Name;

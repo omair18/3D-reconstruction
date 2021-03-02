@@ -23,13 +23,41 @@ find_package(CUDA REQUIRED)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${LIBRARIES_PATH}/librdkafka/lib/cmake/RdKafka")
 find_package(RdKafka REQUIRED PATHS ${LIBRARIES_PATH}/librdkafka NO_DEFAULT_PATH)
 
-find_package(Boost COMPONENTS log stacktrace_addr2line system json REQUIRED PATHS ${LIBRARIES_PATH}/boost NO_DEFAULT_PATH)
+find_package(Boost COMPONENTS
+        log
+        stacktrace_addr2line
+        program_options
+        system
+        json
+        REQUIRED
+        PATHS ${LIBRARIES_PATH}/boost
+        NO_DEFAULT_PATH)
 
-find_package(OpenCV COMPONENTS opencv_core REQUIRED PATHS ${LIBRARIES_PATH}/opencv NO_DEFAULT_PATH)
+find_package(OpenCV COMPONENTS
+        opencv_core
+        opencv_cudaarithm
+        opencv_imgproc
+        opencv_cudaimgproc
+        opencv_cudawarping
+        opencv_sfm
+        opencv_rgbd
+        opencv_cudafeatures2d
+        opencv_features2d
+        opencv_xfeatures2d
+        opencv_highgui
+        opencv_imgcodecs
+        REQUIRED
+        PATHS ${LIBRARIES_PATH}/opencv
+        NO_DEFAULT_PATH)
 
 find_library(NVJPEG_LIBRARY nvjpeg ${CUDA_TOOLKIT_ROOT_DIR}/lib64)
 
 find_library(NVJPEG2K_LIBRARY nvjpeg2k ${CUDA_TOOLKIT_ROOT_DIR}/lib64)
+
+find_library(NPPC_LIBRARY nppc ${CUDA_TOOLKIT_ROOT_DIR}/lib64)
+
+find_library(NPPIG_LIBRARY nppig ${CUDA_TOOLKIT_ROOT_DIR}/lib64)
+find_library(NPPIF_LIBRARY nppif ${CUDA_TOOLKIT_ROOT_DIR}/lib64)
 
 message("CXX compiler -- " ${CMAKE_CXX_COMPILER})
 message("C compiler -- " ${CMAKE_C_COMPILER})
@@ -37,8 +65,12 @@ message("CUDA compiler -- " ${CMAKE_CUDA_COMPILER})
 
 message("-- Found NvJPEG: " ${NVJPEG_LIBRARY})
 message("-- Found NvJPEG2000: " ${NVJPEG2K_LIBRARY})
+message("-- Found NPPC: " ${NPPC_LIBRARY})
+message("-- Found NPPIG: " ${NPPIG_LIBRARY})
+message("-- Found NPPIF: " ${NPPIF_LIBRARY})
 
 add_subdirectory(src)
 add_subdirectory(test)
 
 file(COPY web DESTINATION ${PROJECT_BINARY_DIR}/bin)
+file(COPY python/kafka_dataset_sender.py DESTINATION ${PROJECT_BINARY_DIR}/bin)

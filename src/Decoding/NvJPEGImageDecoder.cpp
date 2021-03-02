@@ -1,6 +1,7 @@
 #include <opencv2/core/cuda.hpp>
+#include <nppi_geometry_transforms.h>
 
-#include "NvJPEGDecoder.h"
+#include "NvJPEGImageDecoder.h"
 #include "Logger.h"
 
 #define CHECK_NVJPEG(status)                                                    \
@@ -21,7 +22,10 @@
         }                                                                       \
     }
 
-NvJPEGDecoder::NvJPEGDecoder() :
+namespace Decoding
+{
+
+NvJPEGImageDecoder::NvJPEGImageDecoder() :
 m_initialized(false)
 {
     m_bufferSize = 0;
@@ -29,7 +33,7 @@ m_initialized(false)
     InitDecoder();
 }
 
-NvJPEGDecoder::~NvJPEGDecoder()
+NvJPEGImageDecoder::~NvJPEGImageDecoder()
 {
     nvjpegDecodeParamsDestroy(m_decodeParams);
     nvjpegJpegStreamDestroy(m_jpegStream);
@@ -51,26 +55,12 @@ NvJPEGDecoder::~NvJPEGDecoder()
     }
 }
 
-void NvJPEGDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::Mat &decodedData)
-{
-    cv::cuda::GpuMat decodedImage;
-    DecodeInternal(data, size, decodedImage);
-    decodedImage.download(decodedData);
-}
-
-void NvJPEGDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::cuda::GpuMat &decodedData)
-{
-    cv::cuda::GpuMat decodedImage;
-    DecodeInternal(data, size, decodedImage);
-    decodedData = decodedImage.clone();
-}
-
-void NvJPEGDecoder::InitDecoder()
+void NvJPEGImageDecoder::InitDecoder()
 {
     cudaStreamCreateWithFlags(&m_cudaStream, cudaStreamNonBlocking);
 
     nvjpegStatus_t status = nvjpegCreateEx(nvjpegBackend_t::NVJPEG_BACKEND_HARDWARE, nullptr,
-                                           nullptr, NVJPEG_FLAGS_DEFAULT, &m_handle);
+                                               nullptr, NVJPEG_FLAGS_DEFAULT, &m_handle);
     m_hardwareBackendAvailable = true;
     if(status == nvjpegStatus_t::NVJPEG_STATUS_ARCH_MISMATCH)
     {
@@ -108,49 +98,85 @@ void NvJPEGDecoder::InitDecoder()
     m_initialized = true;
 }
 
-void NvJPEGDecoder::AllocateBuffer(int width, int height, int channels)
-{
-    size_t imageSize = width * height * channels;
-    if(imageSize > m_bufferSize)
+void NvJPEGImageDecoder::AllocateBuffer(int width, int height, int channels)
     {
-        if (m_imageBuffer.channel[0])
+        size_t imageSize = width * height * channels;
+        if(imageSize > m_bufferSize)
         {
-            CHECK_CUDA(cudaFree(m_imageBuffer.channel[0]));
+            if (m_imageBuffer.channel[0])
+            {
+                CHECK_CUDA(cudaFree(m_imageBuffer.channel[0]));
+            }
+            cudaMalloc(reinterpret_cast<void **>(&m_imageBuffer.channel[0]), imageSize);
+            m_imageBuffer.pitch[0] = width * channels;
+            m_bufferSize = imageSize;
         }
-        cudaMalloc(reinterpret_cast<void **>(&m_imageBuffer.channel[0]), imageSize);
-        m_imageBuffer.pitch[0] = width * channels;
-        m_bufferSize = imageSize;
     }
-}
 
-void NvJPEGDecoder::DecodeInternal(const unsigned char *data, unsigned long long int size, cv::cuda::GpuMat &outputImage)
+void NvJPEGImageDecoder::DecodeInternal(const unsigned char *data, unsigned long long int size, cv::cuda::GpuMat &outputImage)
+    {
+        unsigned int channels;
+        unsigned int width;
+        unsigned int height;
+
+        CHECK_NVJPEG(nvjpegJpegStreamParse(m_handle, reinterpret_cast<const unsigned char *>(data), size, 0, 0, m_jpegStream));
+
+        nvjpegJpegStreamGetComponentsNum(m_jpegStream, &channels);
+
+        nvjpegJpegStreamGetComponentDimensions(m_jpegStream, 0, &width, &height);
+
+        AllocateBuffer(width, height, channels);
+
+        CHECK_NVJPEG(nvjpegDecodeJpegHost(m_handle, m_decoder, m_decoupledState, m_decodeParams, m_jpegStream));
+
+        CHECK_NVJPEG(nvjpegDecodeJpegTransferToDevice(m_handle, m_decoder, m_decoupledState, m_jpegStream, m_cudaStream));
+
+        CHECK_NVJPEG(nvjpegDecodeJpegDevice(m_handle, m_decoder, m_decoupledState, &m_imageBuffer, m_cudaStream));
+
+        CHECK_CUDA(cudaStreamSynchronize(m_cudaStream));
+
+        outputImage = cv::cuda::GpuMat(height, width, CV_8UC3, m_imageBuffer.channel[0]);
+    }
+
+
+void NvJPEGImageDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::Mat &decodedData)
 {
-    unsigned int channels;
-    unsigned int width;
-    unsigned int height;
-
-    CHECK_NVJPEG(nvjpegJpegStreamParse(m_handle, reinterpret_cast<const unsigned char *>(data), size, 0, 0, m_jpegStream));
-
-    nvjpegJpegStreamGetComponentsNum(m_jpegStream, &channels);
-
-    nvjpegJpegStreamGetComponentDimensions(m_jpegStream, 0, &width, &height);
-
-    AllocateBuffer(width, height, channels);
-
-    CHECK_NVJPEG(nvjpegDecodeJpegHost(m_handle, m_decoder, m_decoupledState, m_decodeParams, m_jpegStream));
-
-    CHECK_NVJPEG(nvjpegDecodeJpegTransferToDevice(m_handle, m_decoder, m_decoupledState, m_jpegStream, m_cudaStream));
-
-    CHECK_NVJPEG(nvjpegDecodeJpegDevice(m_handle, m_decoder, m_decoupledState, &m_imageBuffer, m_cudaStream));
-
-    CHECK_CUDA(cudaStreamSynchronize(m_cudaStream));
-
-    outputImage = cv::cuda::GpuMat(height, width, CV_8UC3, m_imageBuffer.channel[0]);
+    cv::cuda::GpuMat decodedImage;
+    DecodeInternal(data, size, decodedImage);
+    decodedImage.download(decodedData);
 }
 
-bool NvJPEGDecoder::IsInitialized()
+void NvJPEGImageDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::cuda::GpuMat &decodedData)
+{
+    cv::cuda::GpuMat decodedImage;
+    DecodeInternal(data, size, decodedImage);
+    decodedData = decodedImage.clone();
+}
+
+    void NvJPEGImageDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::Mat &decodedImage,
+                                    size_t outputWidth, size_t outputHeight) {
+
+    }
+
+    void
+    NvJPEGImageDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::cuda::GpuMat &decodedImage,
+                               size_t outputWidth, size_t outputHeight) {
+
+    }
+
+    void NvJPEGImageDecoder::Decode(const unsigned char *data, unsigned long long int size,
+                                    DataStructures::CUDAImage &decodedImage) {
+
+    }
+
+    void NvJPEGImageDecoder::Decode(const unsigned char *data, unsigned long long int size,
+                                    DataStructures::CUDAImage &decodedImage, size_t outputWidth, size_t outputHeight) {
+
+    }
+
+bool NvJPEGImageDecoder::IsInitialized()
 {
     return m_initialized;
 }
 
-
+}

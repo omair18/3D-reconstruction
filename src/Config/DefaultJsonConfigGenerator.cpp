@@ -1,6 +1,9 @@
+#include <filesystem>
+
 #include "DefaultJsonConfigGenerator.h"
 #include "JsonConfig.h"
 #include "ConfigNodes.h"
+#include "PathUtils.h"
 
 namespace Config
 {
@@ -22,6 +25,8 @@ std::shared_ptr<JsonConfig> DefaultJsonConfigGenerator::GenerateServiceDefaultCo
     auto gpuConfig = std::make_shared<JsonConfig>();
     auto pipelineConfig = std::make_shared<JsonConfig>();
     auto queueConfig = std::make_shared<JsonConfig>();
+    std::filesystem::path defaultWebDirectoryPath = Utils::PathUtils::GetExecutableFolderPath();
+    defaultWebDirectoryPath /= "web";
 
     webServerConfig->AddNodeBool(ConfigNodes::ServiceConfig::WebServerConfig::Enabled, true);
     webServerConfig->AddNodeString(ConfigNodes::ServiceConfig::WebServerConfig::IpAddress, "127.0.0.1");
@@ -29,10 +34,9 @@ std::shared_ptr<JsonConfig> DefaultJsonConfigGenerator::GenerateServiceDefaultCo
     webServerConfig->AddNodeString(ConfigNodes::ServiceConfig::WebServerConfig::Protocol,
                                    ConfigNodes::ServiceConfig::WebServerConfig::HTTP);
     webServerConfig->AddNodeInt(ConfigNodes::ServiceConfig::WebServerConfig::ThreadPoolSize, 2);
-    webServerConfig->AddNodeString(ConfigNodes::ServiceConfig::WebServerConfig::CertificatePath, "/home/a.crt");
-    webServerConfig->AddNodeString(ConfigNodes::ServiceConfig::WebServerConfig::PublicKeyPath, "/home/b.key");
+    webServerConfig->AddNodeString(ConfigNodes::ServiceConfig::WebServerConfig::WebFolderPath,
+                                   defaultWebDirectoryPath.string());
     webServerConfig->AddNodeBool(ConfigNodes::ServiceConfig::WebServerConfig::UseDhParams, true);
-    webServerConfig->AddNodeString(ConfigNodes::ServiceConfig::WebServerConfig::DhParamsPath, "/home/c.pem");
 
     gpuConfig->AddNodeString(ConfigNodes::ServiceConfig::GpuConfig::SelectionPolicy,
                              ConfigNodes::ServiceConfig::GpuConfig::Manual);
@@ -43,7 +47,7 @@ std::shared_ptr<JsonConfig> DefaultJsonConfigGenerator::GenerateServiceDefaultCo
     config->SetNode(ConfigNodes::ServiceConfig::WebServer, webServerConfig);
     config->SetNode(ConfigNodes::ServiceConfig::Gpu, gpuConfig);
     config->SetNode(ConfigNodes::ServiceConfig::Pipeline, pipelineConfig);
-    config->SetNode(ConfigNodes::ServiceConfig::Queue, queueConfig);
+    config->SetNode(ConfigNodes::ServiceConfig::Queues, queueConfig);
 
     return config;
 }

@@ -1,0 +1,11 @@
+#ifndef NVJPEG_HARDWARE_IMAGE_ENCODER_H
+#define NVJPEG_HARDWARE_IMAGE_ENCODER_H
+
+
+class NvJPEGHardwareImageEncoder
+{
+
+};
+
+
+#endif // NVJPEG_HARDWARE_IMAGE_ENCODER_H

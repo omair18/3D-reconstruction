@@ -15,6 +15,11 @@ namespace GPU
     class GpuManager;
 }
 
+namespace Networking
+{
+    class WebServer;
+}
+
 namespace Service
 {
 
@@ -22,7 +27,7 @@ class ServiceSDK
 {
 public:
 
-    ServiceSDK(int argc = 0, char** argv = nullptr);
+    ServiceSDK(int argc, char** argv);
 
     ~ServiceSDK();
 
@@ -36,6 +41,10 @@ private:
 
     void InitializeGpuManager();
 
+    void InitializeServiceGPU(const std::shared_ptr<Config::JsonConfig>& serviceConfig);
+
+    void InitializeWebServer(const std::shared_ptr<Config::JsonConfig>& serviceConfig);
+
     std::shared_ptr<Config::JsonConfig> GetServiceConfig();
 
     constexpr const inline static char* organizationName = "BSUIR";
@@ -44,6 +53,7 @@ private:
 
     std::unique_ptr<Config::JsonConfigManager> configManager_;
     std::unique_ptr<GPU::GpuManager> gpuManager_;
+    std::unique_ptr<Networking::WebServer> webServer_;
 
     std::string configPath_;
 

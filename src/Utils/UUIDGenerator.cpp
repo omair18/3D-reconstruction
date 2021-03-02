@@ -5,7 +5,12 @@
 
 #include "UUIDGenerator.h"
 
+namespace Utils
+{
+
 std::string UUIDGenerator::GenerateUUID()
 {
     return boost::lexical_cast<std::string>(boost::uuids::uuid(boost::uuids::random_generator()()));
+}
+
 }

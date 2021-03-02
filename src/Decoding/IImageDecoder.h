@@ -11,18 +11,36 @@ namespace cv
     }
 }
 
+namespace DataStructures
+{
+    struct CUDAImage;
+}
+
+namespace Decoding
+{
+
 class IImageDecoder
 {
 public:
     IImageDecoder() = default;
 
-    virtual void Decode(const unsigned char* data, unsigned long long size, cv::Mat& decodedData) = 0;
+    virtual void Decode(const unsigned char* data, unsigned long long size, cv::Mat& decodedImage) = 0;
 
-    virtual void Decode(const unsigned char* data, unsigned long long size, cv::cuda::GpuMat& decodedData) = 0;
+    virtual void Decode(const unsigned char* data, unsigned long long size, cv::Mat& decodedImage, size_t outputWidth, size_t outputHeight) = 0;
+
+    virtual void Decode(const unsigned char* data, unsigned long long size, cv::cuda::GpuMat& decodedImage) = 0;
+
+    virtual void Decode(const unsigned char* data, unsigned long long size, cv::cuda::GpuMat& decodedImage, size_t outputWidth, size_t outputHeight) = 0;
+
+    virtual void Decode(const unsigned char* data, unsigned long long size, DataStructures::CUDAImage& decodedImage) = 0;
+
+    virtual void Decode(const unsigned char* data, unsigned long long size, DataStructures::CUDAImage& decodedImage, size_t outputWidth, size_t outputHeight) = 0;
 
     virtual bool IsInitialized() = 0;
 
     virtual ~IImageDecoder() = default;
 };
+
+}
 
 #endif // INTERFACE_IMAGE_DECODER_H

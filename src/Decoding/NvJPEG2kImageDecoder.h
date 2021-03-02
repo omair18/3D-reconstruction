@@ -2,16 +2,20 @@
 #define NVJPEG2K_DECODER_H
 
 #include <nvjpeg2k.h>
+#include <npp.h>
 
 #include "IImageDecoder.h"
 
-class NvJPEG2kDecoder final : public IImageDecoder
+namespace Decoding
+{
+
+class NvJPEG2kImageDecoder final : public IImageDecoder
 {
 public:
 
-    NvJPEG2kDecoder();
+    NvJPEG2kImageDecoder();
 
-    ~NvJPEG2kDecoder() override;
+    ~NvJPEG2kImageDecoder() override;
 
     void Decode(const unsigned char *data, unsigned long long size, cv::Mat &decodedData) override;
 
@@ -27,7 +31,9 @@ private:
 
     void InitDecoder();
 
+    cudaStream_t cudaStream_;
 };
 
+}
 
 #endif // NVJPEG2K_DECODER_H

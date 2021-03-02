@@ -1,13 +1,16 @@
-#include <pwd.h>
 #include <filesystem>
 
 #include "ServiceSDK.h"
 #include "StackTraceDumper.h"
 #include "Logger.h"
 #include "JsonConfigManager.h"
+#include "JsonConfig.h"
 #include "DefaultJsonConfigGenerator.h"
 #include "GpuManager.h"
 #include "ConfigNodes.h"
+#include "PathUtils.h"
+#include "WebServer.h"
+#include "WebServerFactory.h"
 
 namespace Service
 {
@@ -34,11 +37,11 @@ void ServiceSDK::Initialize()
 
     auto serviceConfig = GetServiceConfig();
 
+    InitializeWebServer(serviceConfig);
+
     InitializeGpuManager();
 
-    auto matchingGpu = gpuManager_->SelectMatchingGPU(serviceConfig);
-
-
+    InitializeServiceGPU(serviceConfig);
 
 }
 
@@ -49,44 +52,34 @@ ServiceSDK::~ServiceSDK()
 
 void ServiceSDK::InitializeConfigFolderPath()
 {
-    char* homeFolder = getenv("HOME");
-    if(!homeFolder)
+    std::filesystem::path appDataFolderPath = Utils::PathUtils::GetAppDataPath();
+
+    appDataFolderPath /= organizationName;
+    appDataFolderPath /= productName;
+    appDataFolderPath /= version;
+
+    if(!std::filesystem::exists(appDataFolderPath))
     {
-        struct passwd* pwd = getpwuid(getuid());
-        if(pwd)
-        {
-            homeFolder = pwd->pw_dir;
-        }
-    }
-
-    std::filesystem::path homeFolderPath = homeFolder;
-
-    homeFolderPath /= organizationName;
-    homeFolderPath /= productName;
-    homeFolderPath /= version;
-
-    if(!std::filesystem::exists(homeFolderPath))
-    {
-        LOG_TRACE() << "Config directory with path " << homeFolderPath << " is not created. Trying to create it ...";
+        LOG_TRACE() << "Config directory with path " << appDataFolderPath << " is not created. Trying to create it ...";
         std::error_code errorCode;
-        std::filesystem::create_directories(homeFolderPath, errorCode);
+        std::filesystem::create_directories(appDataFolderPath, errorCode);
         if(errorCode)
         {
-            LOG_ERROR() << "Failed to create config directory with path " << homeFolderPath << ". Error code "
-            << errorCode.value() << ": " << errorCode.message();
+            LOG_ERROR() << "Failed to create config directory with path " << appDataFolderPath << ". Error code "
+                        << errorCode.value() << ": " << errorCode.message();
             throw std::runtime_error(errorCode.message());
         }
         else
         {
-            LOG_TRACE() << "Successfully created config directory with path " << homeFolderPath << ".";
+            LOG_TRACE() << "Successfully created config directory with path " << appDataFolderPath << ".";
         }
     }
     else
     {
-        LOG_TRACE() << "Using existing config directory: " << homeFolderPath << ".";
+        LOG_TRACE() << "Using existing config directory: " << appDataFolderPath << ".";
     }
 
-    configPath_ = homeFolderPath.string();
+    configPath_ = appDataFolderPath.string();
 }
 
 void ServiceSDK::InitializeConfigManager()
@@ -113,7 +106,7 @@ std::shared_ptr<Config::JsonConfig> ServiceSDK::GetServiceConfig()
         throw std::runtime_error("Service configuration is invalid");
     }
 
-    LOG_TRACE() << "Service configuration successfully";
+    LOG_TRACE() << "Service configuration successfully loaded";
 
     return serviceConfig;
 }
@@ -121,6 +114,45 @@ std::shared_ptr<Config::JsonConfig> ServiceSDK::GetServiceConfig()
 void ServiceSDK::InitializeGpuManager()
 {
     gpuManager_->UpdateCUDACapableDevicesList();
+}
+
+void ServiceSDK::InitializeServiceGPU(const std::shared_ptr<Config::JsonConfig>& serviceConfig)
+{
+    auto matchingGpu = gpuManager_->SelectMatchingGPU(serviceConfig);
+    gpuManager_->SetDevice(matchingGpu);
+}
+
+void ServiceSDK::InitializeWebServer(const std::shared_ptr<Config::JsonConfig> &serviceConfig)
+{
+    if(!serviceConfig->Contains(Config::ConfigNodes::ServiceConfig::WebServer))
+    {
+        LOG_ERROR() << "Invalid service configuration. There is no node "
+        << Config::ConfigNodes::ServiceConfig::WebServer
+        << " in service configuration file.";
+        throw std::runtime_error("Invalid service configuration.");
+    }
+
+    auto webServerConfig = (*serviceConfig)[Config::ConfigNodes::ServiceConfig::WebServer];
+
+    if(!webServerConfig->Contains(Config::ConfigNodes::ServiceConfig::WebServerConfig::Enabled))
+    {
+        LOG_ERROR() << "Invalid service web server configuration. There is no node "
+        << Config::ConfigNodes::ServiceConfig::WebServerConfig::Enabled << " in web server configuration node.";
+        throw std::runtime_error("Invalid service web server configuration.");
+    }
+
+    bool webServerEnabled = (*webServerConfig)[Config::ConfigNodes::ServiceConfig::WebServerConfig::Enabled]->ToBool();
+
+    if(webServerEnabled)
+    {
+        LOG_TRACE() << "Web server is enabled.";
+        webServer_ = Networking::WebServerFactory::Create();
+        webServer_->Initialize(webServerConfig);
+    }
+    else
+    {
+        LOG_TRACE() << "Web server is disabled.";
+    }
 }
 
 

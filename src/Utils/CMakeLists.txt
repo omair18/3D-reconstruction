@@ -1,11 +1,13 @@
 set(UTILS_LIB_HEADERS
         FastPimpl.h
         StackTraceDumper.h
-        UUIDGenerator.h)
+        UUIDGenerator.h
+        PathUtils.h)
 
 set(UTILS_LIB_CPPS
         StackTraceDumper.cpp
-        UUIDGenerator.cpp)
+        UUIDGenerator.cpp
+        PathUtils.cpp)
 
 source_group("Header Files" FILES ${UTILS_LIB_HEADERS})
 source_group("Source Files" FILES ${UTILS_LIB_CPPS})

@@ -27,8 +27,6 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
         libcutensor1 \
         libcutensor-dev \
         libpng-dev \
-        libvulkan1 \
-        libvulkan-dev \
         libjpeg-turbo8-dev \
         libmetis-dev \
         libtiff-dev \
@@ -73,13 +71,13 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
     
 
 RUN cd /opt \
-    && wget https://cmake.org/files/v3.19/cmake-3.19.4.tar.gz \
-    && tar -xzvf cmake-3.19.4.tar.gz \
-    && rm cmake-3.19.4.tar.gz \
-    && cd cmake-3.19.4 \
+    && wget https://cmake.org/files/v3.19/cmake-3.19.6.tar.gz \
+    && tar -xzvf cmake-3.19.6.tar.gz \
+    && rm cmake-3.19.6.tar.gz \
+    && cd cmake-3.19.6 \
     && ./bootstrap \
     && make install -j`nproc` \
-    && rm -rf /opt/cmake-3.19.4
+    && rm -rf /opt/cmake-3.19.6
     
 RUN cd /opt \
     && git clone https://github.com/gflags/gflags.git --branch=v2.2.2 \
@@ -91,8 +89,11 @@ RUN cd /opt \
     && cmake \
         -DCMAKE_CXX_STANDARD=17 \
         -DCMAKE_CXX_STANDARD_REQUIRED=ON \
-        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd" \
-        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd" \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_C_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
         -DCMAKE_BUILD_TYPE=RELEASE \
         -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/gflags \
         -DBUILD_SHARED_LIBS=ON \
@@ -116,8 +117,12 @@ RUN cd /opt \
     && cmake \
         -DCMAKE_CXX_STANDARD=17 \
         -DCMAKE_CXX_STANDARD_REQUIRED=ON \
-        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd" \
-        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd" \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+        -DBUILD_TESTING=OFF \
+        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_C_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
         -DCMAKE_BUILD_TYPE=RELEASE \
         -DBUILD_SHARED_LIBS=ON \
         -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/glog \
@@ -139,8 +144,12 @@ RUN cd /opt \
         -DCMAKE_CXX_STANDARD=17 \
         -DCMAKE_CXX_STANDARD_REQUIRED=ON \
         -DCMAKE_BUILD_TYPE=RELEASE \
-        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -fPIC -std=gnu++17 -fopenmp -fopenmp-simd" \
-        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd" \
+        -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_C_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
         -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/librdkafka \
         -DRDKAFKA_BUILD_EXAMPLES=OFF \
         -DRDKAFKA_BUILD_TESTS=OFF \
@@ -158,12 +167,12 @@ RUN cd /opt \
     && rm boost_1_75_0.tar.gz \
     && cd boost_1_75_0 \
     && ./bootstrap.sh --prefix=/var/3DReconstructionEnv/boost \
-    && ./b2 install cxxflags="-fPIC -Ofast -march=native -mtune=native -std=gnu++17 -fopenmp -fopenmp-simd" \
+    && ./b2 install cxxflags="-fPIC -Ofast -march=native -mtune=native -std=gnu++17 -fopenmp -fopenmp-simd -DNDEBUG" \
     && rm -r /opt/boost_lib
    
     
 RUN cd /opt \
-    && git clone https://gitlab.com/libeigen/eigen.git --branch=3.3.9 \
+    && git clone https://gitlab.com/libeigen/eigen.git --branch=3.3 \
     && cd eigen \
     && git submodule init \
     && git submodule update \
@@ -179,11 +188,15 @@ RUN cd /opt \
         -DBOOST_INCLUDEDIR=/var/3DReconstructionEnv/boost/include \
         -DBOOST_LIBRARYDIR=/var/3DReconstructionEnv/boost/lib \
         -DCMAKE_CXX_STANDARD_REQUIRED=ON \
-        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd" \
-        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd" \
+        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_C_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
         -DEIGEN_CUDA_COMPUTE_ARCH=86 \
         -DCUDA_NVCC_FLAGS="-gencode arch=compute_86,code=[sm_86,compute_86]" \
         -DBUILD_TESTING=OFF \
+        -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
         -DEIGEN_TEST_CXX11=ON \
         -DEIGEN_BUILD_BTL=OFF \
         -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/eigen \
@@ -206,12 +219,15 @@ RUN cd /opt \
         -DEigen3_DIR=/var/3DReconstructionEnv/eigen/share/eigen3/cmake \
         -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/ceres \
         -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
         -DBUILD_TESTING=OFF \
         -DBUILD_EXAMPLES=OFF \
         -DBUILD_BENCHMARKS=OFF \
         -Dgflags_DIR=/var/3DReconstructionEnv/gflags/lib/cmake/gflags \
-        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -fPIC -std=gnu++17 -fopenmp -fopenmp-simd" \
-        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd" \
+        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -fPIC -std=gnu++17 -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -std=gnu++17 -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_C_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
         -Dglog_DIR=/var/3DReconstructionEnv/glog \
         .. \
     && make -j`nproc` \
@@ -233,8 +249,11 @@ RUN cd /opt \
         -DCMAKE_CXX_STANDARD=17 \
         -DENABLE_CXX11=ON \
         -DCMAKE_CXX_STANDARD_REQUIRED=ON \
-        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -fPIC" \
-        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC" \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -fPIC -DNDEBUG" \
+        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -DNDEBUG" \
+        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -DNDEBUG" \
+        -DCMAKE_C_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -DNDEBUG" \
         -DBUILD_TESTS=OFF \
         -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs \
         -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/opencv \
@@ -247,7 +266,7 @@ RUN cd /opt \
         -DWITH_CUBLAS=ON \
         -DWITH_CUFFT=ON \
         -DWITH_EIGEN=ON \
-        -DWITH_VULKAN=ON \
+        -DWITH_VULKAN=OFF \
         -DBUILD_opencv_python3=OFF \
         -DBUILD_opencv_python_tests=OFF \
         -DBUILD_opencv_python_bindings_generator=OFF \
@@ -292,12 +311,15 @@ RUN cd /opt \
     && cd build \
     && cmake \
         -DCMAKE_BUILD_TYPE=RELEASE \
-        -DCMAKE_CXX_FLAGS="-Ofast -fopenmp -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp-simd" \
-        -DCMAKE_C_FLAGS="-Ofast -fopenmp -march=native -mtune=native -fPIC -fopenmp-simd" \
+        -DCMAKE_CXX_FLAGS="-Ofast -fopenmp -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -fopenmp -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_C_FLAGS="-Ofast -fopenmp -march=native -mtune=native -fPIC -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_C_FLAGS_RELEASE="-Ofast -fopenmp -march=native -mtune=native -fPIC -fopenmp-simd -DNDEBUG" \
         -DOpenMVG_BUILD_DOC=OFF \
         -DOpenMVG_BUILD_EXAMPLES=OFF \
         -DOpenMVG_BUILD_GUI_SOFTWARES=OFF \
         -DOpenMVG_BUILD_SOFTWARES=OFF \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
         -DOpenMVG_BUILD_SHARED=ON \
         -DEigen3_DIR=/var/3DReconstructionEnv/eigen/share/eigen3/cmake \
         -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/openMVG \
@@ -320,8 +342,12 @@ RUN cd /opt \
         -DCGAL_HEADER_ONLY=OFF \
         -DCMAKE_CXX_STANDARD=17 \
         -DCMAKE_CXX_STANDARD_REQUIRED=ON \
-        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd" \
-        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd" \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+        -DOpenMVG_BUILD_SHARED=ON \
+        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_C_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
         -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/CGAL \
         -DEigen3_DIR=/var/3DReconstructionEnv/eigen/share/eigen3/cmake \
         .. \
@@ -351,9 +377,12 @@ RUN cd /opt \
         -DBUILD_SHARED_LIBS=OFF \
         -DCMAKE_CXX_STANDARD=17 \
         -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
         -DOpenMVS_USE_CUDA=ON \
-        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd" \
-        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd" \
+        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_C_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
         -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/openMVS \
         -DCGAL_ROOT=/var/3DReconstructionEnv/CGAL/lib/cmake/CGAL \
         -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs \

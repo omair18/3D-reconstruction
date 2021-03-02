@@ -1,10 +1,12 @@
 set(DATA_STRUCTURES_LIB_HEADERS
-    ModelDataset.h
-    CUDAImage.h)
+        ModelDataset.h
+        CUDAImage.h
+        CUDAImageDescriptor.h)
 
 set(DATA_STRUCTURES_LIB_CPPS
-    ModelDataset.cpp
-    CUDAImage.cpp)
+        ModelDataset.cpp
+        CUDAImage.cpp
+        CUDAImageDescriptor.cpp)
 
 source_group("Header Files" FILES ${DATA_STRUCTURES_LIB_HEADERS})
 source_group("Source Files" FILES ${DATA_STRUCTURES_LIB_CPPS})

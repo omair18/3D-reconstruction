@@ -16,9 +16,14 @@ target_link_libraries(Service
         PUBLIC
 
         PRIVATE
+        networking
         stdc++fs
         utils
         config
         log
         gpu)
+
+add_executable(KafkaDatasetSender KafkaDatasetSender.cpp)
+
+target_link_libraries(KafkaDatasetSender Boost::program_options)
 

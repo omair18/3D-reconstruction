@@ -2,14 +2,16 @@ set(DECODING_LIB_HEADERS
         IImageDecoder.h
         ImageDecoderFactory.h
         OpenCVImageDecoder.h
-        NvJPEGDecoder.h
-        NvJPEG2kDecoder.h)
+        NvJPEGImageDecoder.h
+        NvJPEGHardwareImageDecoder.h
+        NvJPEG2kImageDecoder.h)
 
 set(DECODING_LIB_CPPS
         ImageDecoderFactory.cpp
         OpenCVImageDecoder.cpp
-        NvJPEGDecoder.cpp
-        NvJPEG2kDecoder.cpp)
+        NvJPEGImageDecoder.cpp
+        NvJPEGHardwareImageDecoder.cpp
+        NvJPEG2kImageDecoder.cpp)
 
 source_group("Header Files" FILES ${DECODING_LIB_HEADERS})
 source_group("Source Files" FILES ${DECODING_LIB_CPPS})
@@ -25,7 +27,8 @@ target_link_libraries(decoding
         log
         ${NVJPEG_LIBRARY}
         ${CUDA_LIBRARIES}
-        opencv_cudaarithm
-        )
+        ${NPPC_LIBRARY}
+        ${NPPIG_LIBRARY}
+        opencv_cudaarithm)
 
 target_include_directories(decoding PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

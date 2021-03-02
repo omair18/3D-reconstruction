@@ -19,6 +19,7 @@ target_link_libraries(config
 
         PRIVATE
         stdc++fs
+        utils
         log
         Boost::json)
 

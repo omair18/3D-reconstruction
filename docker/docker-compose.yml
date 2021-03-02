@@ -10,7 +10,7 @@ services:
             - "reconstruction_zookeeper_data:/data:rw"
             - "reconstruction_zookeeper_datalog:/datalog:rw"
         environment:
-        ALLOW_ANONYMOUS_LOGIN: "yes"
+            ALLOW_ANONYMOUS_LOGIN: "yes"
         restart: unless-stopped
         networks:
             - reconstruction_network
@@ -47,7 +47,7 @@ services:
             NVIDIA_VISIBLE_DEVICES: all
             NVIDIA_DRIVER_CAPABILITIES: all
             DISPLAY: unix:1
-        runtime: nvidia
+            runtime: nvidia
         restart: unless-stopped
         depends_on:
             - reconstruction_kafka

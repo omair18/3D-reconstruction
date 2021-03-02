@@ -91,7 +91,7 @@ inline void load_server_certificate(boost::asio::ssl::context& ctx)
             [](std::size_t,
                boost::asio::ssl::context_base::password_purpose)
             {
-                return "test";
+                return "print_elements_kernel";
             });
 
     ctx.set_options(
@@ -728,7 +728,7 @@ int main(int argc, char* argv[])
     net::io_context ioc{threads};
 
     // The SSL context is required, and holds certificates
-    ssl::context ctx{ssl::context::tlsv12};
+    ssl::context ctx{ssl::context::method::tlsv12 };
 
     // This holds the self-signed certificate used by the server
     load_server_certificate(ctx);

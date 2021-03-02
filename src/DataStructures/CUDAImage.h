@@ -3,15 +3,19 @@
 
 #include <cstddef>
 
-struct CUDAImage
+namespace DataStructures
 {
-    size_t width = 0;
-    size_t height = 0;
-    size_t pitch = 0;
-    size_t channels = 0;
 
-    unsigned char* gpuData = nullptr;
+struct CUDAImage final
+{
+    size_t width_ = 0;
+    size_t height_ = 0;
+    size_t pitch_ = 0;
+    size_t channels_ = 0;
+    size_t elementSize_ = 0;
+    unsigned char* gpuData_ = nullptr;
 };
 
+}
 
 #endif // CUDA_IMAGE_H
