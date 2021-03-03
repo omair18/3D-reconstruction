@@ -37,6 +37,7 @@ find_package(OpenCV COMPONENTS
         opencv_core
         opencv_cudaarithm
         opencv_imgproc
+        opencv_videoio
         opencv_cudaimgproc
         opencv_cudawarping
         opencv_sfm

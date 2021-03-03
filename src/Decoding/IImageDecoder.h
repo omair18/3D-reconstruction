@@ -24,6 +24,8 @@ class IImageDecoder
 public:
     IImageDecoder() = default;
 
+    virtual ~IImageDecoder() = default;
+
     virtual void Decode(const unsigned char* data, unsigned long long size, cv::Mat& decodedImage) = 0;
 
     virtual void Decode(const unsigned char* data, unsigned long long size, cv::Mat& decodedImage, size_t outputWidth, size_t outputHeight) = 0;
@@ -36,9 +38,10 @@ public:
 
     virtual void Decode(const unsigned char* data, unsigned long long size, DataStructures::CUDAImage& decodedImage, size_t outputWidth, size_t outputHeight) = 0;
 
+    virtual void Initialize() = 0;
+
     virtual bool IsInitialized() = 0;
 
-    virtual ~IImageDecoder() = default;
 };
 
 }

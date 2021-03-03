@@ -14,12 +14,12 @@ def main():
         '-i',
         '--input',
         type=str,
-        help='Path to a folder with images or to a video',
+        help='Path to a folder with images or to a video.',
         required=True
     )
 
     parser.add_argument(
-        '-fs',
+        '-f',
         '--frame-step',
         type=int,
         help='Frame step.',
@@ -35,18 +35,18 @@ def main():
     )
 
     parser.add_argument(
-        '-ci',
+        '-c',
         '--camera-id',
         type=int,
-        help='Camera id',
+        help='Camera id.',
         required=True
     )
 
     parser.add_argument(
-        '-jq',
+        '-j',
         '--jpeg-quality',
         type=int,
-        help='JPEG quality',
+        help='JPEG quality.',
         required=False,
         default=40
     )
@@ -59,14 +59,6 @@ def main():
         required=True
     )
 
-    parser.add_argument(
-        '-gi',
-        '--group-id',
-        type=int,
-        help='Group id of Kafka broker.',
-        required=True
-    )
-
     args = parser.parse_args()
 
     input_path = args.input
@@ -75,16 +67,15 @@ def main():
     camera_id = args.camera_id
     broker = args.broker
     topic = args.topic
-    group_id = args.group_id
-
-    frames = []
-    dataset_uuid = str(uuid.uuid4())
 
     if not os.path.exists(input_path):
         raise RuntimeError("Invalid input path!")
 
     if frame_step <= 0:
         raise RuntimeError("Frame step must be positive!")
+
+    frames = []
+    dataset_uuid = str(uuid.uuid4())
 
     print("Reading input ...")
 

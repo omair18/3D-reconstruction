@@ -174,9 +174,16 @@ void NvJPEGImageDecoder::Decode(const unsigned char *data, unsigned long long in
 
     }
 
+void NvJPEGImageDecoder::Initialize()
+{
+
+}
+
 bool NvJPEGImageDecoder::IsInitialized()
 {
     return m_initialized;
 }
+
+
 
 }

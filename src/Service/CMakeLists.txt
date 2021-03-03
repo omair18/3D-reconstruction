@@ -25,5 +25,13 @@ target_link_libraries(Service
 
 add_executable(KafkaDatasetSender KafkaDatasetSender.cpp)
 
-target_link_libraries(KafkaDatasetSender Boost::program_options)
+target_link_libraries(KafkaDatasetSender
+        PRIVATE
+        Boost::program_options
+        Boost::json
+        opencv_core
+        opencv_imgcodecs
+        opencv_videoio
+        stdc++fs
+        RdKafka::rdkafka++)
 

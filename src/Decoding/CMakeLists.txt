@@ -26,9 +26,12 @@ target_link_libraries(decoding
         PRIVATE
         log
         ${NVJPEG_LIBRARY}
+        ${NVJPEG2K_LIBRARY}
         ${CUDA_LIBRARIES}
         ${NPPC_LIBRARY}
         ${NPPIG_LIBRARY}
-        opencv_cudaarithm)
+        opencv_cudaarithm
+        opencv_imgproc
+        opencv_imgcodecs)
 
 target_include_directories(decoding PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

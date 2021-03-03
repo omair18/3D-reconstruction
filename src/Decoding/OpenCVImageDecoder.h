@@ -25,6 +25,8 @@ public:
 
     void Decode(const unsigned char* data, unsigned long long size, DataStructures::CUDAImage& decodedImage, size_t outputWidth, size_t outputHeight) override;
 
+    void Initialize() override;
+
     bool IsInitialized() override;
 };
 

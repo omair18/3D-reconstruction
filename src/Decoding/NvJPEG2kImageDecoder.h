@@ -21,6 +21,8 @@ public:
 
     void Decode(const unsigned char *data, unsigned long long size, cv::cuda::GpuMat &decodedData) override;
 
+    void Initialize() override;
+
     bool IsInitialized() override;
 
 

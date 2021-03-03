@@ -1,7 +1,8 @@
 set(DATA_STRUCTURES_LIB_HEADERS
         ModelDataset.h
         CUDAImage.h
-        CUDAImageDescriptor.h)
+        CUDAImageDescriptor.h
+        ThreadSafeQueue.h)
 
 set(DATA_STRUCTURES_LIB_CPPS
         ModelDataset.cpp
