@@ -11,13 +11,34 @@
 namespace Utils
 {
 
+/**
+ * @class PathUtils
+ *
+ * @brief
+ */
 class PathUtils
 {
 public:
+
+    /**
+     * @brief
+     *
+     * @return
+     */
     static std::string GetAppDataPath();
 
+    /**
+     * @brief
+     *
+     * @return
+     */
     static std::string GetExecutablePath();
 
+    /**
+     * @brief
+     *
+     * @return
+     */
     static std::string GetExecutableFolderPath();
 };
 

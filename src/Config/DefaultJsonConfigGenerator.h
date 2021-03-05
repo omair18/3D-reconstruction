@@ -22,10 +22,26 @@ class JsonConfig;
 class DefaultJsonConfigGenerator
 {
 public:
+
+    /**
+     * @brief
+     *
+     * @return
+     */
     static std::shared_ptr<JsonConfig> GenerateKafkaConsumerDefaultConfig();
 
+    /**
+     * @brief
+     *
+     * @return
+     */
     static std::shared_ptr<JsonConfig> GenerateKafkaProducerDefaultConfig();
 
+    /**
+     * @brief
+     *
+     * @return
+     */
     static std::shared_ptr<JsonConfig> GenerateServiceDefaultConfig();
 
 };

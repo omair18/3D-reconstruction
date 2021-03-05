@@ -28,6 +28,9 @@ public:
     void Initialize() override;
 
     bool IsInitialized() override;
+
+private:
+    void AllocateBuffer(int width, int height, int channels) override;
 };
 
 }

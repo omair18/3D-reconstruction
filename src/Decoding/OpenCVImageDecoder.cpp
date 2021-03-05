@@ -53,4 +53,9 @@ void OpenCVImageDecoder::Initialize()
     LOG_TRACE() << "OpenCV decoder was successfully initialized.";
 }
 
+void OpenCVImageDecoder::AllocateBuffer(int width, int height, int channels)
+{
+
+}
+
 }

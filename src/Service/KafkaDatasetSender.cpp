@@ -141,6 +141,7 @@ int main(int argc, char** argv)
         }
     }
 
+    frames.clear();
     std::cout << "Sending images ..." << std::endl;
 
     std::string kafkaErrorString;
@@ -170,6 +171,7 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
+    delete globalConfig;
 
     auto encodedImagesTotal = encodedImages.size();
     for(int i = 0; i < encodedImagesTotal; ++i)
@@ -197,7 +199,6 @@ int main(int argc, char** argv)
         producer->flush(1000);
     }
 
-    delete globalConfig;
     delete producer;
 
     return EXIT_SUCCESS;

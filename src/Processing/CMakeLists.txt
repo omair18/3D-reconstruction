@@ -12,6 +12,7 @@ add_library(processing SHARED ${PROCESSING_LIB_HEADERS} ${PROCESSING_LIB_CPPS})
 target_link_libraries(processing
         PUBLIC
 
-        PRIVATE)
+        PRIVATE
+        datastructures)
 
 target_include_directories(processing PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

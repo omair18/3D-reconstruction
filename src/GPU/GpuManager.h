@@ -6,6 +6,7 @@
 
 #include "GPU.h"
 
+//
 namespace Config
 {
     class JsonConfig;

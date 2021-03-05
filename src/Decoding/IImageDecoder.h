@@ -42,6 +42,10 @@ public:
 
     virtual bool IsInitialized() = 0;
 
+protected:
+
+    virtual void AllocateBuffer(int width, int height, int channels) = 0;
+
 };
 
 }

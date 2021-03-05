@@ -3,17 +3,35 @@
 
 #include "CUDAImage.h"
 
+/**
+ * @namespace DataStructures
+ *
+ * @brief
+ */
 namespace DataStructures
 {
 
+/**
+ * @class CUDAImageDescriptor
+ *
+ * @brief
+ */
 class CUDAImageDescriptor final
 {
 public:
 
 private:
+
+    ///
     CUDAImage image_;
+
+    ///
     int frameId_;
+
+    ///
     int cameraId_;
+
+    ///
     int timestamp_;
 };
 

@@ -29,7 +29,7 @@ public:
 private:
     void DecodeInternal(const unsigned char* data, unsigned long long size, cv::cuda::GpuMat& outputImage);
 
-    void AllocateBuffer(int width, int height, int channels);
+    void AllocateBuffer(int width, int height, int channels) override;
 
     void InitDecoder();
 

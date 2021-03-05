@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.2.0-devel-ubuntu20.04
+FROM nvidia/cuda:11.2.1-devel-ubuntu20.04
 
 ENV TZ=Europe/Minsk
 ENV NVIDIA_DRIVER_CAPABILITIES=all
@@ -390,6 +390,6 @@ RUN cd /opt \
     && make -j`nproc` \
     && make install \
     && rm -rf /opt/openMVS
-    
-    
+
+
 WORKDIR /opt

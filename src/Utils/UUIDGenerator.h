@@ -11,9 +11,20 @@
 namespace Utils
 {
 
+/**
+ * @class UUIDGenerator
+ *
+ * @brief
+ */
 class UUIDGenerator
 {
 public:
+
+    /**
+     * @brief
+     *
+     * @return
+     */
     static std::string GenerateUUID();
 };
 
