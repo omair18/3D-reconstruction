@@ -155,5 +155,10 @@ void ServiceSDK::InitializeWebServer(const std::shared_ptr<Config::JsonConfig> &
     }
 }
 
+void ServiceSDK::Start()
+{
+
+}
+
 
 }

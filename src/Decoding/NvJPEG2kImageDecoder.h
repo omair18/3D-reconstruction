@@ -13,17 +13,25 @@ class NvJPEG2kImageDecoder final : public IImageDecoder
 {
 public:
 
-    NvJPEG2kImageDecoder();
+    explicit NvJPEG2kImageDecoder(cudaStream_t& cudaStream);
 
-    ~NvJPEG2kImageDecoder() override;
+    void Decode(const unsigned char* data, unsigned long long size, cv::Mat& decodedData) override;
 
-    void Decode(const unsigned char *data, unsigned long long size, cv::Mat &decodedData) override;
+    void Decode(const unsigned char* data, unsigned long long size, cv::Mat& decodedImage, size_t outputWidth, size_t outputHeight) override;
 
-    void Decode(const unsigned char *data, unsigned long long size, cv::cuda::GpuMat &decodedData) override;
+    void Decode(const unsigned char* data, unsigned long long size, cv::cuda::GpuMat& decodedData) override;
+
+    void Decode(const unsigned char* data, unsigned long long size, cv::cuda::GpuMat& decodedImage, size_t outputWidth, size_t outputHeight) override;
+
+    void Decode(const unsigned char* data, unsigned long long size, DataStructures::CUDAImage& decodedImage) override;
+
+    void Decode(const unsigned char* data, unsigned long long size, DataStructures::CUDAImage& decodedImage, size_t outputWidth, size_t outputHeight) override;
 
     void Initialize() override;
 
     bool IsInitialized() override;
+
+    ~NvJPEG2kImageDecoder() override;
 
 
 private:

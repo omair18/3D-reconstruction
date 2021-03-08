@@ -1,4 +1,5 @@
 #include <iostream>
+#include <mutex>
 
 #include "ServiceSDK.h"
 
@@ -9,6 +10,12 @@ int main(int argc, char** argv)
     try
     {
         serviceSdk.Initialize();
+
+        serviceSdk.Start();
+
+        std::mutex mutex;
+        mutex.lock();
+        std::lock_guard<std::mutex> lockGuard(mutex);
     }
     catch (std::exception& exception)
     {

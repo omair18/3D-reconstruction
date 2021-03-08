@@ -8,16 +8,6 @@
 namespace Config
 {
 
-std::shared_ptr<JsonConfig> DefaultJsonConfigGenerator::GenerateKafkaConsumerDefaultConfig()
-{
-    return std::shared_ptr<JsonConfig>();
-}
-
-std::shared_ptr<JsonConfig> DefaultJsonConfigGenerator::GenerateKafkaProducerDefaultConfig()
-{
-    return std::shared_ptr<JsonConfig>();
-}
-
 std::shared_ptr<JsonConfig> DefaultJsonConfigGenerator::GenerateServiceDefaultConfig()
 {
     auto config = std::make_shared<JsonConfig>();

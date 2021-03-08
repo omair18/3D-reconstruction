@@ -15,7 +15,7 @@ value_(std::make_shared<boost::json::value>())
 }
 
 JsonConfig::JsonConfig(const JsonConfig& other) :
-value_(other.value_)
+value_(std::make_shared<boost::json::value>(*other.value_))
 {
 
 }

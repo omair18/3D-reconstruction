@@ -196,7 +196,7 @@ int main(int argc, char** argv)
                           0,
                           nullptr,
                           nullptr);
-        producer->flush(1000);
+        producer->flush(10000);
     }
 
     delete producer;

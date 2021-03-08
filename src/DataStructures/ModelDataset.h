@@ -35,7 +35,7 @@ public:
      *
      * @brief
      */
-    enum ProcessingState
+    enum ProcessingStatus
     {
         ///
         COLLECTING = 0,
@@ -49,6 +49,14 @@ public:
         ///
         READY
     };
+
+    const std::string& GetUUID();
+
+    void SetUUID(const std::string& UUID);
+
+    std::string GetProcessingStatusString();
+
+    ProcessingStatus GetProcessingStatus();
 
 private:
 
@@ -65,7 +73,7 @@ private:
     int totalSize_;
 
     ///
-    ProcessingState state_;
+    ProcessingStatus status_;
 };
 
 }

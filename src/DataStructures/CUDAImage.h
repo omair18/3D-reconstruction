@@ -1,8 +1,8 @@
-/**--------------------------------------------------------------------------------------------------
- * @file	CUDAImage.h.
+/**
+ * @file CUDAImage.h.
  *
- * Declares class for working with images on CUDA.
- *-----------------------------------------------------------------------------------------------**/
+ * @brief Declares class for working with images on CUDA.
+ */
 
 
 #ifndef CUDA_IMAGE_H
@@ -20,11 +20,18 @@ namespace cv
     }
 }
 
+/**
+ * @namespace DataStructures
+ *
+ * @brief
+ */
 namespace DataStructures
 {
 
 struct CUDAImage final
 {
+    CUDAImage();
+
     CUDAImage(const CUDAImage& other);
 
     CUDAImage(CUDAImage&& other) noexcept;
@@ -87,13 +94,22 @@ struct CUDAImage final
 
     void CopyFromCvMatAsync(const cv::Mat& src, void* cudaStream = nullptr);
 
-    void CopyFromRawPointer(void* src, size_t width, size_t height, size_t channels, size_t elementSize, bool pitchedAllocation);
+    void CopyFromRawHostPointer(void* src, size_t width, size_t height, size_t channels, size_t elementSize, bool pitchedAllocation);
 
-    void CopyFromRawPointerAsync(void* src, size_t width, size_t height, size_t channels, size_t elementSize, bool pitchedAllocation, void* cudaStream = nullptr);
+    void CopyFromRawHostPointerAsync(void* src, size_t width, size_t height, size_t channels, size_t elementSize, bool pitchedAllocation, void* cudaStream = nullptr);
 
-    void CopyToRawPointer(void* dst, size_t width, size_t height, size_t channels, size_t elementSize);
+    void CopyToRawHostPointer(void* dst, size_t width, size_t height, size_t channels, size_t elementSize);
 
-    void CopyToRawPointerAsync(void* dst, size_t width, size_t height, size_t channels, size_t elementSize, void* cudaStream = nullptr);
+    void CopyToRawHostPointerAsync(void* dst, size_t width, size_t height, size_t channels, size_t elementSize, void* cudaStream = nullptr);
+
+    void CopyFromRawDevicePointer(void* src, size_t width, size_t height, size_t channels, size_t elementSize, bool pitchedAllocation);
+
+    void CopyFromRawDevicePointerAsync(void* src, size_t width, size_t height, size_t channels, size_t elementSize, bool pitchedAllocation, void* cudaStream = nullptr);
+
+    void CopyToRawDevicePointer(void* dst, size_t width, size_t height, size_t channels, size_t elementSize);
+
+    void CopyToRawDevicePointerAsync(void* dst, size_t width, size_t height, size_t channels, size_t elementSize, void* cudaStream = nullptr);
+
 
     [[nodiscard]] bool Empty() const;
 

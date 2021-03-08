@@ -31,7 +31,9 @@ target_link_libraries(decoding
         ${CUDA_nppc_LIBRARY}
         ${CUDA_nppig_LIBRARY}
         opencv_cudaarithm
+        opencv_cudawarping
         opencv_imgproc
-        opencv_imgcodecs)
+        opencv_imgcodecs
+        datastructures)
 
 target_include_directories(decoding PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

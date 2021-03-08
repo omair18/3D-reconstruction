@@ -12,7 +12,7 @@ namespace Decoding
 class NvJPEGImageDecoder : public IImageDecoder
 {
 public:
-    NvJPEGImageDecoder();
+    explicit NvJPEGImageDecoder(cudaStream_t& cudaStream);
 
     void Decode(const unsigned char* data, unsigned long long size, cv::Mat& decodedData) override;
 
@@ -32,34 +32,42 @@ public:
 
     ~NvJPEGImageDecoder() override;
 
-private:
-    void DecodeInternal(const unsigned char* data, unsigned long long size, cv::cuda::GpuMat& outputImage);
+protected:
+
+    nvjpegJpegState_t state_{};
+    nvjpegJpegState_t decoupledState_{};
+    nvjpegHandle_t handle_{};
+
+    nvjpegBufferPinned_t pinnedBuffer_{};
+    nvjpegBufferDevice_t deviceBuffer_{};
+
+    nvjpegDecodeParams_t decodeParams_{};
+    nvjpegJpegDecoder_t decoder_{};
+
+    nvjpegJpegStream_t  jpegStream_{};
+    cudaStream_t cudaStream_;
+
+    nvjpegImage_t imageBuffer_{};
+    size_t bufferSize_;
+
+    NppStreamContext nppStreamContext_;
+    nvjpegImage_t resizeBuffer_{};
+    size_t resizeBufferSize_;
+
+    bool initialized_;
+
+    void DecodeInternal(const unsigned char* data, unsigned long long size, DataStructures::CUDAImage& image);
+
+    void DecodeInternalWithResize(const unsigned char* data, unsigned long long size, DataStructures::CUDAImage& image, size_t outputWidth, size_t outputHeight);
 
     void AllocateBuffer(int width, int height, int channels) override;
 
+    void AllocateResizeBuffer(int width, int height, int channels);
+
+private:
+
     void InitDecoder();
 
-    nvjpegJpegState_t m_state;
-    nvjpegJpegState_t m_decoupledState;
-    nvjpegHandle_t m_handle;
-
-    nvjpegBufferPinned_t m_pinnedBuffer;
-    nvjpegBufferDevice_t m_deviceBuffer;
-
-    nvjpegDecodeParams_t m_decodeParams;
-    nvjpegJpegDecoder_t m_decoder;
-
-    nvjpegJpegStream_t  m_jpegStream;
-    cudaStream_t m_cudaStream;
-
-    nvjpegImage_t m_imageBuffer;
-    size_t m_bufferSize;
-
-    NppStatus resizeStatus_;
-    NppiSize outputSize_;
-
-    bool m_hardwareBackendAvailable;
-    bool m_initialized;
 };
 
 }

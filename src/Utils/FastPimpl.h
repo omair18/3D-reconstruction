@@ -1,7 +1,7 @@
 /**
  * @file FastPimpl.h.
  *
- * Declares the fast "Pointer to IMPLementation" class
+ * @brief Declares the fast "Pointer to IMPLementation" class
  */
 
 #ifndef FAST_PIMPL_H
@@ -36,8 +36,8 @@ public:
     /**
      * @brief This constructor uses placement-new to create T-class object at data_.
      *
-     * @tparam Args - variadic template param of arguments of T-class constructor.
-     * @param args - Arguments of T-class constructor.
+     * @tparam Args - variadic template param of arguments of T-class constructor
+     * @param args - Arguments of T-class constructor
      */
     template<class...Args>
     explicit FastPimpl(Args &&...args)
@@ -48,7 +48,7 @@ public:
     /**
      * @brief Operator = for R-value param. Moves data from other object to current.
      *
-     * @param fastPimpl - R-value reference for other FastPimpl object.
+     * @param fastPimpl - R-value reference for other FastPimpl object
      * @return L-value reference to current FastPimpl object.
      */
     FastPimpl &operator=(FastPimpl&& fastPimpl) noexcept
@@ -60,7 +60,7 @@ public:
     /**
      * @brief Operator = for L-value param. Destroys current data and creates a copy of other object's data.
      *
-     * @param fastPimpl - L-value reference for other FastPimpl object.
+     * @param fastPimpl - L-value reference for other FastPimpl object
      * @return L-value reference to current FastPimpl object.
      */
     FastPimpl &operator=(const FastPimpl &fastPimpl)
@@ -139,8 +139,8 @@ private:
      * If there is a value mismatch, there will be a compilation error. Error information will contain correct values
      * of size and alignment.
      *
-     * @tparam ActualSize - Real size of T-class object.
-     * @tparam ActualAlignment - Real alignment of T-class object.
+     * @tparam ActualSize - Real size of T-class object
+     * @tparam ActualAlignment - Real alignment of T-class object
      */
     template<std::size_t ActualSize, std::size_t ActualAlignment>
     static void validate() noexcept

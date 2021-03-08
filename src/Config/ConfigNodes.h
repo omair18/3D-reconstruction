@@ -1,8 +1,8 @@
-/**--------------------------------------------------------------------------------------------------
- * @file	ConfigNodes.h.
+/**
+ * @file ConfigNodes.h.
  *
- * Declares constant configuration nodes in all configuration files.
- *-----------------------------------------------------------------------------------------------**/
+ * @brief Declares constant configuration nodes in all configuration files.
+ */
 
 
 #ifndef CONFIG_NODES_H
@@ -79,8 +79,24 @@ namespace Config
                 const inline static std::string MaxSMs = "MAX_SMs";
             }
 
+            const inline static std::string Storage = "storage";
+            namespace StorageConfig
+            {
+                const inline static std::string Type = "type";
+                const inline static std::string Filesystem = "filesystem";
+                const inline static std::string Path = "path";
+            }
         }
 
+        namespace AlgorithmsConfig
+        {
+            namespace AlgorithmsNames
+            {
+
+            }
+
+
+        }
     }
 }
 

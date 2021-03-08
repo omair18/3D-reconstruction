@@ -1,8 +1,8 @@
-/**--------------------------------------------------------------------------------------------------
- * @file	JsonConfig.h.
+/**
+ * @file JsonConfig.h.
  *
- * Declares the JsonConfig class. A class for working with configs in JSON format.
- *-----------------------------------------------------------------------------------------------**/
+ * @brief Declares the JsonConfig class. A class for working with configs in JSON format.
+ */
 
 #ifndef JSON_CONFIG_H
 #define JSON_CONFIG_H
@@ -60,28 +60,28 @@ public:
     /**
      * @brief Copy constructor. Creates a copy of other-param object.
      *
-     * @param other - Instance of existing JsonConfig.
+     * @param other - Instance of existing JsonConfig
      */
     JsonConfig(const JsonConfig& other);
 
     /**
-     * @brief Move constructor. Moves data from other-param to current instance.
+     * @brief Move constructor. Moves data from other-param to current instance_.
      *
-     * @param other - Instance of existing JsonConfig.
+     * @param other - Instance of existing JsonConfig
      */
     JsonConfig(JsonConfig&& other) noexcept;
 
     /**
-     * @brief Constructs new JsonConfig instance with data from file, located at path-param.
+     * @brief Constructs new JsonConfig instance_ with data from file, located at path-param.
      *
-     * @param path - Path to .json file.
+     * @param path - Path to .json file
      */
     explicit JsonConfig(const std::filesystem::path& path);
 
     /**
-     * @brief Constructs new JsonConfig instance with data from existing JSON-object.
+     * @brief Constructs new JsonConfig instance_ with data from existing JSON-object.
      *
-     * @param object - Instance of existing JSON-object;
+     * @param object - Instance of existing JSON-object
      */
     explicit JsonConfig(const boost::json::value& object);
 
@@ -94,8 +94,8 @@ public:
      * @brief Adds bool value-param with key key-param. If current JsonConfig is no an object,
      * does nothing and creates a record in log file with severity ERROR.
      *
-     * @param key - Key value.
-     * @param value - Value of boolean to add.
+     * @param key - Key value
+     * @param value - Value of boolean to add
      */
     void AddNodeBool(const std::string &key, bool value);
 
@@ -103,8 +103,8 @@ public:
      * @brief Adds float value-param with key key-param. If current JsonConfig is no an object,
      * does nothing and creates a record in log file with severity ERROR.
      *
-     * @param key - Key value.
-     * @param val - Value of float to add.
+     * @param key - Key value
+     * @param val - Value of float to add
      */
     void AddNodeFloat(const std::string& key, float val);
 
@@ -112,8 +112,8 @@ public:
      * @brief Adds int value-param with key key-param. If current JsonConfig is no an object,
      * does nothing and creates a record in log file with severity ERROR.
      *
-     * @param key - Key value.
-     * @param val - Value of integer to add.
+     * @param key - Key value
+     * @param val - Value of integer to add
      */
     void AddNodeInt(const std::string& key, int val);
 
@@ -121,8 +121,8 @@ public:
      * @brief Adds string value-param with key key-param. If current JsonConfig is no an object,
      * does nothing and creates a record in log file with severity ERROR.
      *
-     * @param key - Key value.
-     * @param value - Value of string to add.
+     * @param key - Key value
+     * @param value - Value of string to add
      */
     void AddNodeString(const std::string& key, const std::string &value);
 
@@ -130,8 +130,8 @@ public:
      * @brief Adds vector&lt;float&gt; value-param with key key-param. If current JsonConfig is no an object,
      * does nothing and creates a record in log file with severity ERROR.
      *
-     * @param key - Key value.
-     * @param val - Array of float values to add.
+     * @param key - Key value
+     * @param val - Array of float values to add
      */
     void AddNodeVecFloat(const std::string& key, const std::vector<float>& val);
 
@@ -139,8 +139,8 @@ public:
      * @brief Adds vector&lt;int&gt; value-param with key key-param. If current JsonConfig is no an object,
      * does nothing and creates a record in log file with severity ERROR.
      *
-     * @param key - Key value.
-     * @param val - Array of integral values to add.
+     * @param key - Key value
+     * @param val - Array of integral values to add
      */
     void AddNodeVecInt(const std::string& key, const std::vector<int>& val);
 
@@ -148,8 +148,8 @@ public:
      * @brief Adds vector&lt;vector&lt;int&gt;&gt; value-param with key key-param.
      * If current JsonConfig is no an object, does nothing and creates a record in log file with severity ERROR.
      *
-     * @param key - Key value.
-     * @param val - 2D-array of integral values to add.
+     * @param key - Key value
+     * @param val - 2D-array of integral values to add
      */
     void AddNodeVecVecInt(const std::string& key, const std::vector<std::vector<int>>& val);
 
@@ -157,8 +157,8 @@ public:
      * @brief Adds vector&lt;vector&lt;vector&lt;int&gt&gt;&gt; value-param with key key-param.
      * If current JsonConfig is no an object, does nothing and creates a record in log file with severity ERROR.
      *
-     * @param key - Key value.
-     * @param val - 3D-array of integral values to add.
+     * @param key - Key value
+     * @param val - 3D-array of integral values to add
      */
     void AddNodeVecVecVecInt(const std::string& key, const std::vector<std::vector<std::vector<int>>>& val);
 
@@ -166,7 +166,7 @@ public:
      * @brief Converts object from object-param to JSON value and adds it to array.
      * If current JsonConfig is no an array, does nothing and creates a record in log file with severity ERROR.
      *
-     * @param object - An object for adding to array.
+     * @param object - An object for adding to array
      */
     void AddObject(const std::shared_ptr<JsonConfig>& object);
 
@@ -178,22 +178,22 @@ public:
     std::string Dump();
 
     /**
-     * @brief Initializes current JsonConfig instance with JSON from jsonString-param.
-     * If the instance of JsonConfig was not empty, old data will be replaced with new data.
+     * @brief Initializes current JsonConfig instance_ with JSON from jsonString-param.
+     * If the instance_ of JsonConfig was not empty, old data will be replaced with new data.
      * If jsonString-param contains invalid JSON, does nothing and puts a record in a log file with
      * severity ERROR about parsing failure.
      *
-     * @param jsonString - String with JSON value.
+     * @param jsonString - String with JSON value
      */
     void FromJsonString(const std::string& jsonString);
 
     /**
-     * @brief Initializes current JsonConfig instance with array of JSON values from configs-param.
-     * If the instance of JsonConfig was not empty, old data will be replaced with new data.
+     * @brief Initializes current JsonConfig instance_ with array of JSON values from configs-param.
+     * If the instance_ of JsonConfig was not empty, old data will be replaced with new data.
      * If one of the object from configs-param contains invalid JSON, skips invalid object and puts a record in a
      * log file with severity ERROR about parsing failure.
      *
-     * @param configs - Vector of JSON values.
+     * @param configs - Vector of JSON values
      */
     void FromVectorConfigs(const std::vector<std::shared_ptr<JsonConfig>>& configs);
 
@@ -221,15 +221,15 @@ public:
     /**
      * @brief Checks weather current JSON object contains node with key-param key.
      *
-     * @param key - Key to check.
-     * @return True if contains. Otherwise returns false.
+     * @param key - Key to check
+     * @return True if contains. Otherwise returns false
      */
     bool Contains(const std::string& key);
 
     /**
      * @brief Puts current JSON value to ostream as string in a human-readable format.
      *
-     * @param stream - Output data stream.
+     * @param stream - Output data stream
      */
     void Save(std::ofstream& stream);
 
@@ -237,8 +237,8 @@ public:
      * @brief Converts value at node-param to JSON value and sets it to current object at node id-param.
      * If node-param contains invalid JSON object, does nothing and puts a record to log file with ERROR severity.
      *
-     * @param key - Key for adding a new node.
-     * @param object - JSON value for adding to current JSON object with key key-param.
+     * @param key - Key for adding a new node
+     * @param object - JSON value for adding to current JSON object with key key-param
      */
     void SetNode(const std::string& key, const std::shared_ptr<JsonConfig>& object);
 
@@ -345,7 +345,7 @@ public:
      * @brief Provides access to node at current JSON value with key key-param as a pointer.
      * If there is no such node, returns nullptr and puts a record to a log file with severity ERROR.
      *
-     * @param key - Key of the node to access.
+     * @param key - Key of the node to access
      * @return A pointer to key-param node or nullptr.
      */
     std::shared_ptr<JsonConfig> operator[] (const std::string& key);
@@ -354,7 +354,7 @@ public:
      * @brief Provides access to node at current JSON value with key key-param as a pointer.
      * If there is no such node, returns nullptr and puts a record to a log file with severity ERROR.
      *
-     * @param key - Key of the node to access.
+     * @param key - Key of the node to access
      * @return A pointer to key-param node or nullptr.
      */
     std::shared_ptr<JsonConfig> operator[] (const std::string& key) const;

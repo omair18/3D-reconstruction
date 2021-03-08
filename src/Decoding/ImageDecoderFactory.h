@@ -19,7 +19,7 @@ enum DecoderType
 class ImageDecoderFactory final
 {
 public:
-    static std::unique_ptr<IImageDecoder> Create();
+    static std::unique_ptr<IImageDecoder> Create(DecoderType type, bool useCUDAStream, void* cudaStream);
 };
 
 }

@@ -12,7 +12,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CUDA_STANDARD 17)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
-set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_86,code=[sm_86,compute_86] -std=c++17")
+set(CMAKE_CUDA_FLAGS
+        "${CMAKE_CUDA_FLAGS}
+        -std=c++17
+        -gencode arch=compute_61,code=[sm_61,compute_61]
+        -gencode arch=compute_75,code=[sm_75,compute_75]
+        -gencode arch=compute_80,code=[sm_80,compute_80]
+        -gencode arch=compute_86,code=[sm_86,compute_86]")
 set(CUDA_VERBOSE_BUILD ON)
 
 #set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Ofast  -fopenmp -fopenmp-simd -march=native -mtune=native")
@@ -67,3 +73,5 @@ add_subdirectory(test)
 
 file(COPY web DESTINATION ${PROJECT_BINARY_DIR}/bin)
 file(COPY python/kafka_dataset_sender.py DESTINATION ${PROJECT_BINARY_DIR}/bin)
+file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/bin/models)
+file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/bin/Logs)

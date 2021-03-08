@@ -5,6 +5,18 @@
 #include "CUDAImage.h"
 #include "Logger.h"
 
+DataStructures::CUDAImage::CUDAImage() :
+gpuData_(nullptr),
+height_(0),
+elementSize_(0),
+width_(0),
+pitch_(0),
+channels_(0),
+pitchedAllocation_(false)
+{
+
+}
+
 void DataStructures::CUDAImage::Allocate(unsigned int width, unsigned int height, unsigned int channels, unsigned int elementSize, bool pitchedAllocation)
 {
     if(gpuData_)
@@ -271,7 +283,7 @@ bool DataStructures::CUDAImage::Empty() const
     return gpuData_ == nullptr;
 }
 
-void DataStructures::CUDAImage::CopyFromRawPointer(void* src, size_t width, size_t height, size_t channels, size_t elementSize, bool pitchedAllocation)
+void DataStructures::CUDAImage::CopyFromRawHostPointer(void* src, size_t width, size_t height, size_t channels, size_t elementSize, bool pitchedAllocation)
 {
     if(gpuData_)
     {
@@ -377,7 +389,7 @@ void DataStructures::CUDAImage::CopyFromCvMatAsync(const cv::Mat &src, void *cud
                  src.cols * src.channels() * src.elemSize(), src.rows, cudaMemcpyKind::cudaMemcpyHostToDevice, (cudaStream_t)cudaStream);
 }
 
-void DataStructures::CUDAImage::CopyFromRawPointerAsync(void *src, size_t width, size_t height, size_t channels, size_t elementSize, bool pitchedAllocation, void *cudaStream)
+void DataStructures::CUDAImage::CopyFromRawHostPointerAsync(void *src, size_t width, size_t height, size_t channels, size_t elementSize, bool pitchedAllocation, void *cudaStream)
 {
     if(gpuData_)
     {
@@ -400,7 +412,7 @@ void DataStructures::CUDAImage::CopyFromRawPointerAsync(void *src, size_t width,
                  cudaMemcpyKind::cudaMemcpyHostToDevice, (cudaStream_t)cudaStream);
 }
 
-void DataStructures::CUDAImage::CopyToRawPointer(void *dst, size_t width, size_t height, size_t channels, size_t elementSize)
+void DataStructures::CUDAImage::CopyToRawHostPointer(void *dst, size_t width, size_t height, size_t channels, size_t elementSize)
 {
     if(gpuData_)
     {
@@ -409,7 +421,7 @@ void DataStructures::CUDAImage::CopyToRawPointer(void *dst, size_t width, size_t
     }
 }
 
-void DataStructures::CUDAImage::CopyToRawPointerAsync(void *dst, size_t width, size_t height, size_t channels, size_t elementSize, void *cudaStream)
+void DataStructures::CUDAImage::CopyToRawHostPointerAsync(void *dst, size_t width, size_t height, size_t channels, size_t elementSize, void *cudaStream)
 {
     if(gpuData_)
     {
@@ -664,6 +676,26 @@ void DataStructures::CUDAImage::CopyFromCUDAImageAsync(const DataStructures::CUD
     }
     cudaMemcpy2DAsync(gpuData_, pitch_, src.gpuData_, src.pitch_, src.width_ * src.channels_ * src.elementSize_,
                  src.height_, cudaMemcpyKind::cudaMemcpyDeviceToDevice, (cudaStream_t)cudaStream);
+}
+
+void DataStructures::CUDAImage::CopyFromRawDevicePointer(void *src, size_t width, size_t height, size_t channels, size_t elementSize, bool pitchedAllocation)
+{
+
+}
+
+void DataStructures::CUDAImage::CopyFromRawDevicePointerAsync(void *src, size_t width, size_t height, size_t channels, size_t elementSize, bool pitchedAllocation, void *cudaStream)
+{
+
+}
+
+void DataStructures::CUDAImage::CopyToRawDevicePointer(void *dst, size_t width, size_t height, size_t channels, size_t elementSize)
+{
+
+}
+
+void DataStructures::CUDAImage::CopyToRawDevicePointerAsync(void *dst, size_t width, size_t height, size_t channels, size_t elementSize, void *cudaStream)
+{
+
 }
 
 

@@ -1,3 +1,9 @@
+/**
+ * @file UUIDGenerator.h.
+ *
+ * @brief Declares the class for generating UUIDs.
+ */
+
 #ifndef UUID_GENERATOR_H
 #define UUID_GENERATOR_H
 
@@ -6,7 +12,7 @@
 /**
  * @namespace Utils
  *
- * @brief Namespace of libutils library
+ * @brief Namespace of libutils library.
  */
 namespace Utils
 {
@@ -14,16 +20,16 @@ namespace Utils
 /**
  * @class UUIDGenerator
  *
- * @brief
+ * @brief A class for generating UUIDs.
  */
 class UUIDGenerator
 {
 public:
 
     /**
-     * @brief
+     * @brief Generates UUID according to RFC-4122 as std::string.
      *
-     * @return
+     * @return Generated UUID as std::string.
      */
     static std::string GenerateUUID();
 };

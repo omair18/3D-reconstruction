@@ -2,12 +2,16 @@ set(DATA_STRUCTURES_LIB_HEADERS
         ModelDataset.h
         CUDAImage.h
         CUDAImageDescriptor.h
-        ThreadSafeQueue.h)
+        ProcessingQueue.h
+        ProcessingQueueManager.h
+        ProcessingData.h)
 
 set(DATA_STRUCTURES_LIB_CPPS
         ModelDataset.cpp
         CUDAImage.cpp
-        CUDAImageDescriptor.cpp)
+        CUDAImageDescriptor.cpp
+        ProcessingQueueManager.cpp
+        ProcessingData.cpp)
 
 source_group("Header Files" FILES ${DATA_STRUCTURES_LIB_HEADERS})
 source_group("Source Files" FILES ${DATA_STRUCTURES_LIB_CPPS})
@@ -23,6 +27,7 @@ target_link_libraries(datastructures
         PRIVATE
         log
         opencv_core
+        config
         ${CUDA_CUDART_LIBRARY})
 
 

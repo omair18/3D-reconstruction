@@ -29,7 +29,7 @@ private:
     bool ValidateServerConfiguration(const std::shared_ptr<Config::JsonConfig>& webServerConfig);
 
     std::string address_;
-    int port_;
+    int port_ = -1;
     std::vector<std::thread> threadPool_;
 
     std::string webDirectoryPath_;

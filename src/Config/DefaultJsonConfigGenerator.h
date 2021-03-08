@@ -1,3 +1,10 @@
+/**
+ * @file DefaultJsonConfigGenerator.h.
+ *
+ * @brief Declares the DefaultJsonConfigGenerator class. A class for generating default JSON configs.
+ */
+
+
 #ifndef DEFAULT_JSON_CONFIG_GENERATOR_H
 #define DEFAULT_JSON_CONFIG_GENERATOR_H
 
@@ -17,25 +24,11 @@ class JsonConfig;
 /**
  * @class DefaultJsonConfigGenerator
  *
- * @brief
+ * @brief A class for generating default JSON configs.
  */
 class DefaultJsonConfigGenerator
 {
 public:
-
-    /**
-     * @brief
-     *
-     * @return
-     */
-    static std::shared_ptr<JsonConfig> GenerateKafkaConsumerDefaultConfig();
-
-    /**
-     * @brief
-     *
-     * @return
-     */
-    static std::shared_ptr<JsonConfig> GenerateKafkaProducerDefaultConfig();
 
     /**
      * @brief

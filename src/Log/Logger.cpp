@@ -30,34 +30,33 @@ namespace Log
 {
 bool Logger::Init()
 {
-    if(!initialized)
+    if(!initialized_)
     {
-        instance = new Logger();
-        instance->backend = new boost::log::sources::severity_logger_mt<SEVERITY_LEVEL>();
-        InitSink();
-        initialized = true;
+        instance_ = new Logger();
+        instance_->backend_ = new boost::log::sources::severity_logger_mt<SEVERITY_LEVEL>();
+        initialized_ = InitSink();
     }
     else
     {
         std::clog << "Failed to initialize logger." << std::endl;
     }
-    return initialized;
+    return initialized_;
 }
 
 void Logger::Free()
 {
-    if(initialized)
+    if(initialized_)
     {
-        if(instance->backend)
-            delete instance->backend;
-        delete instance;
-        initialized = false;
+        if(instance_->backend_)
+            delete instance_->backend_;
+        delete instance_;
+        initialized_ = false;
     }
 }
 
 const Logger* Logger::GetInstance() noexcept
 {
-    return instance;
+    return instance_;
 }
 
 Logger::RecordStream Logger::CreateRecordSteam() const
@@ -68,12 +67,15 @@ Logger::RecordStream Logger::CreateRecordSteam() const
 bool Logger::InitSink()
 {
     typedef boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend> fileSink_t;
-    auto pSink = boost::make_shared<fileSink_t>(
+    auto sink = boost::make_shared<fileSink_t>(
             //boost::log::keywords::
             );
-
+    if(!sink)
     {
-        auto backend = pSink->locked_backend();
+        return false;
+    }
+    {
+        auto backend = sink->locked_backend();
 
         backend->set_file_collector(boost::log::sinks::file::make_collector(
                 boost::log::keywords::target = "Logs",                              // where to store rotated files
@@ -85,9 +87,9 @@ bool Logger::InitSink()
         backend->scan_for_files();
     }
 
-    boost::log::core::get()->add_sink(pSink);
+    boost::log::core::get()->add_sink(sink);
 
-    pSink->set_formatter(boost::log::expressions::stream
+    sink->set_formatter(boost::log::expressions::stream
     << boost::log::expressions::format_date_time<boost::posix_time::ptime>("TimeStamp", "%d-%m-%Y %H:%M:%S.%f")
     << " [" << boost::this_thread::get_id() << "] "
     << boost::log::expressions::attr<std::string>("SeverityLevel")
@@ -120,11 +122,11 @@ Logger::RecordStream::~RecordStream()
 
 Logger::RecordStream::RecordStream(const Logger *logger) :
 logger_(logger),
-record_(logger->backend->open_record())
+record_(logger->backend_->open_record())
 {
     if(!!record_)
     {
-        auto recordPump = boost::log::aux::make_record_pump(*logger_->backend, record_);
+        auto recordPump = boost::log::aux::make_record_pump(*logger_->backend_, record_);
         recordPump_ = new auto (boost::move(recordPump));
     }
 }
@@ -142,7 +144,7 @@ void Logger::RecordStream::WriteData()
     recordPump_ = nullptr;
     if(!!record_)
     {
-        auto recordPump = boost::log::aux::make_record_pump(*logger_->backend, record_);
+        auto recordPump = boost::log::aux::make_record_pump(*logger_->backend_, record_);
         recordPump_ = new auto (boost::move(recordPump));
     }
 }

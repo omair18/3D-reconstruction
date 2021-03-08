@@ -33,6 +33,8 @@ public:
 
     void Initialize();
 
+    void Start();
+
 private:
 
     void InitializeConfigFolderPath();
