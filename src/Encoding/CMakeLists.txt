@@ -4,14 +4,14 @@ set(ENCODING_LIB_HEADERS
         OpenCVImageEncoder.h
         NvJPEGImageEncoder.h
         NvJPEGHardwareImageEncoder.h
-        NvJPEG2kImageEncoder.h)
+        )
 
 set(ENCODING_LIB_CPPS
         ImageEncoderFactory.cpp
         OpenCVImageEncoder.cpp
         NvJPEGImageEncoder.cpp
         NvJPEGHardwareImageEncoder.cpp
-        NvJPEG2kImageEncoder.cpp)
+        )
 
 source_group("Header Files" FILES ${ENCODING_LIB_HEADERS})
 source_group("Source Files" FILES ${ENCODING_LIB_CPPS})

@@ -1,14 +1,16 @@
-//
-// Created by valera on 02.03.2021.
-//
+#ifndef NVJPEG_IMAGE_ENCODER_H
+#define NVJPEG_IMAGE_ENCODER_H
 
-#ifndef INC_3D_RECONSTRUCTION_NVJPEGIMAGEENCODER_H
-#define INC_3D_RECONSTRUCTION_NVJPEGIMAGEENCODER_H
+#include "IImageEncoder.h"
 
+namespace Encoding
+{
 
-class NvJPEGImageEncoder {
+class NvJPEGImageEncoder : public IImageEncoder
+{
 
 };
 
+}
 
-#endif //INC_3D_RECONSTRUCTION_NVJPEGIMAGEENCODER_H
+#endif // NVJPEG_IMAGE_ENCODER_H

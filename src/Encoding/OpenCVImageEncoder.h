@@ -1,14 +1,16 @@
-//
-// Created by valera on 02.03.2021.
-//
+#ifndef OPENCV_IMAGE_ENCODER_H
+#define OPENCV_IMAGE_ENCODER_H
 
-#ifndef INC_3D_RECONSTRUCTION_OPENCVIMAGEENCODER_H
-#define INC_3D_RECONSTRUCTION_OPENCVIMAGEENCODER_H
+#include "IImageEncoder.h"
 
+namespace Encoding
+{
 
-class OpenCVImageEncoder {
+class OpenCVImageEncoder final : public IImageEncoder
+{
 
 };
 
+}
 
-#endif //INC_3D_RECONSTRUCTION_OPENCVIMAGEENCODER_H
+#endif // OPENCV_IMAGE_ENCODER_H

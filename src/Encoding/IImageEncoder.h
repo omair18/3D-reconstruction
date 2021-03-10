@@ -7,6 +7,10 @@ namespace Encoding
 class IImageEncoder
 {
 
+public:
+
+private:
+
 };
 
 }
