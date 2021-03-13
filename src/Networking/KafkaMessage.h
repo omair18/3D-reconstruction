@@ -31,6 +31,12 @@ public:
 
     ~KafkaMessage() = default;
 
+    KafkaMessage& operator=(const KafkaMessage& message);
+
+    KafkaMessage& operator=(KafkaMessage&& message) noexcept;
+
+    bool operator==(const KafkaMessage& other);
+
     bool Empty();
 
     const std::vector<unsigned char>& GetData();

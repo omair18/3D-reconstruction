@@ -23,7 +23,7 @@ void GpuManager::UpdateCUDACapableDevicesList()
     cudaCapableDevices_.reserve(gpusCount);
     cudaDeviceProp properties {};
     cudaError_t status;
-    for (unsigned int i = 0; i < gpusCount; ++i)
+    for (int i = 0; i < gpusCount; ++i)
     {
         status = cudaGetDeviceProperties(&properties, static_cast<int>(i));
         if(status != cudaError_t::cudaSuccess)
@@ -43,6 +43,9 @@ void GpuManager::UpdateCUDACapableDevicesList()
             gpu.multiprocessorsAmount_ = properties.multiProcessorCount;
             gpu.memoryTotal_ = properties.totalGlobalMem;
             gpu.memoryBandwidth_ = static_cast<double>(properties.memoryBusWidth) * properties.memoryClockRate / 4000000;
+            gpu.maxThreadsPerBlock_ = properties.maxThreadsPerBlock;
+            gpu.sharedMemPerBlock_ = properties.sharedMemPerBlock;
+            gpu.maxThreadsPerMultiprocessor_ = properties.maxThreadsPerMultiProcessor;
 
             LOG_TRACE() << "Found GPU: [" << i << "] "
             << gpu.name_ << " with "
@@ -60,6 +63,7 @@ void GpuManager::SetDevice(GPU& gpu)
 {
     LOG_TRACE() << "Using " << gpu.name_ << " as current GPU.";
     cudaSetDevice(static_cast<int>(gpu.deviceId_));
+    selectedGPU_ = std::make_shared<GPU>(gpu);
 }
 
 const std::vector<GPU>& GpuManager::GetCUDACapableDevicesList()
@@ -176,6 +180,11 @@ GPU& GpuManager::SelectMatchingGPU(const std::shared_ptr<Config::JsonConfig> &co
 
     LOG_ERROR() << "Failed to select matching GPU. Unknown selection policy is configured.";
     throw std::runtime_error("Failed to select matching GPU.");
+}
+
+const std::shared_ptr<GPU> &GpuManager::GetCurrentGPU()
+{
+    return selectedGPU_;
 }
 
 }

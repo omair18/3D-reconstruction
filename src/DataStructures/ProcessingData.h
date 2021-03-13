@@ -18,7 +18,15 @@ class ProcessingData
 public:
     ProcessingData() = default;
 
-    ProcessingData(const ProcessingData& other) = default;
+    ProcessingData(const ProcessingData& other);
+
+    ProcessingData(ProcessingData&& other) noexcept;
+
+    ProcessingData& operator=(const ProcessingData& other);
+
+    ProcessingData& operator=(ProcessingData&& other) noexcept;
+
+
 
 private:
 

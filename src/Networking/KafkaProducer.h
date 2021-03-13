@@ -20,6 +20,8 @@ public:
 
     ~KafkaProducer();
 
+    bool Initialize(const std::shared_ptr<Config::JsonConfig>& config);
+
     void Produce(const std::shared_ptr<KafkaMessage>& message);
 private:
     RdKafka::Producer* producer_ = nullptr;

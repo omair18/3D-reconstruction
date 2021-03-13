@@ -58,10 +58,12 @@ public:
 
     ProcessingStatus GetProcessingStatus();
 
+    const std::vector<CUDAImageDescriptor>& GetImagesDescriptors() noexcept;
+
 private:
 
     ///
-    std::vector<CUDAImageDescriptor> imageDescriptors_;
+    std::vector<CUDAImageDescriptor> imagesDescriptors_;
 
     ///
     std::string UUID_;

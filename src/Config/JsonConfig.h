@@ -359,6 +359,30 @@ public:
      */
     std::shared_ptr<JsonConfig> operator[] (const std::string& key) const;
 
+    /**
+     * @brief
+     *
+     * @param other
+     * @return
+     */
+    JsonConfig& operator=(const JsonConfig& other);
+
+    /**
+     * @brief
+     *
+     * @param other
+     * @return
+     */
+    JsonConfig& operator=(JsonConfig&& other) noexcept;
+
+    /**
+     * @brief
+     *
+     * @param other
+     * @return
+     */
+    bool operator==(const JsonConfig& other);
+
 private:
 
     /// A pointer to JSON data.

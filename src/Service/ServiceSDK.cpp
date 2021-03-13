@@ -9,15 +9,17 @@
 #include "GpuManager.h"
 #include "ConfigNodes.h"
 #include "PathUtils.h"
-#include "WebServer.h"
-#include "WebServerFactory.h"
+#include "WebServerManager.h"
+#include "ProcessingQueueManager.h"
 
 namespace Service
 {
 
 ServiceSDK::ServiceSDK(int argc, char** argv) :
 configManager_(std::make_unique<Config::JsonConfigManager>()),
-gpuManager_(std::make_unique<GPU::GpuManager>())
+gpuManager_(std::make_unique<GPU::GpuManager>()),
+webServerManager_(std::make_unique<Networking::WebServerManager>()),
+queueManager_(std::make_unique<DataStructures::ProcessingQueueManager>())
 {
 
 }
@@ -28,6 +30,7 @@ void ServiceSDK::Initialize()
 
     Utils::StackTraceDumper::ProcessSignal(SIGABRT);
     Utils::StackTraceDumper::ProcessSignal(SIGSEGV);
+    Utils::StackTraceDumper::ProcessSignal(SIGTERM);
 
     LOG_TRACE() << "Initializing service ...";
 
@@ -124,38 +127,20 @@ void ServiceSDK::InitializeServiceGPU(const std::shared_ptr<Config::JsonConfig>&
 
 void ServiceSDK::InitializeWebServer(const std::shared_ptr<Config::JsonConfig> &serviceConfig)
 {
-    if(!serviceConfig->Contains(Config::ConfigNodes::ServiceConfig::WebServer))
-    {
-        LOG_ERROR() << "Invalid service configuration. There is no node "
-        << Config::ConfigNodes::ServiceConfig::WebServer
-        << " in service configuration file.";
-        throw std::runtime_error("Invalid service configuration.");
-    }
-
-    auto webServerConfig = (*serviceConfig)[Config::ConfigNodes::ServiceConfig::WebServer];
-
-    if(!webServerConfig->Contains(Config::ConfigNodes::ServiceConfig::WebServerConfig::Enabled))
-    {
-        LOG_ERROR() << "Invalid service web server configuration. There is no node "
-        << Config::ConfigNodes::ServiceConfig::WebServerConfig::Enabled << " in web server configuration node.";
-        throw std::runtime_error("Invalid service web server configuration.");
-    }
-
-    bool webServerEnabled = (*webServerConfig)[Config::ConfigNodes::ServiceConfig::WebServerConfig::Enabled]->ToBool();
-
-    if(webServerEnabled)
-    {
-        LOG_TRACE() << "Web server is enabled.";
-        webServer_ = Networking::WebServerFactory::Create();
-        webServer_->Initialize(webServerConfig);
-    }
-    else
-    {
-        LOG_TRACE() << "Web server is disabled.";
-    }
+    webServerManager_->CreateWebServer(serviceConfig);
 }
 
 void ServiceSDK::Start()
+{
+
+}
+
+void ServiceSDK::InitializeProcessingQueues(const std::shared_ptr<Config::JsonConfig> &serviceConfig)
+{
+
+}
+
+void ServiceSDK::InitializeProcessors(const std::shared_ptr<Config::JsonConfig>& serviceConfig)
 {
 
 }

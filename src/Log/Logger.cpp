@@ -68,8 +68,10 @@ bool Logger::InitSink()
 {
     typedef boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend> fileSink_t;
     auto sink = boost::make_shared<fileSink_t>(
-            //boost::log::keywords::
-            );
+            boost::log::keywords::file_name = "Logs/%Y_%m_%d-%H_%M-%5N.log",
+            boost::log::keywords::max_size = 16 * 1024 * 1024,
+            boost::log::keywords::auto_flush = true
+    );
     if(!sink)
     {
         return false;

@@ -65,7 +65,7 @@ int main()
         cv::cuda::resize(cvGpuMat, resizedGpu, resizedSize);
         auto cvGpuResizeEnd = std::chrono::high_resolution_clock::now();
 
-        NppiSize srcSize = { .width = (int)cudaImageWidth, .height = (int)cudaImageHeight };
+        NppiSize srcSize = { .width = static_cast<int>(cudaImageWidth), .height = static_cast<int>(cudaImageHeight) };
         NppiRect srcRoi = { .x = 0, .y = 0, .width = srcSize.width, .height = srcSize.height };
         NppiSize dstSize = { .width = resizedSize.width, .height = resizedSize.height };
         NppiRect dstRoi = { .x = 0, .y = 0, .width = dstSize.width, .height = dstSize.height };

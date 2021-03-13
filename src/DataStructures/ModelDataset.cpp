@@ -33,4 +33,9 @@ DataStructures::ModelDataset::ProcessingStatus DataStructures::ModelDataset::Get
     return status_;
 }
 
+const std::vector<CUDAImageDescriptor> &ModelDataset::GetImagesDescriptors() noexcept
+{
+    return imagesDescriptors_;
+}
+
 }

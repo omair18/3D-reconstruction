@@ -26,6 +26,8 @@ public:
 
     ~KafkaConsumer();
 
+    bool Initialize(const std::shared_ptr<Config::JsonConfig>& config);
+
     std::shared_ptr<KafkaMessage> Consume();
 private:
 

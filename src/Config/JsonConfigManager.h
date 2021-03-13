@@ -70,10 +70,10 @@ public:
     void ReadSettingsFromFile(const std::filesystem::path& filePath);
 
     /**
-     * @brief
+     * @brief Checks weather configuration file with specific name exists in config folder.
      *
-     * @param configName
-     * @return
+     * @param configName - Name of configuration file without extension
+     * @return True if configName-param.json was found in folder with configuration files.
      */
     bool ConfigExists(const std::string& configName);
 

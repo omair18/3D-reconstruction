@@ -23,6 +23,11 @@ target_link_libraries(algorithms
         PUBLIC
 
         PRIVATE
+        encoding
+        decoding
+        networking
+        datastructures
+        log
         )
 
 target_include_directories(algorithms PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

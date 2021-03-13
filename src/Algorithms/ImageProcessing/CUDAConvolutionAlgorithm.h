@@ -1,0 +1,11 @@
+#ifndef CUDA_CONVOLUTION_ALGORITHM_H
+#define CUDA_CONVOLUTION_ALGORITHM_H
+
+
+class CUDAConvolutionAlgorithm
+{
+
+};
+
+
+#endif // CUDA_CONVOLUTION_ALGORITHM_H

@@ -15,6 +15,11 @@ namespace DataStructures
     class ProcessingData;
 }
 
+namespace Config
+{
+    class JsonConfig;
+}
+
 /**
  * @namespace Algorithms
  *
@@ -34,17 +39,15 @@ public:
     /**
      * @brief Default constructor.
      */
-    IAlgorithm() = default;
+    explicit IAlgorithm(const std::shared_ptr<Config::JsonConfig>& config){};
 
     /**
-     * @brief Executes an algorithm on the container of ProcessingData.
+     * @brief
      *
-     * @param processingDataBatch - List of ProcessingData
-     *
-     * @return True if after processing the container contains at least one element, false otherwise.
+     * @param processingData
+     * @return
      */
-    virtual bool Process(std::shared_ptr<DataStructures::ProcessingData>& processingDataBatch,
-                         bool usesCUDAStream = false, void* cudaStream = nullptr) = 0;
+    virtual bool Process(std::shared_ptr<DataStructures::ProcessingData>& processingData) = 0;
 
 
     /**

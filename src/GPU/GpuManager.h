@@ -72,10 +72,15 @@ public:
      */
     void SetDevice(GPU& gpu);
 
+    const std::shared_ptr<GPU>& GetCurrentGPU();
+
 private:
 
     /// List of CUDA-capable devices
     std::vector<GPU> cudaCapableDevices_;
+
+    ///
+    std::shared_ptr<GPU> selectedGPU_;
 };
 
 }

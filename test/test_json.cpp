@@ -4,23 +4,14 @@
 
 int main()
 {
-    boost::json::value a = {
-            {"a", 1233},
-            {"b", {1, 2, 3} }
-    };
+    boost::json::value t1, t2;
+    t1.emplace_object();
+    t2.emplace_object();
 
-    std::vector<int> b;
+    t1.as_object().emplace("1", 1);
+    t2.as_object().emplace("1", 2);
 
-    auto& arr = a.at("b").as_array();
+    std::cout << (t1 == t2) << std::endl;
 
-    b.reserve(arr.size());
-
-    for(auto& val : arr)
-    {
-        b.push_back(val.as_int64());
-    }
-    a.at("b").as_object();
-
-    std::cout << a << std::endl;
     return 0;
 }

@@ -57,6 +57,8 @@ find_package(OpenCV COMPONENTS
         PATHS ${LIBRARIES_PATH}/opencv
         NO_DEFAULT_PATH)
 
+find_package(AWSSDK REQUIRED PATHS ${LIBRARIES_PATH}/aws NO_DEFAULT_PATH)
+
 find_library(NVJPEG_LIBRARY nvjpeg ${CUDA_TOOLKIT_ROOT_DIR}/lib64)
 
 find_library(NVJPEG2K_LIBRARY nvjpeg2k ${CUDA_TOOLKIT_ROOT_DIR}/lib64)

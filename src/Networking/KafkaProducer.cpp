@@ -5,9 +5,18 @@
 #include "JsonConfig.h"
 #include "Logger.h"
 
-Networking::KafkaProducer::KafkaProducer(const std::shared_ptr<Config::JsonConfig> &config)
+Networking::KafkaProducer::KafkaProducer(const std::shared_ptr<Config::JsonConfig> &config) :
+producer_(nullptr)
 {
-
+    LOG_TRACE() << "Initializing kafka producer ...";
+    if(Initialize(config))
+    {
+        LOG_TRACE() << "Kafka producer was initialized successfully.";
+    }
+    else
+    {
+        LOG_ERROR() << "Failed to initialize kafka producer.";
+    }
 }
 
 Networking::KafkaProducer::~KafkaProducer()
@@ -21,7 +30,7 @@ Networking::KafkaProducer::~KafkaProducer()
 void Networking::KafkaProducer::Produce(const std::shared_ptr<KafkaMessage> &message)
 {
     std::string key = message->GetKey()->Dump();
-    producer_->produce(topic_,
+    auto errorCode = producer_->produce(topic_,
                         RdKafka::Topic::PARTITION_UA,
                         RdKafka::Producer::RK_MSG_COPY,
                        (void*)message->GetData().data(),
@@ -32,4 +41,19 @@ void Networking::KafkaProducer::Produce(const std::shared_ptr<KafkaMessage> &mes
                         nullptr,
                         nullptr);
 
+    if(errorCode != RdKafka::ErrorCode::ERR_NO_ERROR)
+    {
+        LOG_ERROR() << "";
+
+    }
+    else
+    {
+        LOG_TRACE() << "";
+    }
+
+}
+
+bool Networking::KafkaProducer::Initialize(const std::shared_ptr<Config::JsonConfig> &config)
+{
+    return false;
 }

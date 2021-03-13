@@ -25,25 +25,35 @@ namespace GPU
 struct GPU
 {
     /// Id of GPU.
-    unsigned int deviceId_;
+    int deviceId_;
 
     /// Name of CUDA-capable device.
     std::string name_;
 
     /// Major version of compute capability.
-    unsigned int computeCapabilityMajor_;
+    int computeCapabilityMajor_;
 
     /// Minor version of compute capability.
-    unsigned int computeCapabilityMinor_;
+    int computeCapabilityMinor_;
 
     /// Amount of SMs on GPU.
-    unsigned int multiprocessorsAmount_;
+    int multiprocessorsAmount_;
 
     /// Global memory available on device in bytes.
     std::size_t memoryTotal_;
 
     /// Bandwidth of GPU memory in GB/s.
     double memoryBandwidth_;
+
+    ///
+    int maxThreadsPerMultiprocessor_;
+
+    ///
+    int maxThreadsPerBlock_;
+
+    ///
+    std::size_t sharedMemPerBlock_;
+
 };
 
 }

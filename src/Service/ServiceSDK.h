@@ -17,7 +17,12 @@ namespace GPU
 
 namespace Networking
 {
-    class WebServer;
+    class WebServerManager;
+}
+
+namespace DataStructures
+{
+    class ProcessingQueueManager;
 }
 
 namespace Service
@@ -47,6 +52,10 @@ private:
 
     void InitializeWebServer(const std::shared_ptr<Config::JsonConfig>& serviceConfig);
 
+    void InitializeProcessingQueues(const std::shared_ptr<Config::JsonConfig>& serviceConfig);
+
+    void InitializeProcessors(const std::shared_ptr<Config::JsonConfig>& serviceConfig);
+
     std::shared_ptr<Config::JsonConfig> GetServiceConfig();
 
     constexpr const inline static char* organizationName = "BSUIR";
@@ -55,7 +64,9 @@ private:
 
     std::unique_ptr<Config::JsonConfigManager> configManager_;
     std::unique_ptr<GPU::GpuManager> gpuManager_;
-    std::unique_ptr<Networking::WebServer> webServer_;
+    std::unique_ptr<Networking::WebServerManager> webServerManager_;
+    std::unique_ptr<DataStructures::ProcessingQueueManager> queueManager_;
+
 
     std::string configPath_;
 

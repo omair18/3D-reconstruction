@@ -23,7 +23,6 @@ target_link_libraries(processing
         PRIVATE
         datastructures
         log
-        networking
         ${CUDA_CUDART_LIBRARY})
 
 target_include_directories(processing PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

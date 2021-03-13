@@ -37,19 +37,6 @@ namespace Config
         namespace ServiceConfig
         {
             const inline static std::string WebServer = "webServer";
-            namespace WebServerConfig
-            {
-                const inline static std::string Enabled = "enabled";
-                const inline static std::string IpAddress = "ipAddress";
-                const inline static std::string Port = "port";
-                const inline static std::string Protocol = "protocol";
-                const inline static std::string ThreadPoolSize = "threadPoolSize";
-                const inline static std::string HTTP = "HTTP";
-                const inline static std::string HTTPS = "HTTPS";
-                const inline static std::string HTTP_AND_HTTPS = "HTTP_AND_HTTPS";
-                const inline static std::string UseDhParams = "useDhParams";
-                const inline static std::string WebFolderPath = "webFolderPath";
-            }
 
             const inline static std::string Pipeline = "pipeline";
             namespace PipelineConfig
@@ -84,7 +71,39 @@ namespace Config
             {
                 const inline static std::string Type = "type";
                 const inline static std::string Filesystem = "filesystem";
+                const inline static std::string AmazonBucket = "amazonBucket";
                 const inline static std::string Path = "path";
+            }
+        }
+
+        namespace NetworkingConfig
+        {
+            namespace WebServerConfig
+            {
+                const inline static std::string Enabled = "enabled";
+                const inline static std::string IpAddress = "ipAddress";
+                const inline static std::string Port = "port";
+                const inline static std::string Protocol = "protocol";
+                const inline static std::string ThreadPoolSize = "threadPoolSize";
+                const inline static std::string HTTP = "HTTP";
+                const inline static std::string HTTPS = "HTTPS";
+                const inline static std::string HTTP_AND_HTTPS = "HTTP_AND_HTTPS";
+                const inline static std::string UseDhParams = "useDhParams";
+                const inline static std::string WebFolderPath = "webFolderPath";
+            }
+
+            namespace KafkaConsumerConfig
+            {
+                const inline static std::string Brokers = "brokers";
+                const inline static std::string Topics = "topics";
+                const inline static std::string EnablePartitionEOF = "enablePartitionEOF";
+                const inline static std::string GroupId = "groupId";
+                const inline static std::string Timeout = "timeout";
+            }
+
+            namespace KafkaProducerConfig
+            {
+
             }
         }
 
@@ -92,10 +111,20 @@ namespace Config
         {
             namespace AlgorithmsNames
             {
+                // Kafka IO
+                const inline static std::string KafkaConsumptionAlgorithm = "kafkaConsumptionAlgorithm";
+                const inline static std::string KafkaProducingAlgorithm = "kafkaProducingAlgorithm";
 
+                // Decoding
+                const inline static std::string ImageDecodingAlgorithm = "imageDecodingAlgorithm";
+
+                // Image processing
+                const inline static std::string CUDAConvolutionAlgorithm = "CUDAConvolutionAlgorithm";
+                const inline static std::string CUDAResizeAlgorithm = "CUDAResizeAlgorithm";
+
+                // Photogrammetry
+                const inline static std::string DatasetCollectingAlgorithm = "datasetCollectingAlgorithm";
             }
-
-
         }
     }
 }

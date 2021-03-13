@@ -6,7 +6,7 @@
 {                                                                           \
     if (status != NVJPEG_STATUS_SUCCESS)                                    \
     {                                                                       \
-        LOG_ERROR() << "NVJPEG error " << (int)(status);                    \
+        LOG_ERROR() << "NVJPEG error " << static_cast<int>(status);         \
         return;                                                             \
     }                                                                       \
 }
@@ -15,7 +15,9 @@
 {                                                                           \
     if (status != cudaSuccess)                                              \
     {                                                                       \
-        LOG_ERROR() << "CUDA Runtime error " << (int)(status);              \
+        LOG_ERROR() << "CUDA Runtime error " << static_cast<int>(status)    \
+        << " : " << cudaGetErrorName(status) << " - "                       \
+        << cudaGetErrorString(status);                                      \
         return;                                                             \
     }                                                                       \
 }

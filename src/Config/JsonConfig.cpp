@@ -570,4 +570,39 @@ std::shared_ptr<JsonConfig> JsonConfig::operator[](const std::string& key) const
     }
 }
 
+JsonConfig &JsonConfig::operator=(const JsonConfig &other)
+{
+    if(this == &other)
+    {
+        return *this;
+    }
+    value_ = std::make_shared<boost::json::value>(*other.value_);
+    return *this;
+}
+
+JsonConfig &JsonConfig::operator=(JsonConfig &&other) noexcept
+{
+    if(other.value_ == value_)
+    {
+        return *this;
+    }
+    value_ = std::move(other.value_);
+    return *this;
+}
+
+bool JsonConfig::operator==(const JsonConfig &other)
+{
+    if (this == &other)
+    {
+        return true;
+    }
+
+    if (value_ == other.value_)
+    {
+        return true;
+    }
+
+    return *value_ == *other.value_;
+}
+
 }

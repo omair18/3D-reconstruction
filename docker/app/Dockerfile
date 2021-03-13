@@ -24,7 +24,9 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
         unzip \
         pkg-config \
         wget \
+        libcurl4-gnutls-dev \
         libcutensor1 \
+        libnvgraph10 \
         libcutensor-dev \
         libpng-dev \
         libjpeg-turbo8-dev \
@@ -390,6 +392,34 @@ RUN cd /opt \
     && make -j`nproc` \
     && make install \
     && rm -rf /opt/openMVS
+
+    cd /opt \
+    && git clone --branch=1.8.161 https://github.com/aws/aws-sdk-cpp.git \
+    && cd aws-sdk-cpp \
+    && mkdir build \
+    && cd build \
+    && cmake \
+        -DCMAKE_CXX_STANDARD=17 \
+        -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_C_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_BUILD_TYPE=RELEASE \
+        -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/aws \
+        -DENABLE_UNITY_BUILD=OFF \
+        -DENABLE_TESTING=OFF \
+        -DAUTORUN_UNIT_TESTS=OFF \
+        -DANDROID_BUILD_CURL=OFF \
+        -DANDROID_BUILD_OPENSSL=OFF \
+        -DANDROID_BUILD_ZLIB=OFF \
+        .. \
+    && make -j`nproc` \
+    && make install \
+    && rm -rf /opt/aws-sdk-cpp
+
 
 
 WORKDIR /opt

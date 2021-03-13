@@ -1,6 +1,6 @@
 set(NETWORKING_LIB_HEADERS
         WebServer.h
-        WebServerFactory.h
+        WebServerManager.h
         HttpsSession.h
         HttpSession.h
         KafkaConsumer.h
@@ -10,7 +10,7 @@ set(NETWORKING_LIB_HEADERS
 
 set(NETWORKING_LIB_CPPS
         WebServer.cpp
-        WebServerFactory.cpp
+        WebServerManager.cpp
         HttpsSession.cpp
         HttpSession.cpp
         KafkaConsumer.cpp

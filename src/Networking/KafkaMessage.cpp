@@ -47,3 +47,28 @@ void Networking::KafkaMessage::SetKey(const std::shared_ptr<Config::JsonConfig> 
 {
     messageKey_ = key;
 }
+
+bool Networking::KafkaMessage::operator==(const Networking::KafkaMessage &other)
+{
+    return *messageKey_ == *other.messageKey_ && messageData_ == other.messageData_;
+}
+
+Networking::KafkaMessage &Networking::KafkaMessage::operator=(Networking::KafkaMessage &&message) noexcept
+{
+    messageKey_ = std::move(message.messageKey_);
+    messageData_ = std::move(message.messageData_);
+    return *this;
+}
+
+Networking::KafkaMessage &Networking::KafkaMessage::operator=(const Networking::KafkaMessage &message)
+{
+    if(this == &message)
+    {
+        return *this;
+    }
+
+    messageData_ = message.messageData_;
+    messageKey_ = std::make_shared<Config::JsonConfig>(*message.messageKey_);
+
+    return *this;
+}
