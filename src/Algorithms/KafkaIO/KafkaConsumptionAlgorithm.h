@@ -1,7 +1,7 @@
 #ifndef KAFKA_CONSUMPTION_ALGORITHM_H
 #define KAFKA_CONSUMPTION_ALGORITHM_H
 
-#include "IAlgorithm.h"
+#include "ICPUAlgorithm.h"
 
 namespace Networking
 {
@@ -11,9 +11,11 @@ namespace Networking
 namespace Algorithms
 {
 
-class KafkaConsumptionAlgorithm : public IAlgorithm
+class KafkaConsumptionAlgorithm final : public ICPUAlgorithm
 {
 public:
+
+    bool Process(std::shared_ptr<DataStructures::ProcessingData> &processingData) override;
 
 private:
     std::unique_ptr<Networking::KafkaConsumer> consumer_;

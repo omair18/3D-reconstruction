@@ -2,13 +2,15 @@ set(PROCESSING_LIB_HEADERS
         IProcessor.h
         GpuProcessor.h
         ProcessorFactory.h
-        CpuProcessor.h)
+        CpuProcessor.h
+        Thread.h)
 
 set(PROCESSING_LIB_CPPS
         IProcessor.cpp
         GpuProcessor.cpp
         ProcessorFactory.cpp
-        CpuProcessor.cpp)
+        CpuProcessor.cpp
+        Thread.cpp)
 
 source_group("Header Files" FILES ${PROCESSING_LIB_HEADERS})
 source_group("Source Files" FILES ${PROCESSING_LIB_CPPS})

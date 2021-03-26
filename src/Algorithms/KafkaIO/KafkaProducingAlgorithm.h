@@ -1,7 +1,7 @@
 #ifndef KAFKA_PRODUCING_ALGORITHM_H
 #define KAFKA_PRODUCING_ALGORITHM_H
 
-#include "IAlgorithm.h"
+#include "ICPUAlgorithm.h"
 
 namespace Networking
 {
@@ -11,10 +11,12 @@ namespace Networking
 namespace Algorithms
 {
 
-class KafkaProducingAlgorithm : public IAlgorithm
+class KafkaProducingAlgorithm final: public ICPUAlgorithm
 {
 
 public:
+
+    bool Process(std::shared_ptr<DataStructures::ProcessingData> &processingData) override;
 
 private:
     std::unique_ptr<Networking::KafkaProducer> producer_;

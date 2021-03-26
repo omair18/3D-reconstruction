@@ -13,10 +13,10 @@ namespace Networking
 namespace DataStructures
 {
 
-class ProcessingData
+class ProcessingData final
 {
 public:
-    ProcessingData() = default;
+    ProcessingData();
 
     ProcessingData(const ProcessingData& other);
 
@@ -26,7 +26,33 @@ public:
 
     ProcessingData& operator=(ProcessingData&& other) noexcept;
 
+    const ModelDataset& GetModelDataset();
 
+    void SetModelDataset(const ModelDataset& dataset);
+
+    void SetModelDataset(ModelDataset&& dataset) noexcept;
+
+    const std::shared_ptr<Networking::KafkaMessage>& GetKafkaMessage();
+
+    void SetKafkaMessage(const std::shared_ptr<Networking::KafkaMessage>& message);
+
+    void SetKafkaMessage(std::shared_ptr<Networking::KafkaMessage>&& message) noexcept;
+
+    const std::shared_ptr<Config::JsonConfig>& GetReconstructionParams();
+
+    void SetReconstructionParams(const std::shared_ptr<Config::JsonConfig>& params);
+
+    void SetReconstructionParams(std::shared_ptr<Config::JsonConfig>&& params) noexcept;
+
+    CUDAImage& GetDecodedImage();
+
+    void SetDecodedImage(const CUDAImage& image);
+
+    void SetDecodedImage(CUDAImage&& image) noexcept;
+
+    void SetDecodedImageAsync(const CUDAImage& image, void* cudaStream);
+
+    void SetDecodedImageAsync(CUDAImage&& image, void* cudaStream) noexcept;
 
 private:
 
@@ -35,6 +61,8 @@ private:
     std::shared_ptr<Networking::KafkaMessage> kafkaMessage_;
 
     ModelDataset modelDataset_;
+
+    CUDAImage decodedImage_;
 
 };
 

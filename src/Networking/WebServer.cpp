@@ -16,44 +16,44 @@ bool WebServer::ValidateServerConfiguration(const std::shared_ptr<Config::JsonCo
 {
     auto& webServerConfig = *webServerConfig_;
 
-    if(!webServerConfig.Contains(Config::ConfigNodes::ServiceConfig::WebServerConfig::IpAddress))
+    if(!webServerConfig.Contains(Config::ConfigNodes::NetworkingConfig::WebServerConfig::IpAddress))
     {
         LOG_ERROR() << "Invalid web server configuration. There is no node "
-        << Config::ConfigNodes::ServiceConfig::WebServerConfig::IpAddress << " in web server configuration.";
+        << Config::ConfigNodes::NetworkingConfig::WebServerConfig::IpAddress << " in web server configuration.";
         throw std::runtime_error("Invalid web server configuration.");
     }
 
-    if(!webServerConfig.Contains(Config::ConfigNodes::ServiceConfig::WebServerConfig::Port))
+    if(!webServerConfig.Contains(Config::ConfigNodes::NetworkingConfig::WebServerConfig::Port))
     {
         LOG_ERROR() << "Invalid web server configuration. There is no node "
-        << Config::ConfigNodes::ServiceConfig::WebServerConfig::Port << " in web server configuration.";
+        << Config::ConfigNodes::NetworkingConfig::WebServerConfig::Port << " in web server configuration.";
         throw std::runtime_error("Invalid web server configuration.");
     }
 
-    if(!webServerConfig.Contains(Config::ConfigNodes::ServiceConfig::WebServerConfig::Protocol))
+    if(!webServerConfig.Contains(Config::ConfigNodes::NetworkingConfig::WebServerConfig::Protocol))
     {
         LOG_ERROR() << "Invalid web server configuration. There is no node "
-        << Config::ConfigNodes::ServiceConfig::WebServerConfig::Protocol << " in web server configuration.";
+        << Config::ConfigNodes::NetworkingConfig::WebServerConfig::Protocol << " in web server configuration.";
         throw std::runtime_error("Invalid web server configuration.");
     }
 
-    if(!webServerConfig.Contains(Config::ConfigNodes::ServiceConfig::WebServerConfig::ThreadPoolSize))
+    if(!webServerConfig.Contains(Config::ConfigNodes::NetworkingConfig::WebServerConfig::ThreadPoolSize))
     {
         LOG_ERROR() << "Invalid web server configuration. There is no node "
-        << Config::ConfigNodes::ServiceConfig::WebServerConfig::ThreadPoolSize << " in web server configuration.";
+        << Config::ConfigNodes::NetworkingConfig::WebServerConfig::ThreadPoolSize << " in web server configuration.";
         throw std::runtime_error("Invalid web server configuration.");
     }
 
-    if(!webServerConfig.Contains(Config::ConfigNodes::ServiceConfig::WebServerConfig::WebFolderPath))
+    if(!webServerConfig.Contains(Config::ConfigNodes::NetworkingConfig::WebServerConfig::WebFolderPath))
     {
         LOG_ERROR();
         throw std::runtime_error("Invalid web server configuration.");
     }
 
-    if(!webServerConfig.Contains(Config::ConfigNodes::ServiceConfig::WebServerConfig::UseDhParams))
+    if(!webServerConfig.Contains(Config::ConfigNodes::NetworkingConfig::WebServerConfig::UseDhParams))
     {
         LOG_ERROR() << "Invalid web server configuration. There is no node "
-        << Config::ConfigNodes::ServiceConfig::WebServerConfig::WebFolderPath << " in web server configuration.";
+        << Config::ConfigNodes::NetworkingConfig::WebServerConfig::WebFolderPath << " in web server configuration.";
         throw std::runtime_error("Invalid web server configuration.");
     }
 
@@ -65,8 +65,8 @@ void WebServer::Initialize(const std::shared_ptr<Config::JsonConfig> &webServerC
     LOG_TRACE() << "Initializing web server ...";
     if(ValidateServerConfiguration(webServerConfig))
     {
-        address_ = (*webServerConfig)[Config::ConfigNodes::ServiceConfig::WebServerConfig::IpAddress]->ToString();
-        port_ = (*webServerConfig)[Config::ConfigNodes::ServiceConfig::WebServerConfig::Port]->ToInt();
+        address_ = (*webServerConfig)[Config::ConfigNodes::NetworkingConfig::WebServerConfig::IpAddress]->ToString();
+        port_ = (*webServerConfig)[Config::ConfigNodes::NetworkingConfig::WebServerConfig::Port]->ToInt();
 
     }
 }

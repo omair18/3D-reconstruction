@@ -6,7 +6,8 @@ set(NETWORKING_LIB_HEADERS
         KafkaConsumer.h
         KafkaProducer.h
         KafkaMessage.h
-        EndpointListener.h)
+        EndpointListener.h
+        AmazonBucketStorage.h)
 
 set(NETWORKING_LIB_CPPS
         WebServer.cpp
@@ -16,7 +17,8 @@ set(NETWORKING_LIB_CPPS
         KafkaConsumer.cpp
         KafkaProducer.cpp
         KafkaMessage.cpp
-        EndpointListener.cpp)
+        EndpointListener.cpp
+        AmazonBucketStorage.cpp)
 
 source_group("Header Files" FILES ${NETWORKING_LIB_HEADERS})
 source_group("Source Files" FILES ${NETWORKING_LIB_CPPS})

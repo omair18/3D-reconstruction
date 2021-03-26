@@ -1,11 +1,16 @@
 #ifndef CUDA_CONVOLUTION_ALGORITHM_H
 #define CUDA_CONVOLUTION_ALGORITHM_H
 
+#include "IGPUAlgorithm.h"
 
-class CUDAConvolutionAlgorithm
+namespace Algorithms
+{
+
+class CUDAConvolutionAlgorithm : public IGPUAlgorithm
 {
 
 };
 
+}
 
 #endif // CUDA_CONVOLUTION_ALGORITHM_H

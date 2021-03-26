@@ -10,7 +10,7 @@ namespace Networking
 {
 
 EndpointListener::EndpointListener(const std::shared_ptr<Config::JsonConfig> &config) :
-        ioContext_((*config)[Config::ConfigNodes::ServiceConfig::WebServerConfig::ThreadPoolSize]->ToInt()),
+        ioContext_((*config)[Config::ConfigNodes::NetworkingConfig::WebServerConfig::ThreadPoolSize]->ToInt()),
         sslIoContext_(boost::asio::ssl::context::method::tlsv12)
 {
     InitializeIoContext(config);
@@ -18,9 +18,9 @@ EndpointListener::EndpointListener(const std::shared_ptr<Config::JsonConfig> &co
 
 void EndpointListener::InitializeIoContext(const std::shared_ptr<Config::JsonConfig> &config)
 {
-    std::filesystem::path webDirectoryPath = (*config)[Config::ConfigNodes::ServiceConfig::WebServerConfig::WebFolderPath]->ToString();
-    bool useSsl = (*config)[Config::ConfigNodes::ServiceConfig::WebServerConfig::HTTPS] ||
-            (*config)[Config::ConfigNodes::ServiceConfig::WebServerConfig::HTTP_AND_HTTPS];
+    std::filesystem::path webDirectoryPath = (*config)[Config::ConfigNodes::NetworkingConfig::WebServerConfig::WebFolderPath]->ToString();
+    bool useSsl = (*config)[Config::ConfigNodes::NetworkingConfig::WebServerConfig::HTTPS] ||
+            (*config)[Config::ConfigNodes::NetworkingConfig::WebServerConfig::HTTP_AND_HTTPS];
     if(useSsl)
     {
         const std::string certificateExtension = ".crt";
@@ -50,7 +50,7 @@ void EndpointListener::InitializeIoContext(const std::shared_ptr<Config::JsonCon
             }
         }
 
-        bool useDhParams = (*config)[Config::ConfigNodes::ServiceConfig::WebServerConfig::UseDhParams]->ToBool();
+        bool useDhParams = (*config)[Config::ConfigNodes::NetworkingConfig::WebServerConfig::UseDhParams]->ToBool();
 
         std::ifstream certificateFile(certificatePath);
 

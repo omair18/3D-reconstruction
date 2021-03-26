@@ -39,6 +39,13 @@ void Processing::GpuProcessor::Process()
 
             }
 
+            cudaStreamSynchronize(cudaStream_);
+
+            if(outputQueue_)
+            {
+
+            }
+
         }
         catch (std::exception& exception)
         {

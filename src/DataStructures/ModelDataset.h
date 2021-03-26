@@ -50,6 +50,14 @@ public:
         READY
     };
 
+    ModelDataset() = default;
+
+    ~ModelDataset() = default;
+
+    ModelDataset& operator=(const ModelDataset& other);
+
+    ModelDataset& operator=(ModelDataset&& other);
+
     const std::string& GetUUID();
 
     void SetUUID(const std::string& UUID);

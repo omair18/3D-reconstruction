@@ -26,7 +26,7 @@ public:
     ~WebServer();
 private:
 
-    bool ValidateServerConfiguration(const std::shared_ptr<Config::JsonConfig>& webServerConfig);
+    static bool ValidateServerConfiguration(const std::shared_ptr<Config::JsonConfig>& webServerConfig);
 
     std::string address_;
     int port_ = -1;

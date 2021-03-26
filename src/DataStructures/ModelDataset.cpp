@@ -38,4 +38,14 @@ const std::vector<CUDAImageDescriptor> &ModelDataset::GetImagesDescriptors() noe
     return imagesDescriptors_;
 }
 
+ModelDataset &ModelDataset::operator=(const ModelDataset &other)
+{
+    return *this;
+}
+
+ModelDataset &ModelDataset::operator=(ModelDataset &&other)
+{
+    return *this;
+}
+
 }

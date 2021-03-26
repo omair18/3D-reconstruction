@@ -18,7 +18,7 @@ namespace DataStructures
  * @tparam Type
  */
 template<class Type>
-class ProcessingQueue
+class ProcessingQueue final
 {
 public:
 

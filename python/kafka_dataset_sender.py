@@ -5,6 +5,7 @@ import time
 import uuid
 import json
 from kafka import KafkaProducer
+from kafka.errors import KafkaTimeoutError
 
 
 def main():
@@ -23,6 +24,14 @@ def main():
         '--frame-step',
         type=int,
         help='Frame step.',
+        required=True
+    )
+
+    parser.add_argument(
+        '-t',
+        '--topic',
+        type=str,
+        help='Topic of Kafka broker.',
         required=True
     )
 
@@ -52,11 +61,30 @@ def main():
     )
 
     parser.add_argument(
+        '-l',
+        '--focal-length',
+        type=float,
+        help='Focal length of the camera in millimeters.',
+        required=False,
+        default=40.0
+    )
+
+    parser.add_argument(
+        '-s',
+        '--sensor-size',
+        type=float,
+        help='Camera sensor size in millimeters.',
+        required=False,
+        default=33.3
+    )
+
+    parser.add_argument(
         '-t',
-        '--topic',
-        type=str,
-        help='Topic of Kafka broker.',
-        required=True
+        '--timeout',
+        type=int,
+        help='Kafka producer flush timeout in milliseconds',
+        required=False,
+        default=10000
     )
 
     args = parser.parse_args()
@@ -67,6 +95,9 @@ def main():
     camera_id = args.camera_id
     broker = args.broker
     topic = args.topic
+    focal_length = args.focal_length
+    sensor_size = args.sensor_size
+    timeout = args.timeout
 
     if not os.path.exists(input_path):
         raise RuntimeError("Invalid input path!")
@@ -123,12 +154,18 @@ def main():
             'cameraID': camera_id,
             'timestamp': int(round(time.time() * 1000)),
             'UUID': dataset_uuid,
-            'frameId': i,
-            'framesTotal': encoded_images_total
+            'frameID': i,
+            'framesTotal': encoded_images_total,
+            'focalLength': focal_length,
+            'sensorSize': sensor_size
         }
         key_json = json.dumps(key_json_str)
         print(key_json)
         producer.send(topic, key=str(key_json).encode('utf-8'), value=encoded_images[i].tobytes())
+        try:
+            producer.flush(timeout)
+        except KafkaTimeoutError:
+            print('Producing error.')
 
 
 if __name__ == '__main__':

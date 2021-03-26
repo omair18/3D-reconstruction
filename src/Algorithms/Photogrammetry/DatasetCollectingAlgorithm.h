@@ -1,15 +1,21 @@
 #ifndef DATASET_COLLECTING_ALGORITHM_H
 #define DATASET_COLLECTING_ALGORITHM_H
 
-#include "IAlgorithm.h"
+#include "ICPUAlgorithm.h"
+
+namespace Config
+{
+    class JsonConfig;
+}
 
 namespace Algorithms
 {
 
-class DatasetCollectingAlgorithm : public IAlgorithm
+class DatasetCollectingAlgorithm : public ICPUAlgorithm
 {
 
 public:
+    DatasetCollectingAlgorithm(const std::shared_ptr<Config::JsonConfig>& config);
 
 private:
 

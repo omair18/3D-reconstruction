@@ -39,3 +39,8 @@ void Processing::CpuProcessor::Process()
     }).detach();
 
 }
+
+void Processing::CpuProcessor::Initialize()
+{
+
+}

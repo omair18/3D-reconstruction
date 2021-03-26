@@ -54,6 +54,15 @@ public:
      * @brief Default destructor.
      */
     virtual ~IAlgorithm() = default;
+
+    /**
+     * @brief Checks weather this algorithm requires GPU.
+     * @return True if GPU is required.
+     */
+    [[nodiscard]] bool RequiresGPU() const { return isGPURequired_; };
+
+protected:
+    bool isGPURequired_;
 };
 
 }

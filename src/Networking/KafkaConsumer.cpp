@@ -1,16 +1,18 @@
 #include <librdkafka/rdkafkacpp.h>
-
+#include <boost/algorithm/string/trim.hpp>
 
 #include "KafkaConsumer.h"
 #include "KafkaMessage.h"
+#include "JsonConfig.h"
 #include "Logger.h"
+#include "ConfigNodes.h"
 
-Networking::KafkaConsumer::KafkaConsumer(const std::shared_ptr<Config::JsonConfig> &config) :
+Networking::KafkaConsumer::KafkaConsumer(const std::shared_ptr<Config::JsonConfig> &kafkaConfig) :
 timeoutMs_(-1),
 consumer_(nullptr)
 {
     LOG_TRACE() << "Initializing kafka consumer ...";
-    if(Initialize(config))
+    if(Initialize(kafkaConfig))
     {
         LOG_TRACE() << "Kafka consumer was initialized successfully.";
     }
@@ -93,47 +95,146 @@ Networking::KafkaConsumer::~KafkaConsumer()
     }
 }
 
-bool Networking::KafkaConsumer::Initialize(const std::shared_ptr<Config::JsonConfig> &config)
+bool Networking::KafkaConsumer::Initialize(const std::shared_ptr<Config::JsonConfig> &kafkaConfig)
 {
-    const auto kafkaConfig = (*(*config)[ConfigNodes::ServiceConfig::Configuration])[ConfigNodes::ServiceConfig::Kafka];
+    ValidateConfig(kafkaConfig);
 
-    const auto topicsList = (*kafkaConfig)[ConfigNodes::ServiceConfig::Topics]->ToVectorString();
-    std::string brokersList = (*kafkaConfig)[ConfigNodes::ServiceConfig::Servers]->ToString();
-    std::string errStr;
+    auto topics = (*kafkaConfig)[Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::Topics]->ToVectorString();
+    auto brokersList = (*kafkaConfig)[Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::Brokers]->ToVectorString();
+    bool enablePartitionEOF = (*kafkaConfig)[Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::EnablePartitionEOF]->ToBool();
+    auto timeoutMs = (*kafkaConfig)[Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::Timeout]->ToInt();
+    auto groupId = (*kafkaConfig)[Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::GroupId]->ToInt();
 
-    m_consumerConfig = RdKafka::Conf::create(RdKafka::Conf::ConfType::CONF_GLOBAL);
-    m_consumerConfig->set("enable.partition.eof", "true", errStr);
+    std::string errorString;
 
-    checkErrors(errStr.empty(), "Kafka consumer param enable.partition.eof set to true",
-                "Failed to set kafka consumer param enable.partition.eof to true. Message: %s",
-                errStr.c_str())
+    RdKafka::Conf* globalConfig = RdKafka::Conf::create(RdKafka::Conf::ConfType::CONF_GLOBAL);
+    globalConfig->set("enable.partition.eof", enablePartitionEOF ? "true" : "false", errorString);
+    if(!errorString.empty())
+    {
+        LOG_ERROR() << "Failed to set kafka consumer param enable.partition.eof. Message: " << errorString;
+        throw std::runtime_error("Failed to set kafka consumer param enable.partition.eof.");
+    }
+    else
+    {
+        LOG_TRACE() << "Kafka consumer param enable.partition.eof set to " << (enablePartitionEOF ? "true." : "false.");
+    }
 
-    m_consumerConfig->set("group.id", "0", errStr);
-
-    checkErrors(errStr.empty(), "Kafka consumer param group.id set to 0",
-                "Failed to set kafka consumer param group.id to 0. Message: %s",
-                errStr.c_str())
+    globalConfig->set("group.id", std::to_string(groupId), errorString);
+    if(!errorString.empty())
+    {
+        LOG_ERROR() << "Failed to set kafka consumer param group.id. Message: " << errorString;
+        throw std::runtime_error("Failed to set kafka consumer param group.id.");
+    }
+    else
+    {
+        LOG_TRACE() << "Kafka consumer param group.id set to " << groupId << ".";
+    }
 
     RdKafka::Conf* topicConf = RdKafka::Conf::create(RdKafka::Conf::ConfType::CONF_TOPIC);
-    m_consumerConfig->set("default_topic_conf", topicConf, errStr);
+    globalConfig->set("default_topic_conf", topicConf, errorString);
     delete  topicConf;
 
-    m_consumerConfig->set("metadata.broker.list", brokersList, errStr);
+    std::string brokersListString;
+    for(auto& broker : brokersList)
+    {
+        boost::algorithm::trim(broker);
+        brokersListString += broker;
+        brokersListString += ",";
+    }
+    brokersListString = brokersListString.substr(0, brokersListString.size() - 1);
 
-    checkErrors(errStr.empty(), "Kafka consumer param metadata.broker.list set to %s",
-                "Failed to set kafka consumer param metadata.broker.list to %s. Message: %s",
-                brokersList, errStr.c_str())
+    globalConfig->set("metadata.broker.list", brokersListString, errorString);
+    if(!errorString.empty())
+    {
+        LOG_ERROR() << "Failed to set kafka consumer param metadata.broker.list. Message: " << errorString;
+        throw std::runtime_error("Failed to set kafka consumer param metadata.broker.list.");
+    }
+    else
+    {
+        LOG_TRACE() << "Kafka consumer param metadata.broker.list set to [" << brokersListString << "].";
+    }
 
-    m_consumer = RdKafka::KafkaConsumer::create(m_consumerConfig, errStr);
+    consumer_ = RdKafka::KafkaConsumer::create(globalConfig, errorString);
+    if(!errorString.empty())
+    {
+        LOG_ERROR() << "Failed to create kafka consumer. Message: " << errorString;
+        if(consumer_)
+        {
+            delete consumer_;
+            consumer_ = nullptr;
+        }
+        throw std::runtime_error("Failed to create kafka consumer.");
+    }
+    else
+    {
+        LOG_TRACE() << "Kafka consumer was successfully created.";
+    }
 
-    checkErrors(errStr.empty(), "Kafka consumer param group.id set to %s",
-                "Failed to create kafka consumer",
-                brokersList)
+    std::string topicsString;
+    for(auto& topic : topics)
+    {
+        topicsString += topic;
+        topicsString += ", ";
+    }
+    topicsString = topicsString.substr(0, topicsString.size() - 2);
 
-    m_consumer->subscribe(topicsList);
+    auto errorCode = consumer_->subscribe(topics);
+    if(errorCode != RdKafka::ErrorCode::ERR_NO_ERROR)
+    {
+        LOG_ERROR() << "Failed to start listening the following topics: " << topicsString << ". "
+        << "Reason : " << RdKafka::err2str(errorCode);
+    }
+    else
+    {
+        LOG_TRACE() << "Kafka consumer is listening the following topics: " << topicsString << ".";
+    }
 
-    delete m_consumerConfig;
+    timeoutMs_ = timeoutMs;
+    LOG_TRACE() << "Kafka consumer's is consumption timeout was set to " << timeoutMs << "milliseconds.";
 
-    m_consumerConfig = nullptr;
+    delete globalConfig;
+    return true;
+}
 
+void Networking::KafkaConsumer::ValidateConfig(const std::shared_ptr<Config::JsonConfig> &kafkaConfig)
+{
+    if(!kafkaConfig->Contains(Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::Topics))
+    {
+        LOG_ERROR() << "Invalid kafka consumer configuration. There is no node "
+                    << Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::Topics
+                    << " in kafka consumer configuration.";
+        throw std::runtime_error("Invalid kafka consumer configuration.");
+    }
+
+    if (!kafkaConfig->Contains(Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::Brokers))
+    {
+        LOG_ERROR() << "Invalid kafka consumer configuration. There is no node "
+                    << Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::Brokers
+                    << " in kafka consumer configuration.";
+        throw std::runtime_error("Invalid kafka consumer configuration.");
+    }
+
+    if (!kafkaConfig->Contains(Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::EnablePartitionEOF))
+    {
+        LOG_ERROR() << "Invalid kafka consumer configuration. There is no node "
+                    << Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::EnablePartitionEOF
+                    << " in kafka consumer configuration.";
+        throw std::runtime_error("Invalid kafka consumer configuration.");
+    }
+
+    if (!kafkaConfig->Contains(Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::GroupId))
+    {
+        LOG_ERROR() << "Invalid kafka consumer configuration. There is no node "
+                    << Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::GroupId
+                    << " in kafka consumer configuration.";
+        throw std::runtime_error("Invalid kafka consumer configuration.");
+    }
+
+    if (!kafkaConfig->Contains(Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::Timeout))
+    {
+        LOG_ERROR() << "Invalid kafka consumer configuration. There is no node "
+                    << Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::Timeout
+                    << " in kafka consumer configuration.";
+        throw std::runtime_error("Invalid kafka consumer configuration.");
+    }
 }

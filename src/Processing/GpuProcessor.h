@@ -15,11 +15,14 @@ public:
 
     explicit GpuProcessor(const std::shared_ptr<Config::JsonConfig>& config);
 
-    void Process() override;
-
     ~GpuProcessor() override;
 
+    void Process() override;
+
+    void Initialize();
+
 private:
+
     cudaStream_t cudaStream_ = nullptr;
 
 };

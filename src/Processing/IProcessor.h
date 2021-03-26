@@ -32,6 +32,10 @@ public:
 
     virtual void Process() = 0;
 
+    virtual void Initialize() = 0;
+
+    virtual void InitializeAlgorithms() = 0;
+
     [[nodiscard]] const std::string& GetName() const
     {
         return name_;

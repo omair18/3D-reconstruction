@@ -103,7 +103,9 @@ namespace Config
 
             namespace KafkaProducerConfig
             {
-
+                const inline static std::string& Topics = KafkaConsumerConfig::Topics;
+                const inline static std::string& Brokers = KafkaConsumerConfig::Brokers;
+                const inline static std::string& Timeout = KafkaConsumerConfig::Timeout;
             }
         }
 
@@ -125,6 +127,17 @@ namespace Config
                 // Photogrammetry
                 const inline static std::string DatasetCollectingAlgorithm = "datasetCollectingAlgorithm";
             }
+        }
+
+        namespace MessageNodes
+        {
+            const inline static std::string CameraID = "cameraID";
+            const inline static std::string Timestamp = "timestamp";
+            const inline static std::string UUID = "UUID";
+            const inline static std::string FrameID = "frameID";
+            const inline static std::string framesTotal = "framesTotal";
+            const inline static std::string FocalLength = "focalLength";
+            const inline static std::string SensorSize = "sensorSize";
         }
     }
 }

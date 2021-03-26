@@ -23,6 +23,8 @@ int main(int argc, char** argv)
     std::string topic;
     int cameraId;
     int jpegQuality;
+    float focalLength;
+    float sensorSize;
 
     boost::program_options::variables_map paramsMap;
     boost::program_options::options_description options("Options");
@@ -30,10 +32,12 @@ int main(int argc, char** argv)
     ("help,h", "Produces help message.")
     ("input,i", boost::program_options::value<std::filesystem::path>(&inputPath)->required(), "Path to a folder with images or to a video.")
     ("frame-step,f", boost::program_options::value<int>(&frameStep)->required(), "Frame step.")
+    ("topic,t", boost::program_options::value<std::string>(&topic)->required(), "Topic of Kafka broker.")
     ("broker,b", boost::program_options::value<std::string>(&kafkaBroker)->required(), "URL of Kafka broker.")
     ("camera-id,c", boost::program_options::value<int>(&cameraId)->required(), "Camera id.")
     ("jpeg-quality,j", boost::program_options::value<int>(&jpegQuality)->default_value(40), "JPEG quality.")
-    ("topic,t", boost::program_options::value<std::string>(&topic)->required(), "Topic of Kafka broker.");
+    ("focal-length,l", boost::program_options::value<float>(&focalLength)->default_value(40.0), "Focal length of the camera in millimeters.")
+    ("sensor-size,s", boost::program_options::value<float>(&sensorSize)->default_value(33.3), "Camera sensor size in millimeters.");
 
     boost::program_options::store(boost::program_options::parse_command_line(argc, argv, options), paramsMap);
 
@@ -181,8 +185,10 @@ int main(int argc, char** argv)
         jsonKey.as_object().emplace("cameraID", cameraId);
         jsonKey.as_object().emplace("timestamp", std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
         jsonKey.as_object().emplace("UUID", datasetUUID);
-        jsonKey.as_object().emplace("frameId", i);
+        jsonKey.as_object().emplace("frameID", i);
         jsonKey.as_object().emplace("framesTotal", encodedImagesTotal);
+        jsonKey.as_object().emplace("focalLength", focalLength);
+        jsonKey.as_object().emplace("sensorSize", sensorSize);
         auto jsonKeyString = boost::json::serialize(jsonKey);
         std::cout << jsonKeyString << std::endl;
 
@@ -196,7 +202,10 @@ int main(int argc, char** argv)
                           0,
                           nullptr,
                           nullptr);
-        producer->flush(10000);
+        if(producer->flush(10000) == RdKafka::ERR__TIMED_OUT)
+        {
+            std::clog << "Producing error.";
+        }
     }
 
     delete producer;

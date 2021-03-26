@@ -1,2 +1,2 @@
-opencv-python
-kafka-python
+opencv-python>=4.5.1
+kafka-python>=2.0.0

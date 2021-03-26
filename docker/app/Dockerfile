@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.2.1-devel-ubuntu20.04
+FROM nvidia/cuda:11.2.2-devel-ubuntu20.04
 
 ENV TZ=Europe/Minsk
 ENV NVIDIA_DRIVER_CAPABILITIES=all
@@ -11,8 +11,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
         software-properties-common \
     && add-apt-repository "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /" \
     && apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub \
-    && apt-get -y update \
-    && apt-get install -y \
+    && apt -y update \
+    && apt install -y \
         autoconf \
         build-essential \
         zlib1g-dev \
@@ -20,6 +20,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
         gcc-9 \
         g++-9 \
         clang-9 \
+        nasm \
+        yasm \
         zip \
         unzip \
         pkg-config \
@@ -56,7 +58,18 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
         libfftw3-dev \
         libzip-dev \
         libbz2-dev \
-        libbzrtp-dev \
+        libbzrtp-dev \  
+        libopenmpt-dev \
+        libvpx-dev \
+        libx265-dev \
+        libx264-dev \
+        libwebp-dev \
+        libxvidcore-dev \
+        libdc1394-22-dev \
+        libtheora-dev \
+        pkg-config \
+        libdrm-dev \
+        libopenjp2-7-dev \
     && ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1 \
     && rm /usr/bin/gcc \
     && rm /usr/bin/g++ \
@@ -73,13 +86,61 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
     
 
 RUN cd /opt \
-    && wget https://cmake.org/files/v3.19/cmake-3.19.6.tar.gz \
-    && tar -xzvf cmake-3.19.6.tar.gz \
-    && rm cmake-3.19.6.tar.gz \
-    && cd cmake-3.19.6 \
+    && wget https://cmake.org/files/v3.19/cmake-3.19.7.tar.gz \
+    && tar -xzvf cmake-3.19.7.tar.gz \
+    && rm cmake-3.19.7.tar.gz \
+    && cd cmake-3.19.7 \
     && ./bootstrap \
     && make install -j`nproc` \
-    && rm -rf /opt/cmake-3.19.6
+    && rm -rf /opt/cmake-3.19.7
+    
+RUN cd /opt \
+    && mkdir NvCodecHeaders \
+    && cd NvCodecHeaders \
+    && git clone --branch=n11.0.10.0 https://github.com/FFmpeg/nv-codec-headers.git \
+    && cd nv-codec-headers \
+    && make -j`nproc` \
+    && make install \
+    && rm -rf /opt/NvCodecHeaders
+    
+RUN cd /opt \
+    && mkdir FFmpeg \
+    && cd FFmpeg \
+    && git clone --branch=n4.3.2 https://github.com/FFmpeg/FFmpeg.git \
+    && cd FFmpeg \
+    && ./configure \
+        --prefix=/usr \
+        --libdir=/usr/lib/x86_64-linux-gnu \
+        --incdir=/usr/include/x86_64-linux-gnu \
+        --arch=amd64 \
+        --enable-gpl \
+        --enable-nonfree \
+        --enable-libopenjpeg \
+        --enable-libopenmpt \
+        --enable-libvpx \
+        --enable-libwebp \
+        --enable-libxml2 \
+        --enable-libxvid \
+        --enable-pthreads \
+        --enable-libdc1394 \
+        --enable-libdrm \
+        --enable-static \
+        --enable-shared \
+        --enable-nvenc \
+        --enable-postproc \
+        --enable-libx264 \
+        --enable-libx265 \
+        --enable-libtheora \
+        --enable-cuda-nvcc \
+        --enable-libnpp \
+        --enable-pic \
+        --extra-libs='-lpthread -lm' \
+        --extra-cflags="-I/usr/local/cuda/include" \
+        --extra-ldflags="-L/usr/local/cuda/lib64" \
+        --nvccflags="-gencode arch=compute_86,code=[sm_86,compute_86] -O3" \
+    && make -j`nproc` \
+    && make install \
+    && rm -r /opt/FFmpeg
     
 RUN cd /opt \
     && git clone https://github.com/gflags/gflags.git --branch=v2.2.2 \
@@ -283,6 +344,7 @@ RUN cd /opt \
         -DWITH_QT=OFF \
         -DWITH_TBB=ON \
         -DWITH_V4L=ON \
+        -DWITH_FFMPEG=ON \
         -DWITH_QUIRC=OFF \
         -DBUILD_opencv_ml=OFF \
         -DBUILD_opencv_bioinspired=OFF \
@@ -393,7 +455,7 @@ RUN cd /opt \
     && make install \
     && rm -rf /opt/openMVS
 
-    cd /opt \
+RUN cd /opt \
     && git clone --branch=1.8.161 https://github.com/aws/aws-sdk-cpp.git \
     && cd aws-sdk-cpp \
     && mkdir build \
@@ -420,6 +482,22 @@ RUN cd /opt \
     && make install \
     && rm -rf /opt/aws-sdk-cpp
 
+COPY 3D-reconstruction /opt/3D-reconstruction
 
+RUN cd /opt/3D-reconstruction \
+    && mkdir build \
+    && cd build \
+    && cmake \
+        -DCMAKE_CXX_STANDARD=17 \
+        -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+        -DCMAKE_BUILD_TYPE=RELEASE \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+        -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        -DCMAKE_C_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+        .. \
+    && make -j`nproc` \
 
-WORKDIR /opt
+WORKDIR /opt/3D-reconstruction/build/bin

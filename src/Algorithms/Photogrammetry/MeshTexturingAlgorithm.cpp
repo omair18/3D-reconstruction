@@ -1,0 +1,1 @@
+#include "MeshTexturingAlgorithm.h"

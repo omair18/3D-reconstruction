@@ -16,17 +16,22 @@ class KafkaMessage;
 class KafkaProducer final
 {
 public:
-    explicit KafkaProducer(const std::shared_ptr<Config::JsonConfig>& config);
+    explicit KafkaProducer(const std::shared_ptr<Config::JsonConfig>& kafkaConfig);
 
     ~KafkaProducer();
 
-    bool Initialize(const std::shared_ptr<Config::JsonConfig>& config);
+    bool Initialize(const std::shared_ptr<Config::JsonConfig>& kafkaConfig);
 
     void Produce(const std::shared_ptr<KafkaMessage>& message);
 private:
+
+    static void ValidateConfig(const std::shared_ptr<Config::JsonConfig>& kafkaConfig);
+
     RdKafka::Producer* producer_ = nullptr;
 
-    std::string topic_;
+    std::vector<std::string> topics_;
+
+    int timeoutMs_ = 0;
 };
 
 }

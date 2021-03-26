@@ -46,6 +46,8 @@ void ServiceSDK::Initialize()
 
     InitializeServiceGPU(serviceConfig);
 
+    InitializeProcessingQueues(serviceConfig);
+
 }
 
 ServiceSDK::~ServiceSDK()
@@ -137,7 +139,8 @@ void ServiceSDK::Start()
 
 void ServiceSDK::InitializeProcessingQueues(const std::shared_ptr<Config::JsonConfig> &serviceConfig)
 {
-
+    LOG_TRACE() << "Creating processing queues ...";
+    queueManager_->Initialize(serviceConfig);
 }
 
 void ServiceSDK::InitializeProcessors(const std::shared_ptr<Config::JsonConfig>& serviceConfig)

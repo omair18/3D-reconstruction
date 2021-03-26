@@ -31,11 +31,21 @@ class DefaultJsonConfigGenerator
 public:
 
     /**
-     * @brief
+     * @brief Generates a default JSON configuration for service.
      *
-     * @return
+     * @return Pointer to the generated config.
      */
     static std::shared_ptr<JsonConfig> GenerateServiceDefaultConfig();
+
+    /**
+     * @brief Generates a JSON queue configuration.
+     *
+     * @param name - Name of the queue
+     * @param size - Size of the queue
+     * @return Pointer to the generated config.
+     */
+    static std::shared_ptr<JsonConfig> GenerateQueueConfig(const std::string& name, size_t size);
+
 
 };
 

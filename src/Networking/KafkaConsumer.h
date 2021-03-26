@@ -22,14 +22,16 @@ class KafkaMessage;
 class KafkaConsumer final
 {
 public:
-    explicit KafkaConsumer(const std::shared_ptr<Config::JsonConfig>& config);
+    explicit KafkaConsumer(const std::shared_ptr<Config::JsonConfig>& kafkaConfig);
 
     ~KafkaConsumer();
 
-    bool Initialize(const std::shared_ptr<Config::JsonConfig>& config);
+    bool Initialize(const std::shared_ptr<Config::JsonConfig>& kafkaConfig);
 
     std::shared_ptr<KafkaMessage> Consume();
 private:
+
+    static void ValidateConfig(const std::shared_ptr<Config::JsonConfig>& kafkaConfig);
 
     int timeoutMs_ = 0;
     RdKafka::KafkaConsumer* consumer_ = nullptr;

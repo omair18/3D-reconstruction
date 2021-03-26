@@ -21,6 +21,8 @@ public:
 
     void Process() override;
 
+    void Initialize() override;
+
 private:
 
 };

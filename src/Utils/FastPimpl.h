@@ -13,7 +13,7 @@
 /**
  * @namespace Utils
  *
- * @brief Namespace of libutils library
+ * @brief Namespace of libutils library.
  */
 namespace Utils
 {
