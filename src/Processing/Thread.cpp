@@ -6,97 +6,93 @@
 namespace Processing
 {
 
-bool Thread::Start()
+Thread::Thread() :
+isStarted_(false),
+needToStop_(false),
+needToStart_(false),
+isDestroyed_(false)
 {
-    std::lock_guard<std::mutex> lock1(mutexInternal_);
-    std::lock_guard<std::mutex> lock2(stateMutex_);
-    if (!isStarted_)
+    thread_ = std::thread(&Thread::Execute, this);
+    SetExecutableFunction([&]()
     {
-        isStarted_ = true;
-        if (StartInternal())
-        {
-            return true;
-        }
-        else
-        {
-            LOG_WARNING() << "Failed to start thread with id " << thread_.get_id() << ".";
-            isStarted_ = false;
-            return false;
-        }
-    }
-    else
-    {
-        LOG_WARNING() << "Thread with id " << thread_.get_id() << " is already started.";
-        return true;
-    }
+        LOG_WARNING() << "Thread executable function is not set.";
+    });
 }
 
-bool Thread::Stop()
+void Thread::Start()
 {
-    std::lock_guard<std::mutex> lock1(mutexInternal_);
-    {
-        std::lock_guard<std::mutex> lock2(stateMutex_);
-        if (!isStarted_)
-        {
-            return true;
-        }
-
-        if (!StopInternal())
-        {
-            return false;
-        }
-
-        isStarted_ = false;
-    }
-
-    WaitForStop();
-    return true;
+    needToStart_ = true;
+    startCondition_.notify_one();
 }
 
-bool Thread::Restart()
+void Thread::Execute()
 {
-    Stop();
-    return Start();
+    return ExecuteInternal();
+}
+
+void Thread::Stop()
+{
+    needToStop_ = true;
 }
 
 bool Thread::IsStarted()
 {
-    std::lock_guard<std::mutex> lock2(stateMutex_);
     return isStarted_;
 }
 
-bool Thread::StartInternal()
+void Thread::SetExecutableFunction(std::function<void()> function)
 {
-    thread_ = std::thread(&Thread::Routine, this);
-    return true;
+    executableFunction_ = std::move(function);
 }
 
-bool Thread::StopInternal()
+void Thread::ExecuteInternal()
 {
-    return true;
-}
-
-bool Thread::WaitForStop()
-{
-    stopCondition_.notify_one();
-    thread_.join();
-    return true;
-}
-
-void Thread::Routine()
-{
-    LOG_TRACE() << "Thread with id " << std::this_thread::get_id() << " was started.";
-
-    while (isStarted_)
+    LOG_TRACE() << "Thread with id " << std::this_thread::get_id() << " was created.";
+    LOG_TRACE() << "Thread with id " << std::this_thread::get_id() << " is waiting for start command ...";
+    if (isDestroyed_)
     {
-        std::unique_lock<std::mutex> lock(stateMutex_);
-        if (stopCondition_.wait_for(lock, std::chrono::milliseconds(100)) == std::cv_status::no_timeout)
-        {
-            break;
-        }
+        return;
     }
+    std::unique_lock<std::mutex> lock(startMutex_);
+    while (!needToStart_)
+    {
+        startCondition_.wait(lock);
+    }
+    if (isDestroyed_)
+    {
+        return;
+    }
+    isStarted_ = true;
+    needToStart_ = false;
+    LOG_TRACE() << "Thread with id " << std::this_thread::get_id() << " was started.";
+    if(!needToStop_)
+    {
+        executableFunction_();
+    }
+    isStarted_ = false;
+    needToStop_ = false;
+    LOG_TRACE() << "Thread with id " << std::this_thread::get_id() << " finished execution.";
 
-    LOG_TRACE() << "Thread with id " << std::this_thread::get_id() << " was stopped.";
+}
+
+Thread::~Thread()
+{
+    Destroy();
+}
+
+void Thread::Destroy()
+{
+    if (!isDestroyed_)
+    {
+        isDestroyed_ = true;
+        Stop();
+        startCondition_.notify_one();
+        if (thread_.joinable())
+        {
+            thread_.join();
+        }
+        LOG_TRACE() << "Thread with id " << std::this_thread::get_id() << " was destroyed.";
+    }
 }
 
 }

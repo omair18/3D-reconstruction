@@ -1,16 +1,16 @@
 set(PROCESSING_LIB_HEADERS
         IProcessor.h
         GpuProcessor.h
-        ProcessorFactory.h
+        ProcessorManager.h
         CpuProcessor.h
         Thread.h)
 
 set(PROCESSING_LIB_CPPS
         IProcessor.cpp
         GpuProcessor.cpp
-        ProcessorFactory.cpp
+        ProcessorManager.cpp
         CpuProcessor.cpp
-        Thread.cpp)
+        Thread.cpp EndlessThread.cpp EndlessThread.h)
 
 source_group("Header Files" FILES ${PROCESSING_LIB_HEADERS})
 source_group("Source Files" FILES ${PROCESSING_LIB_CPPS})
@@ -25,6 +25,8 @@ target_link_libraries(processing
         PRIVATE
         datastructures
         log
+        algorithms
+        config
         ${CUDA_CUDART_LIBRARY})
 
 target_include_directories(processing PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

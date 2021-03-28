@@ -25,6 +25,7 @@ int main(int argc, char** argv)
     int jpegQuality;
     float focalLength;
     float sensorSize;
+    int timeout;
 
     boost::program_options::variables_map paramsMap;
     boost::program_options::options_description options("Options");
@@ -37,7 +38,8 @@ int main(int argc, char** argv)
     ("camera-id,c", boost::program_options::value<int>(&cameraId)->required(), "Camera id.")
     ("jpeg-quality,j", boost::program_options::value<int>(&jpegQuality)->default_value(40), "JPEG quality.")
     ("focal-length,l", boost::program_options::value<float>(&focalLength)->default_value(40.0), "Focal length of the camera in millimeters.")
-    ("sensor-size,s", boost::program_options::value<float>(&sensorSize)->default_value(33.3), "Camera sensor size in millimeters.");
+    ("sensor-size,s", boost::program_options::value<float>(&sensorSize)->default_value(33.3), "Camera sensor size in millimeters.")
+    ("timeout,t", boost::program_options::value<int>(&timeout)->default_value(10000), "Kafka producer flush timeout in milliseconds");
 
     boost::program_options::store(boost::program_options::parse_command_line(argc, argv, options), paramsMap);
 
@@ -202,7 +204,7 @@ int main(int argc, char** argv)
                           0,
                           nullptr,
                           nullptr);
-        if(producer->flush(10000) == RdKafka::ERR__TIMED_OUT)
+        if(producer->flush(timeout) == RdKafka::ERR__TIMED_OUT)
         {
             std::clog << "Producing error.";
         }

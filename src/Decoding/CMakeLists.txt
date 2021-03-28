@@ -28,11 +28,7 @@ target_link_libraries(decoding
         ${NVJPEG_LIBRARY}
         ${NVJPEG2K_LIBRARY}
         ${CUDA_CUDART_LIBRARY}
-        ${CUDA_nppc_LIBRARY}
-        ${CUDA_nppig_LIBRARY}
-        opencv_cudaarithm
-        opencv_cudawarping
-        opencv_imgproc
+        opencv_core
         opencv_imgcodecs
         datastructures)
 

@@ -11,6 +11,7 @@
 #include "PathUtils.h"
 #include "WebServerManager.h"
 #include "ProcessingQueueManager.h"
+#include "ProcessorManager.h"
 
 namespace Service
 {
@@ -19,7 +20,8 @@ ServiceSDK::ServiceSDK(int argc, char** argv) :
 configManager_(std::make_unique<Config::JsonConfigManager>()),
 gpuManager_(std::make_unique<GPU::GpuManager>()),
 webServerManager_(std::make_unique<Networking::WebServerManager>()),
-queueManager_(std::make_unique<DataStructures::ProcessingQueueManager>())
+queueManager_(std::make_unique<DataStructures::ProcessingQueueManager>()),
+processorManager_(std::make_unique<Processing::ProcessorManager>())
 {
 
 }
@@ -40,6 +42,8 @@ void ServiceSDK::Initialize()
 
     auto serviceConfig = GetServiceConfig();
 
+    ValidateServiceConfiguration(serviceConfig);
+
     InitializeWebServer(serviceConfig);
 
     InitializeGpuManager();
@@ -48,10 +52,13 @@ void ServiceSDK::Initialize()
 
     InitializeProcessingQueues(serviceConfig);
 
+    InitializeProcessors(serviceConfig);
+
 }
 
 ServiceSDK::~ServiceSDK()
 {
+    processorManager_->StopAllProcessors();
     LOGGER_FREE();
 }
 
@@ -134,7 +141,8 @@ void ServiceSDK::InitializeWebServer(const std::shared_ptr<Config::JsonConfig> &
 
 void ServiceSDK::Start()
 {
-
+    LOG_TRACE() << "Starting service ...";
+    processorManager_->StartAllProcessors();
 }
 
 void ServiceSDK::InitializeProcessingQueues(const std::shared_ptr<Config::JsonConfig> &serviceConfig)
@@ -145,6 +153,46 @@ void ServiceSDK::InitializeProcessingQueues(const std::shared_ptr<Config::JsonCo
 
 void ServiceSDK::InitializeProcessors(const std::shared_ptr<Config::JsonConfig>& serviceConfig)
 {
+    LOG_TRACE() << "Creating processors ...";
+    processorManager_->Initialize(serviceConfig, configManager_, gpuManager_, queueManager_);
+}
+
+void ServiceSDK::ValidateServiceConfiguration(const std::shared_ptr<Config::JsonConfig> &serviceConfig)
+{
+    if(!serviceConfig->Contains(Config::ConfigNodes::ServiceConfig::WebServer))
+    {
+        LOG_ERROR() << "Invalid service configuration. There is no node "
+                    << Config::ConfigNodes::ServiceConfig::WebServer << " in service configuration.";
+        throw std::runtime_error("Invalid service configuration");
+    }
+
+    if(!serviceConfig->Contains(Config::ConfigNodes::ServiceConfig::Gpu))
+    {
+        LOG_ERROR() << "Invalid service configuration. There is no node "
+                    << Config::ConfigNodes::ServiceConfig::Gpu << " in service configuration.";
+        throw std::runtime_error("Invalid service configuration");
+    }
+
+    if(!serviceConfig->Contains(Config::ConfigNodes::ServiceConfig::Pipeline))
+    {
+        LOG_ERROR() << "Invalid service configuration. There is no node "
+                    << Config::ConfigNodes::ServiceConfig::Pipeline << " in service configuration.";
+        throw std::runtime_error("Invalid service configuration");
+    }
+
+    if(!serviceConfig->Contains(Config::ConfigNodes::ServiceConfig::Queues))
+    {
+        LOG_ERROR() << "Invalid service configuration. There is no node "
+                    << Config::ConfigNodes::ServiceConfig::Queues << " in service configuration.";
+        throw std::runtime_error("Invalid service configuration");
+    }
+
+    if(!serviceConfig->Contains(Config::ConfigNodes::ServiceConfig::Storage))
+    {
+        LOG_ERROR() << "Invalid service configuration. There is no node "
+                    << Config::ConfigNodes::ServiceConfig::Storage << " in service configuration.";
+        throw std::runtime_error("Invalid service configuration");
+    }
 
 }
 

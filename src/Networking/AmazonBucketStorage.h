@@ -7,6 +7,18 @@ namespace Networking
 class AmazonBucketStorage
 {
 
+public:
+
+    AmazonBucketStorage();
+
+    ~AmazonBucketStorage();
+
+private:
+
+    void InitializeAwsSdk();
+
+    inline static bool isAwsSdkInitialized = false;
+
 };
 
 }

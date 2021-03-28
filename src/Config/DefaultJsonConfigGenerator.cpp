@@ -54,12 +54,21 @@ std::shared_ptr<JsonConfig> DefaultJsonConfigGenerator::GenerateServiceDefaultCo
 
     }
 
-
+    /// Storage node
+    {
+        std::filesystem::path defaultModelsDirectoryPath = Utils::PathUtils::GetExecutableFolderPath();
+        defaultModelsDirectoryPath /= "models";
+        resultStorageConfig->AddNodeString(ConfigNodes::ServiceConfig::StorageConfig::Type,
+                                           ConfigNodes::ServiceConfig::StorageConfig::Filesystem);
+        resultStorageConfig->AddNodeString(ConfigNodes::ServiceConfig::StorageConfig::Path,
+                                           defaultModelsDirectoryPath.string());
+    }
 
     config->SetNode(ConfigNodes::ServiceConfig::WebServer, webServerConfig);
     config->SetNode(ConfigNodes::ServiceConfig::Gpu, gpuConfig);
     config->SetNode(ConfigNodes::ServiceConfig::Pipeline, pipelineConfig);
     config->SetNode(ConfigNodes::ServiceConfig::Queues, queuesConfig);
+    config->SetNode(ConfigNodes::ServiceConfig::Storage, resultStorageConfig);
 
     return config;
 }

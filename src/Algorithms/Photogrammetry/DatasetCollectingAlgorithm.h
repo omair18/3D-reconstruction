@@ -15,7 +15,7 @@ class DatasetCollectingAlgorithm : public ICPUAlgorithm
 {
 
 public:
-    DatasetCollectingAlgorithm(const std::shared_ptr<Config::JsonConfig>& config);
+    explicit DatasetCollectingAlgorithm(const std::shared_ptr<Config::JsonConfig>& config);
 
 private:
 

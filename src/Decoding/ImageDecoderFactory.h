@@ -3,23 +3,59 @@
 
 #include <memory>
 
+/**
+ * @namespace Decoding
+ *
+ * @brief
+ */
 namespace Decoding
 {
 
+/**
+ * @class IImageDecoder
+ *
+ * @brief
+ */
 class IImageDecoder;
 
+/**
+ * @enum DecoderType
+ *
+ * @brief
+ */
 enum DecoderType
 {
+    ///
     OPENCV_IMAGE_DECODER = 0,
+
+    ///
     NVJPEG_IMAGE_DECODER,
+
+    ///
     NVJPEG_HARDWARE_IMAGE_DECODER,
+
+    ///
     NVJPEG2K_IMAGE_DECODER
 };
 
+/**
+ * @class ImageDecoderFactory
+ *
+ * @brief
+ */
 class ImageDecoderFactory final
 {
 public:
-    static std::unique_ptr<IImageDecoder> Create(DecoderType type, bool useCUDAStream, void* cudaStream);
+
+    /**
+     * @brief
+     *
+     * @param type
+     * @param useCUDAStream
+     * @param cudaStream
+     * @return
+     */
+    static std::unique_ptr<IImageDecoder> Create(DecoderType type, bool useCUDAStream, void* cudaStream = nullptr);
 };
 
 }

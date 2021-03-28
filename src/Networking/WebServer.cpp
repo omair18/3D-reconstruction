@@ -60,9 +60,10 @@ bool WebServer::ValidateServerConfiguration(const std::shared_ptr<Config::JsonCo
     return false;
 }
 
-void WebServer::Initialize(const std::shared_ptr<Config::JsonConfig> &webServerConfig)
+void WebServer::Initialize(const std::shared_ptr<Config::JsonConfig> &serviceConfig)
 {
     LOG_TRACE() << "Initializing web server ...";
+    auto webServerConfig = (*serviceConfig)[Config::ConfigNodes::ServiceConfig::WebServer];
     if(ValidateServerConfiguration(webServerConfig))
     {
         address_ = (*webServerConfig)[Config::ConfigNodes::NetworkingConfig::WebServerConfig::IpAddress]->ToString();

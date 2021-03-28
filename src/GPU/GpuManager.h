@@ -60,10 +60,10 @@ public:
     /**
      * @brief
      *
-     * @param config
+     * @param serviceConfig
      * @return
      */
-    GPU& SelectMatchingGPU(const std::shared_ptr<Config::JsonConfig>& config);
+    GPU& SelectMatchingGPU(const std::shared_ptr<Config::JsonConfig>& serviceConfig);
 
     /**
      * @brief Selects gpu-param as current GPU for all service's processors.

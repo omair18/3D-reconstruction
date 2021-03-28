@@ -21,7 +21,7 @@ class WebServer
 public:
     WebServer() = default;
 
-    void Initialize(const std::shared_ptr<Config::JsonConfig>& webServerConfig);
+    void Initialize(const std::shared_ptr<Config::JsonConfig>& serviceConfig);
 
     ~WebServer();
 private:

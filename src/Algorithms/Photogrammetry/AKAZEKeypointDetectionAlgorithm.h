@@ -1,6 +1,8 @@
 #ifndef AKAZE_KEYPOINT_DETECTION_ALGORITHM_H
 #define AKAZE_KEYPOINT_DETECTION_ALGORITHM_H
 
+#include <opencv2/core/mat.hpp>
+
 #include "IGPUAlgorithm.h"
 
 namespace Algorithms
@@ -67,7 +69,7 @@ public:
 
     ~AKAZEKeypointDetectionAlgorithm();
 
-    void Process() override;
+    bool Process(std::shared_ptr<DataStructures::ProcessingData>& processingData) override;
 
 
 

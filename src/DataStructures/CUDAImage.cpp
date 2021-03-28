@@ -1046,16 +1046,21 @@ void CUDAImage::MoveToCvMat(cv::Mat &dst)
 
 void CUDAImage::MoveToCvMatAsync(cv::Mat &dst, void *cudaStream)
 {
-
+    auto cvType = ConvertCUDAImageElementTypeAndChannelsToCvType(elementType_, channels_);
+    dst = cv::Mat(height_, width_, cvType);
+    gpuData_ = nullptr;
 }
 
-void CUDAImage::CopyToCvMat(cv::Mat &dst)
+void CUDAImage::CopyToCvMat(cv::Mat &dst) const
 {
-
+    auto cvType = ConvertCUDAImageElementTypeAndChannelsToCvType(elementType_, channels_);
+    dst = cv::Mat(height_, width_, cvType);
 }
 
-void CUDAImage::CopyToCvMatAsync(cv::Mat &dst, void *cudaStream)
+void CUDAImage::CopyToCvMatAsync(cv::Mat &dst, void *cudaStream) const
 {
+    auto cvType = ConvertCUDAImageElementTypeAndChannelsToCvType(elementType_, channels_);
+    dst = cv::Mat(height_, width_, cvType);
 
 }
 

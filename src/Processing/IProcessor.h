@@ -8,18 +8,28 @@
 namespace DataStructures
 {
     class ProcessingData;
+
     template <typename T>
     class ProcessingQueue;
+
+    class ProcessingQueueManager;
 }
 
 namespace Algorithms
 {
     class IAlgorithm;
+    class IAlgorithmFactory;
 }
 
 namespace Config
 {
     class JsonConfig;
+    class JsonConfigManager;
+}
+
+namespace GPU
+{
+    class GpuManager;
 }
 
 namespace Processing
@@ -28,13 +38,19 @@ namespace Processing
 class IProcessor
 {
 public:
-    explicit IProcessor(const std::shared_ptr<Config::JsonConfig>& config);
+    IProcessor(const std::shared_ptr<Config::JsonConfig>& config, const std::unique_ptr<DataStructures::ProcessingQueueManager>& queueManager);
 
     virtual void Process() = 0;
 
+    virtual void Stop() = 0;
+
+    virtual void InitializeAlgorithms(const std::unique_ptr<Algorithms::IAlgorithmFactory>& algorithmFactory,
+                                      const std::unique_ptr<Config::JsonConfigManager>& configManager,
+                                      const std::unique_ptr<GPU::GpuManager>& gpuManager) = 0;
+
     virtual void Initialize() = 0;
 
-    virtual void InitializeAlgorithms() = 0;
+    virtual bool IsStarted() = 0;
 
     [[nodiscard]] const std::string& GetName() const
     {
@@ -44,6 +60,11 @@ public:
     void SetName(const std::string& name)
     {
         name_ = name;
+    };
+
+    void SetName(std::string&& name)
+    {
+        name_ = std::move(name);
     };
 
     virtual ~IProcessor() = default;

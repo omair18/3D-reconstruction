@@ -7,7 +7,6 @@
 #ifndef INTERFACE_ALGORITHM_H
 #define INTERFACE_ALGORITHM_H
 
-#include <list>
 #include <memory>
 
 namespace DataStructures
@@ -62,7 +61,7 @@ public:
     [[nodiscard]] bool RequiresGPU() const { return isGPURequired_; };
 
 protected:
-    bool isGPURequired_;
+    bool isGPURequired_ = false;
 };
 
 }

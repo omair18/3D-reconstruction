@@ -19,7 +19,8 @@ std::unique_ptr<IImageDecoder> ImageDecoderFactory::Create(DecoderType type, boo
             {
                 LOG_WARNING() << "OpenCV image decoder doesn't use CUDA stream.";
             }
-        } break;
+            return std::make_unique<OpenCVImageDecoder>();
+        }
 
         case DecoderType::NVJPEG_IMAGE_DECODER:
         {
@@ -29,7 +30,8 @@ std::unique_ptr<IImageDecoder> ImageDecoderFactory::Create(DecoderType type, boo
                 LOG_ERROR() << "NvJPEG image decoder needs CUDA stream.";
                 return nullptr;
             }
-        } break;
+            return std::make_unique<NvJPEGImageDecoder>((cudaStream_t)cudaStream);
+        }
 
         case DecoderType::NVJPEG_HARDWARE_IMAGE_DECODER:
         {
@@ -39,7 +41,8 @@ std::unique_ptr<IImageDecoder> ImageDecoderFactory::Create(DecoderType type, boo
                 LOG_ERROR() << "NvJPEG hardware image decoder needs CUDA stream.";
                 return nullptr;
             }
-        } break;
+            return std::make_unique<NvJPEGHardwareImageDecoder>((cudaStream_t)cudaStream);
+        }
 
         case DecoderType::NVJPEG2K_IMAGE_DECODER:
         {
@@ -49,7 +52,8 @@ std::unique_ptr<IImageDecoder> ImageDecoderFactory::Create(DecoderType type, boo
                 LOG_ERROR() << "NvJPEG2K image decoder needs CUDA stream.";
                 return nullptr;
             }
-        } break;
+            return std::make_unique<NvJPEG2kImageDecoder>((cudaStream_t)cudaStream);
+        }
 
         default:
         {

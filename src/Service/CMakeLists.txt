@@ -18,6 +18,7 @@ target_link_libraries(Service
         PRIVATE
         networking
         datastructures
+        processing
         stdc++fs
         utils
         config

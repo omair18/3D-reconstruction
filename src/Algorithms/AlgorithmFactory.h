@@ -2,7 +2,7 @@
 #define ALGORITHM_FACTORY_H
 
 #include <functional>
-#include <map>
+#include <unordered_map>
 
 #include "IAlgorithmFactory.h"
 
@@ -11,11 +11,10 @@ namespace Algorithms
 
 class AlgorithmFactory final: public IAlgorithmFactory
 {
-    using Function = std::function<std::unique_ptr<IAlgorithm>(const std::shared_ptr<Config::JsonConfig>&)>;
-    using FunctionMap = std::map<std::string, Function>;
+
 
 public:
-    explicit AlgorithmFactory(const std::shared_ptr<Config::JsonConfig>& algorithmModesConfig);
+    explicit AlgorithmFactory();
 
     std::unique_ptr<IAlgorithm> Create(const std::shared_ptr<Config::JsonConfig>& config) override;
 
@@ -25,9 +24,7 @@ private:
     template<typename T>
     auto GetAlgorithmLambda();
 
-    FunctionMap m_algorithmLambdas;
-
-    const std::shared_ptr<Config::JsonConfig> m_algorithmModesConfig;
+    std::unordered_map<std::string, std::function<std::unique_ptr<IAlgorithm>(const std::shared_ptr<Config::JsonConfig>&)>> m_algorithmLambdas;
 };
 
 template<typename T>

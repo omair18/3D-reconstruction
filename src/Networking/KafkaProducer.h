@@ -2,10 +2,16 @@
 #define KAFKA_PRODUCER_H
 
 #include <memory>
+#include <vector>
 
 namespace Config
 {
     class JsonConfig;
+}
+
+namespace RdKafka
+{
+    class Producer;
 }
 
 namespace Networking

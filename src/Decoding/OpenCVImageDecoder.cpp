@@ -1,6 +1,5 @@
 #include <opencv2/imgcodecs.hpp>
-#include <opencv2/imgproc.hpp>
-#include <opencv2/cudawarping.hpp>
+#include <opencv2/core/cuda.hpp>
 
 #include "OpenCVImageDecoder.h"
 #include "CUDAImage.h"
@@ -15,12 +14,6 @@ void OpenCVImageDecoder::Decode(const unsigned char *data, unsigned long long in
     decodedData = cv::imdecode(buffer, cv::IMREAD_UNCHANGED);
 }
 
-void OpenCVImageDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::Mat &decodedImage, size_t outputWidth, size_t outputHeight)
-{
-    Decode(data, size, decodedImage);
-    cv::resize(decodedImage, decodedImage, cv::Size(outputWidth, outputHeight));
-}
-
 void OpenCVImageDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::cuda::GpuMat &decodedImage)
 {
     cv::Mat decodedFrame;
@@ -28,24 +21,10 @@ void OpenCVImageDecoder::Decode(const unsigned char *data, unsigned long long in
     decodedImage.upload(decodedFrame);
 }
 
-void OpenCVImageDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::cuda::GpuMat &decodedImage, size_t outputWidth, size_t outputHeight)
-{
-    Decode(data, size, decodedImage);
-    cv::cuda::resize(decodedImage, decodedImage, cv::Size(outputWidth, outputHeight));
-}
-
 void OpenCVImageDecoder::Decode(const unsigned char *data, unsigned long long int size, DataStructures::CUDAImage &decodedImage)
 {
     cv::cuda::GpuMat gpuImage;
     Decode(data, size, gpuImage);
-    decodedImage.MoveFromGpuMat(gpuImage);
-}
-
-void OpenCVImageDecoder::Decode(const unsigned char *data, unsigned long long int size, DataStructures::CUDAImage &decodedImage, size_t outputWidth, size_t outputHeight)
-{
-    cv::cuda::GpuMat gpuImage;
-    Decode(data, size, gpuImage);
-    cv::cuda::resize(gpuImage, gpuImage, cv::Size(outputWidth, outputHeight));
     decodedImage.MoveFromGpuMat(gpuImage);
 }
 

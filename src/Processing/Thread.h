@@ -3,6 +3,8 @@
 
 #include <thread>
 #include <condition_variable>
+#include <functional>
+#include <atomic>
 
 
 namespace Processing
@@ -12,37 +14,45 @@ class Thread
 {
 public:
 
-    bool Start();
+    Thread();
 
-    bool Stop();
+    virtual ~Thread();
 
-    bool Restart();
+    void Start();
+
+    void Stop();
+
+    void Destroy();
 
     bool IsStarted();
 
-private:
+    void SetExecutableFunction(std::function<void ()> function);
 
-    virtual bool StartInternal();
+protected:
 
-    virtual bool StopInternal();
-
-    virtual bool WaitForStop();
-
-    virtual void Routine();
+    virtual void ExecuteInternal();
 
     /// Thread
     std::thread thread_;
 
+    std::mutex startMutex_;
+
+    std::atomic_bool isStarted_;
+
+    std::atomic_bool needToStop_;
+
+    std::atomic_bool needToStart_;
+
+    std::atomic_bool isDestroyed_;
+
     /// The condition variable
-    std::condition_variable stopCondition_;
+    std::condition_variable startCondition_;
 
-    /** The internal mutex */
-    std::mutex mutexInternal_; // guards start/stop process with waiting
+    std::function<void ()> executableFunction_;
 
-    bool isStarted_ = false;
+private:
 
-    /** The mutex */
-    std::mutex stateMutex_; // guards isStarted_ variable
+    void Execute();
 
 };
 

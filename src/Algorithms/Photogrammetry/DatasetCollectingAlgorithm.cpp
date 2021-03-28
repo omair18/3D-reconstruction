@@ -1,6 +1,12 @@
 #include "DatasetCollectingAlgorithm.h"
 
-Algorithms::DatasetCollectingAlgorithm::DatasetCollectingAlgorithm(const std::shared_ptr <JsonConfig> &config)
+namespace Algorithms
 {
+
+DatasetCollectingAlgorithm::DatasetCollectingAlgorithm(const std::shared_ptr<Config::JsonConfig> &config) :
+ICPUAlgorithm(config)
+{
+
+}
 
 }

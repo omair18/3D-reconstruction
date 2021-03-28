@@ -42,7 +42,9 @@ namespace Config
             namespace PipelineConfig
             {
                 const inline static std::string Name = "name";
-                const inline static std::string InstancesCount = "instancesCount";
+                const inline static std::string Type = "type";
+                const inline static std::string Cpu = "CPU";
+                const inline static std::string Gpu = "GPU";
                 const inline static std::string Input = "input";
                 const inline static std::string Output = "output";
             }
@@ -69,7 +71,7 @@ namespace Config
             const inline static std::string Storage = "storage";
             namespace StorageConfig
             {
-                const inline static std::string Type = "type";
+                const inline static std::string& Type = PipelineConfig::Type;
                 const inline static std::string Filesystem = "filesystem";
                 const inline static std::string AmazonBucket = "amazonBucket";
                 const inline static std::string Path = "path";
@@ -118,7 +120,8 @@ namespace Config
                 const inline static std::string KafkaProducingAlgorithm = "kafkaProducingAlgorithm";
 
                 // Decoding
-                const inline static std::string ImageDecodingAlgorithm = "imageDecodingAlgorithm";
+                const inline static std::string CpuImageDecodingAlgorithm = "CpuImageDecodingAlgorithm";
+                const inline static std::string CUDAImageDecodingAlgorithm = "CUDAImageDecodingAlgorithm";
 
                 // Image processing
                 const inline static std::string CUDAConvolutionAlgorithm = "CUDAConvolutionAlgorithm";
@@ -127,6 +130,38 @@ namespace Config
                 // Photogrammetry
                 const inline static std::string DatasetCollectingAlgorithm = "datasetCollectingAlgorithm";
             }
+
+            namespace KafkaConsumptionAlgorithmConfig
+            {
+
+            }
+
+            namespace KafkaProducingAlgorithmConfig
+            {
+
+            }
+
+            namespace CpuImageDecodingAlgorithmConfig
+            {
+
+            }
+
+            namespace CUDAImageDecodingAlgorithmConfig
+            {
+
+            }
+
+            namespace CUDAConvolutionAlgorithmConfig
+            {
+
+            }
+
+            namespace CUDAResizeAlgorithmConfig
+            {
+
+            }
+
+
         }
 
         namespace MessageNodes

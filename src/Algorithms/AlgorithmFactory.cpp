@@ -1,10 +1,10 @@
 #include "AlgorithmFactory.h"
+#include "ConfigNodes.h"
 
 namespace Algorithms
 {
 
-AlgorithmFactory::AlgorithmFactory(const std::shared_ptr<Config::JsonConfig>& algorithmModesConfig) :
-m_algorithmModesConfig(algorithmModesConfig)
+AlgorithmFactory::AlgorithmFactory()
 {
     m_algorithmLambdas =
     {
@@ -14,7 +14,7 @@ m_algorithmModesConfig(algorithmModesConfig)
 
 std::unique_ptr<IAlgorithm> AlgorithmFactory::Create(const std::shared_ptr<Config::JsonConfig>& algorithmConfig)
 {
-    /*
+/*
     const auto algorithmName = (*algorithmConfig)[CommonNames::Name]->ToString();
 
     if (auto it = m_algorithmLambdas.find(algorithmName); it != m_algorithmLambdas.end())
@@ -34,8 +34,8 @@ std::unique_ptr<IAlgorithm> AlgorithmFactory::Create(const std::shared_ptr<Confi
     {
         throw std::runtime_error(algorithmName + " algorithm not found");
     }
-     */
-    return nullptr;
+    */
+    throw std::runtime_error("error");
 }
 
 

@@ -85,16 +85,11 @@ unsigned int GpuManager::GetCUDACapableDevicesAmount()
     return count;
 }
 
-GPU& GpuManager::SelectMatchingGPU(const std::shared_ptr<Config::JsonConfig> &config)
+GPU& GpuManager::SelectMatchingGPU(const std::shared_ptr<Config::JsonConfig>& serviceConfig)
 {
     LOG_TRACE() << "Selecting GPU according to selection policy ...";
-    if(!config->Contains(Config::ConfigNodes::ServiceConfig::Gpu))
-    {
-        LOG_ERROR() << "Service configuration doesn't contain " << Config::ConfigNodes::ServiceConfig::Gpu << " node.";
-        throw std::runtime_error("Invalid service configuration.");
-    }
 
-    auto gpuConfig = (*config)[Config::ConfigNodes::ServiceConfig::Gpu];
+    auto gpuConfig = (*serviceConfig)[Config::ConfigNodes::ServiceConfig::Gpu];
 
     if(!gpuConfig->Contains(Config::ConfigNodes::ServiceConfig::GpuConfig::SelectionPolicy))
     {

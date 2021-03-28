@@ -25,6 +25,11 @@ namespace DataStructures
     class ProcessingQueueManager;
 }
 
+namespace Processing
+{
+    class ProcessorManager;
+}
+
 namespace Service
 {
 
@@ -58,6 +63,8 @@ private:
 
     std::shared_ptr<Config::JsonConfig> GetServiceConfig();
 
+    static void ValidateServiceConfiguration(const std::shared_ptr<Config::JsonConfig>& serviceConfig);
+
     constexpr const inline static char* organizationName = "BSUIR";
     constexpr const inline static char* productName = "3D-reconstruction";
     constexpr const inline static char* version = "v0.0.1";
@@ -66,7 +73,7 @@ private:
     std::unique_ptr<GPU::GpuManager> gpuManager_;
     std::unique_ptr<Networking::WebServerManager> webServerManager_;
     std::unique_ptr<DataStructures::ProcessingQueueManager> queueManager_;
-
+    std::unique_ptr<Processing::ProcessorManager>  processorManager_;
 
     std::string configPath_;
 

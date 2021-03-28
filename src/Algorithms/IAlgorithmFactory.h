@@ -14,6 +14,11 @@ namespace Config
     class JsonConfig;
 }
 
+namespace GPU
+{
+    class GpuManager;
+}
+
 /**
  * @namespace Algorithms
  *
@@ -49,7 +54,9 @@ public:
       *
       * return Unique pointer to created algorithm.
       */
-    virtual std::unique_ptr<IAlgorithm> Create(const std::shared_ptr<Config::JsonConfig>& config) = 0;
+    virtual std::unique_ptr<IAlgorithm> Create(const std::shared_ptr<Config::JsonConfig>& config,
+                                               const std::unique_ptr<GPU::GpuManager>& gpuManager,
+                                               void* cudaStream) = 0;
 
 };
 

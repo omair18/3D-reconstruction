@@ -33,9 +33,11 @@ target_link_libraries(algorithms
         PRIVATE
         encoding
         decoding
+        config
         networking
         datastructures
         log
+        opencv_core
         )
 
 target_include_directories(algorithms PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

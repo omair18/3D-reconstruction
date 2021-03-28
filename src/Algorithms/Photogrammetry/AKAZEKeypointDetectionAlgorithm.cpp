@@ -1,17 +1,22 @@
 #include "AKAZEKeypointDetectionAlgorithm.h"
 
-Algorithms::AKAZEKeypointDetectionAlgorithm::AKAZEKeypointDetectionAlgorithm(const std::shared_ptr <JsonConfig>& config) :
-IAlgorithm(config)
+namespace Algorithms
+{
+
+AKAZEKeypointDetectionAlgorithm::AKAZEKeypointDetectionAlgorithm(const std::shared_ptr<Config::JsonConfig> &config) :
+IGPUAlgorithm(config)
 {
 
 }
 
-Algorithms::AKAZEKeypointDetectionAlgorithm::~AKAZEKeypointDetectionAlgorithm()
+AKAZEKeypointDetectionAlgorithm::~AKAZEKeypointDetectionAlgorithm()
 {
 
 }
 
-void Algorithms::AKAZEKeypointDetectionAlgorithm::Process()
+bool AKAZEKeypointDetectionAlgorithm::Process(std::shared_ptr<DataStructures::ProcessingData> &processingData)
 {
+    return false;
+}
 
 }

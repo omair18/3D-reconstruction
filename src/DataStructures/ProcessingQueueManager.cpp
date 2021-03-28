@@ -47,13 +47,6 @@ void ProcessingQueueManager::RemoveQueue(const std::string &queueName)
 
 void ProcessingQueueManager::Initialize(const std::shared_ptr<Config::JsonConfig> &serviceConfig)
 {
-    if(!serviceConfig->Contains(Config::ConfigNodes::ServiceConfig::Queues))
-    {
-        LOG_ERROR() << "Invalid service configuration. There is no node "
-        << Config::ConfigNodes::ServiceConfig::Queues << " in service configuration";
-        throw std::runtime_error("Invalid service configuration.");
-    }
-
     auto queuesConfigsArray = (*serviceConfig)[Config::ConfigNodes::ServiceConfig::Queues];
 
     auto queuesConfigs = queuesConfigsArray->GetObjects();

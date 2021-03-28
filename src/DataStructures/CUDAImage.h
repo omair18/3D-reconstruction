@@ -340,7 +340,7 @@ struct CUDAImage final
      *
      * @param dst
      */
-    void CopyToCvMat(cv::Mat& dst);
+    void CopyToCvMat(cv::Mat& dst) const;
 
     /**
      * @brief
@@ -348,7 +348,7 @@ struct CUDAImage final
      * @param dst
      * @param cudaStream
      */
-    void CopyToCvMatAsync(cv::Mat& dst, void* cudaStream = nullptr);
+    void CopyToCvMatAsync(cv::Mat& dst, void* cudaStream = nullptr) const;
 
     /**
      * @brief

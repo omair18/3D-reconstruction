@@ -6,7 +6,7 @@
 {                                                                           \
     if (status != NVJPEG_STATUS_SUCCESS)                                    \
     {                                                                       \
-        LOG_ERROR() << "NVJPEG error " << static_cast<int>(status);         \
+        LOG_ERROR() << "NvJPEG error " << static_cast<int>(status);         \
         return;                                                             \
     }                                                                       \
 }
@@ -25,7 +25,7 @@
 namespace Decoding
 {
 
-NvJPEGHardwareImageDecoder::NvJPEGHardwareImageDecoder(cudaStream_t &cudaStream) :
+NvJPEGHardwareImageDecoder::NvJPEGHardwareImageDecoder(cudaStream_t cudaStream) :
 NvJPEGImageDecoder(cudaStream)
 {
 
@@ -69,29 +69,14 @@ void NvJPEGHardwareImageDecoder::Decode(const unsigned char *data, unsigned long
     return NvJPEGImageDecoder::Decode(data, size, decodedData);
 }
 
-void NvJPEGHardwareImageDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::Mat &decodedImage, size_t outputWidth, size_t outputHeight)
-{
-    return NvJPEGImageDecoder::Decode(data, size, decodedImage, outputWidth, outputHeight);
-}
-
 void NvJPEGHardwareImageDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::cuda::GpuMat &decodedData)
 {
     return NvJPEGImageDecoder::Decode(data, size, decodedData);
 }
 
-void NvJPEGHardwareImageDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::cuda::GpuMat &decodedImage, size_t outputWidth, size_t outputHeight)
-{
-    return NvJPEGImageDecoder::Decode(data, size, decodedImage, outputWidth, outputHeight);
-}
-
 void NvJPEGHardwareImageDecoder::Decode(const unsigned char *data, unsigned long long int size, DataStructures::CUDAImage &decodedImage)
 {
     return NvJPEGImageDecoder::Decode(data, size, decodedImage);
-}
-
-void NvJPEGHardwareImageDecoder::Decode(const unsigned char *data, unsigned long long int size, DataStructures::CUDAImage &decodedImage, size_t outputWidth, size_t outputHeight)
-{
-    return NvJPEGImageDecoder::Decode(data, size, decodedImage, outputWidth, outputHeight);
 }
 
 void NvJPEGHardwareImageDecoder::Initialize()
