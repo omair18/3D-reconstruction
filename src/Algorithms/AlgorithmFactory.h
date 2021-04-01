@@ -16,7 +16,9 @@ class AlgorithmFactory final: public IAlgorithmFactory
 public:
     explicit AlgorithmFactory();
 
-    std::unique_ptr<IAlgorithm> Create(const std::shared_ptr<Config::JsonConfig>& config) override;
+    std::unique_ptr<IAlgorithm> Create(const std::shared_ptr<Config::JsonConfig>& config,
+                                       const std::unique_ptr<GPU::GpuManager>& gpuManager,
+                                       void* cudaStream) override;
 
     ~AlgorithmFactory() override = default;
 
@@ -24,15 +26,17 @@ private:
     template<typename T>
     auto GetAlgorithmLambda();
 
-    std::unordered_map<std::string, std::function<std::unique_ptr<IAlgorithm>(const std::shared_ptr<Config::JsonConfig>&)>> m_algorithmLambdas;
+    std::unordered_map<std::string, std::function<std::unique_ptr<IAlgorithm>(const std::shared_ptr<Config::JsonConfig>&,
+                                                                              const std::unique_ptr<GPU::GpuManager>&,
+                                                                              void*)>> algorithmLambdas_;
 };
 
 template<typename T>
 auto AlgorithmFactory::GetAlgorithmLambda()
 {
-    return [](const auto & config, const auto & modelManager, const auto& interprocessObjectManager) -> std::unique_ptr<IAlgorithm>
+    return [](const auto & config, const auto & gpuManager, void* cudaStream) -> std::unique_ptr<IAlgorithm>
     {
-        return std::make_unique<T>(config, modelManager, interprocessObjectManager);
+        return std::make_unique<T>(config, gpuManager, cudaStream);
     };
 }
 

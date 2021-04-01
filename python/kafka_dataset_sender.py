@@ -79,7 +79,7 @@ def main():
     )
 
     parser.add_argument(
-        '-t',
+        '-o',
         '--timeout',
         type=int,
         help='Kafka producer flush timeout in milliseconds',

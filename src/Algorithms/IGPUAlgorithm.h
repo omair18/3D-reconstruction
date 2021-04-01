@@ -3,17 +3,25 @@
 
 #include "IAlgorithm.h"
 
+namespace GPU
+{
+    class GpuManager;
+    struct GPU;
+}
+
 namespace Algorithms
 {
 
 class IGPUAlgorithm : public IAlgorithm
 {
 public:
-    explicit IGPUAlgorithm(const std::shared_ptr<Config::JsonConfig>& config) :
-    IAlgorithm(config)
+    explicit IGPUAlgorithm() :
+    IAlgorithm()
     {
         isGPURequired_ = true;
     };
+
+    ~IGPUAlgorithm() override = default;
 };
 
 }

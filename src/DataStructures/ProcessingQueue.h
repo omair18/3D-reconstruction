@@ -63,17 +63,18 @@ public:
      */
     void PutAsync(const Type& element)
     {
-        std::thread([this, element]()
-                    {
-                        {
-                            std::unique_lock<std::mutex> lock(this->dequeMutex_);
-                            this->dequeNotFullCV_.wait(lock, [&](){
-                                return this->deque_.size() < this->maxSize_;
-                            });
-                            this->deque_.push_back(element);
-                        }
-                        this->dequeNotEmptyCV_.notify_one();
-                    }).detach();
+        std::thread([&]()
+        {
+            {
+                std::unique_lock<std::mutex> lock(dequeMutex_);
+                dequeNotFullCV_.wait(lock, [&]()
+                {
+                    return deque_.size() < maxSize_;
+                });
+                deque_.push_back(element);
+            }
+            dequeNotEmptyCV_.notify_one();
+        }).detach();
     }
 
 

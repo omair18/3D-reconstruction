@@ -168,7 +168,16 @@ void JsonConfig::AddObject(const std::shared_ptr<JsonConfig>& object)
 
 std::string JsonConfig::Dump()
 {
-    return boost::json::serialize(*value_);
+    try
+    {
+        return boost::json::serialize(*value_);
+    }
+    catch (std::exception& exception)
+    {
+        LOG_ERROR() << "Failed to serialize JSON value to string. Details: " << exception.what();
+        return "";
+    }
+
 }
 
 void JsonConfig::FromJsonString(const std::string& jsonString)

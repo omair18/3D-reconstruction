@@ -113,6 +113,11 @@ namespace Config
 
         namespace AlgorithmsConfig
         {
+
+            const inline static std::string Algorithms = "algorithms";
+            const inline static std::string& Name = ServiceConfig::PipelineConfig::Name;
+            const inline static std::string Configuration = "configuration";
+
             namespace AlgorithmsNames
             {
                 // Kafka IO
@@ -133,12 +138,18 @@ namespace Config
 
             namespace KafkaConsumptionAlgorithmConfig
             {
-
+                const inline static std::string& Brokers = NetworkingConfig::KafkaConsumerConfig::Brokers;
+                const inline static std::string& Topics = NetworkingConfig::KafkaConsumerConfig::Topics;
+                const inline static std::string& EnablePartitionEOF = NetworkingConfig::KafkaConsumerConfig::EnablePartitionEOF;
+                const inline static std::string& GroupId = NetworkingConfig::KafkaConsumerConfig::GroupId;
+                const inline static std::string& Timeout = NetworkingConfig::KafkaConsumerConfig::Timeout;
             }
 
             namespace KafkaProducingAlgorithmConfig
             {
-
+                const inline static std::string& Topics = NetworkingConfig::KafkaProducerConfig::Topics;
+                const inline static std::string& Brokers = NetworkingConfig::KafkaProducerConfig::Brokers;
+                const inline static std::string& Timeout = NetworkingConfig::KafkaProducerConfig::Timeout;
             }
 
             namespace CpuImageDecodingAlgorithmConfig

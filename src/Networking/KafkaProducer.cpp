@@ -34,6 +34,8 @@ void Networking::KafkaProducer::Produce(const std::shared_ptr<KafkaMessage> &mes
     std::string key = message->GetKey()->Dump();
     for(auto& topic : topics_)
     {
+        //produces too much log records
+        //LOG_TRACE() << "Producing message with key " << key << " to topic " << topic;
         auto errorCode = producer_->produce(topic,
                                             RdKafka::Topic::PARTITION_UA,
                                             RdKafka::Producer::RK_MSG_COPY,

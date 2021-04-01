@@ -59,12 +59,15 @@ void ProcessorManager::AddProcessor(const std::shared_ptr<Config::JsonConfig>& c
     if (type == Config::ConfigNodes::ServiceConfig::PipelineConfig::Cpu)
     {
         processor = std::make_shared<CpuProcessor>(config, queueManager);
+        LOG_TRACE() << "CPU processor " << processor->GetName() << " was created.";
     }
     else
     {
         processor = std::make_shared<GpuProcessor>(config, queueManager);
+        LOG_TRACE() << "GPU processor " << processor->GetName() << " was created.";
     }
 
+    LOG_TRACE() << "Initializing processor " << processor->GetName() << " ...";
     processor->Initialize();
     processor->InitializeAlgorithms(algorithmFactory_, configManager, gpuManager);
 

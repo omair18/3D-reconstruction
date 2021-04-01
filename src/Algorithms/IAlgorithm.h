@@ -38,7 +38,7 @@ public:
     /**
      * @brief Default constructor.
      */
-    explicit IAlgorithm(const std::shared_ptr<Config::JsonConfig>& config){};
+    explicit IAlgorithm() = default;
 
     /**
      * @brief
@@ -48,6 +48,7 @@ public:
      */
     virtual bool Process(std::shared_ptr<DataStructures::ProcessingData>& processingData) = 0;
 
+    virtual void Initialize(const std::shared_ptr<Config::JsonConfig>& config) = 0;
 
     /**
      * @brief Default destructor.
@@ -61,6 +62,7 @@ public:
     [[nodiscard]] bool RequiresGPU() const { return isGPURequired_; };
 
 protected:
+
     bool isGPURequired_ = false;
 };
 

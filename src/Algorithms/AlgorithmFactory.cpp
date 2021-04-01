@@ -1,41 +1,41 @@
 #include "AlgorithmFactory.h"
+#include "JsonConfig.h"
 #include "ConfigNodes.h"
+#include "KafkaIO/KafkaConsumptionAlgorithm.h"
+#include "KafkaIO/KafkaProducingAlgorithm.h"
+#include "Logger.h"
 
 namespace Algorithms
 {
 
 AlgorithmFactory::AlgorithmFactory()
 {
-    m_algorithmLambdas =
+    algorithmLambdas_ =
     {
-        //{ ConfigNodes::AlgorithmNames::FaceDetector, GetAlgorithmLambda<FaceDetectionAlgorithm>() }
+        { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::KafkaConsumptionAlgorithm, GetAlgorithmLambda<KafkaConsumptionAlgorithm>() },
+        { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::KafkaProducingAlgorithm, GetAlgorithmLambda<KafkaProducingAlgorithm>() }
     };
 }
 
-std::unique_ptr<IAlgorithm> AlgorithmFactory::Create(const std::shared_ptr<Config::JsonConfig>& algorithmConfig)
+std::unique_ptr<IAlgorithm> AlgorithmFactory::Create(const std::shared_ptr<Config::JsonConfig>& config,
+                                                     const std::unique_ptr<GPU::GpuManager>& gpuManager,
+                                                     void* cudaStream)
 {
-/*
-    const auto algorithmName = (*algorithmConfig)[CommonNames::Name]->ToString();
+    const auto algorithmName = (*config)[Config::ConfigNodes::AlgorithmsConfig::Name]->ToString();
 
-    if (auto it = m_algorithmLambdas.find(algorithmName); it != m_algorithmLambdas.end())
+    if (auto it = algorithmLambdas_.find(algorithmName); it != algorithmLambdas_.end())
     {
-        LOG_INFO("Add %s algorithm", algorithmName);
+        //LOG_INFO("Add %s algorithm", algorithmName);
 
-        const auto algorithmConfigurationNode = (*algorithmConfig)[ConfigNodes::ServiceConfig::Configuration];
+        const auto algorithmConfiguration = (*config)[Config::ConfigNodes::AlgorithmsConfig::Configuration];
 
-        if ((*algorithmConfigurationNode)[ConfigNodes::ServiceConfig::Modes]->IsNull())
-        {
-            algorithmConfigurationNode->SetNode(ConfigNodes::ServiceConfig::Modes, m_algorithmModesConfig);
-        }
-
-        return it->second(algorithmConfigurationNode, modelManager, interprocessObjectManager);
+        return it->second(algorithmConfiguration, gpuManager, cudaStream);
     }
     else
     {
+        LOG_ERROR() << "";
         throw std::runtime_error(algorithmName + " algorithm not found");
     }
-    */
-    throw std::runtime_error("error");
 }
 
 

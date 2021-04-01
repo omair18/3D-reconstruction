@@ -5,8 +5,8 @@ set(GPU_LIB_HEADERS
 set(GPU_LIB_CPPS
         GpuManager.cpp)
 
-source_group("Header Files" FILES ${CONFIG_LIB_HEADERS})
-source_group("Source Files" FILES ${CONFIG_LIB_CPPS})
+source_group("Header Files" FILES ${GPU_LIB_HEADERS})
+source_group("Source Files" FILES ${GPU_LIB_CPPS})
 
 add_library(gpu SHARED ${GPU_LIB_HEADERS} ${GPU_LIB_CPPS})
 

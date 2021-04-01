@@ -20,7 +20,7 @@ set(ALGORITHMS_LIB_CPPS
         Photogrammetry/DatasetCollectingAlgorithm.cpp
         Photogrammetry/AKAZEKeypointDetectionAlgorithm.cpp
         ImageProcessing/CUDAResizeAlgorithm.cpp
-        ImageProcessing/CUDAConvolutionAlgorithm.cpp)
+        ImageProcessing/CUDAConvolutionAlgorithm.cpp ../Storage/FilesystemStorage.cpp ../Storage/FilesystemStorage.h ../Storage/AmazonBucketStorage.cpp ../Storage/AmazonBucketStorage.h ../Storage/IO/PLYModel.cpp ../Storage/IO/PLYModel.h Decoding/ImageDecodingAlgorithm.cpp Decoding/ImageDecodingAlgorithm.h)
 
 source_group("Header Files" FILES ${ALGORITHMS_LIB_HEADERS})
 source_group("Source Files" FILES ${ALGORITHMS_LIB_CPPS})

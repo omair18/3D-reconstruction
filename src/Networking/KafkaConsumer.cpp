@@ -57,7 +57,7 @@ std::shared_ptr<Networking::KafkaMessage> Networking::KafkaConsumer::Consume()
             }
             else
             {
-                LOG_TRACE() << "";
+                LOG_TRACE() << "Received message with key " << *message->key();
                 auto kafkaMessage = std::make_shared<KafkaMessage>(message);
                 delete message;
                 return kafkaMessage;
@@ -111,23 +111,23 @@ bool Networking::KafkaConsumer::Initialize(const std::shared_ptr<Config::JsonCon
     globalConfig->set("enable.partition.eof", enablePartitionEOF ? "true" : "false", errorString);
     if(!errorString.empty())
     {
-        LOG_ERROR() << "Failed to set kafka consumer param enable.partition.eof. Message: " << errorString;
-        throw std::runtime_error("Failed to set kafka consumer param enable.partition.eof.");
+        LOG_ERROR() << "Failed to set kafka consumer's param enable.partition.eof. Message: " << errorString;
+        throw std::runtime_error("Failed to set kafka consumer's param enable.partition.eof.");
     }
     else
     {
-        LOG_TRACE() << "Kafka consumer param enable.partition.eof set to " << (enablePartitionEOF ? "true." : "false.");
+        LOG_TRACE() << "Kafka consumer's param enable.partition.eof set to " << (enablePartitionEOF ? "true." : "false.");
     }
 
     globalConfig->set("group.id", std::to_string(groupId), errorString);
     if(!errorString.empty())
     {
-        LOG_ERROR() << "Failed to set kafka consumer param group.id. Message: " << errorString;
-        throw std::runtime_error("Failed to set kafka consumer param group.id.");
+        LOG_ERROR() << "Failed to set kafka consumer's param group.id. Message: " << errorString;
+        throw std::runtime_error("Failed to set kafka consumer's param group.id.");
     }
     else
     {
-        LOG_TRACE() << "Kafka consumer param group.id set to " << groupId << ".";
+        LOG_TRACE() << "Kafka consumer's param group.id set to " << groupId << ".";
     }
 
     RdKafka::Conf* topicConf = RdKafka::Conf::create(RdKafka::Conf::ConfType::CONF_TOPIC);
@@ -146,12 +146,12 @@ bool Networking::KafkaConsumer::Initialize(const std::shared_ptr<Config::JsonCon
     globalConfig->set("metadata.broker.list", brokersListString, errorString);
     if(!errorString.empty())
     {
-        LOG_ERROR() << "Failed to set kafka consumer param metadata.broker.list. Message: " << errorString;
-        throw std::runtime_error("Failed to set kafka consumer param metadata.broker.list.");
+        LOG_ERROR() << "Failed to set kafka consumer's param metadata.broker.list. Message: " << errorString;
+        throw std::runtime_error("Failed to set kafka consumer's param metadata.broker.list.");
     }
     else
     {
-        LOG_TRACE() << "Kafka consumer param metadata.broker.list set to [" << brokersListString << "].";
+        LOG_TRACE() << "Kafka consumer's param metadata.broker.list set to [" << brokersListString << "].";
     }
 
     consumer_ = RdKafka::KafkaConsumer::create(globalConfig, errorString);
@@ -190,7 +190,7 @@ bool Networking::KafkaConsumer::Initialize(const std::shared_ptr<Config::JsonCon
     }
 
     timeoutMs_ = timeoutMs;
-    LOG_TRACE() << "Kafka consumer's is consumption timeout was set to " << timeoutMs << "milliseconds.";
+    LOG_TRACE() << "Kafka consumer's consumption timeout was set to " << timeoutMs << "milliseconds.";
 
     delete globalConfig;
     return true;

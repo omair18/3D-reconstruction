@@ -4,7 +4,7 @@ namespace Algorithms
 {
 
 AKAZEKeypointDetectionAlgorithm::AKAZEKeypointDetectionAlgorithm(const std::shared_ptr<Config::JsonConfig> &config) :
-IGPUAlgorithm(config)
+IGPUAlgorithm()
 {
 
 }

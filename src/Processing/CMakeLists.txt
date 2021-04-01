@@ -10,7 +10,7 @@ set(PROCESSING_LIB_CPPS
         GpuProcessor.cpp
         ProcessorManager.cpp
         CpuProcessor.cpp
-        Thread.cpp EndlessThread.cpp EndlessThread.h)
+        Thread.cpp EndlessThread.cpp EndlessThread.h IThread.h)
 
 source_group("Header Files" FILES ${PROCESSING_LIB_HEADERS})
 source_group("Source Files" FILES ${PROCESSING_LIB_CPPS})

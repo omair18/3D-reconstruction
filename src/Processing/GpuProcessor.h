@@ -32,6 +32,8 @@ public:
 
 private:
 
+    static void ValidateAlgorithmConfig(const std::shared_ptr<Config::JsonConfig>& algorithmConfig);
+
     cudaStream_t cudaStream_ = nullptr;
 
     EndlessThread thread_;

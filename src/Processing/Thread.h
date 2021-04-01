@@ -6,31 +6,34 @@
 #include <functional>
 #include <atomic>
 
+#include "IThread.h"
 
 namespace Processing
 {
 
-class Thread
+class Thread final : public IThread
 {
 public:
 
     Thread();
 
-    virtual ~Thread();
+    ~Thread() override;
 
-    void Start();
+    void Start() override;
 
-    void Stop();
+    void Stop() override;
 
     void Destroy();
 
-    bool IsStarted();
+    bool IsStarted() override;
 
     void SetExecutableFunction(std::function<void ()> function);
 
-protected:
+private:
 
-    virtual void ExecuteInternal();
+    void Execute();
+
+    void ExecuteInternal() override;
 
     /// Thread
     std::thread thread_;
@@ -49,10 +52,6 @@ protected:
     std::condition_variable startCondition_;
 
     std::function<void ()> executableFunction_;
-
-private:
-
-    void Execute();
 
 };
 

@@ -119,7 +119,9 @@ boost::log::record_ostream& Logger::RecordStream::GetStream(SEVERITY_LEVEL sever
 Logger::RecordStream::~RecordStream()
 {
     if(recordPump_)
+    {
         delete recordPump_;
+    }
 }
 
 Logger::RecordStream::RecordStream(const Logger *logger) :

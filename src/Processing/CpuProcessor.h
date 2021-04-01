@@ -38,6 +38,8 @@ public:
 
 private:
 
+    static void ValidateAlgorithmConfig(const std::shared_ptr<Config::JsonConfig>& algorithmConfig);
+
     EndlessThread thread_;
 
 };
