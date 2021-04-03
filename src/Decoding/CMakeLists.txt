@@ -30,6 +30,7 @@ target_link_libraries(decoding
         ${CUDA_CUDART_LIBRARY}
         opencv_core
         opencv_imgcodecs
+        opencv_highgui
         datastructures)
 
 target_include_directories(decoding PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

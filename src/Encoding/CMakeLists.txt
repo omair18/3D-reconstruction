@@ -3,15 +3,13 @@ set(ENCODING_LIB_HEADERS
         ImageEncoderFactory.h
         OpenCVImageEncoder.h
         NvJPEGImageEncoder.h
-        NvJPEGHardwareImageEncoder.h
-        )
+        NvJPEGHardwareImageEncoder.h)
 
 set(ENCODING_LIB_CPPS
         ImageEncoderFactory.cpp
         OpenCVImageEncoder.cpp
         NvJPEGImageEncoder.cpp
-        NvJPEGHardwareImageEncoder.cpp
-        )
+        NvJPEGHardwareImageEncoder.cpp)
 
 source_group("Header Files" FILES ${ENCODING_LIB_HEADERS})
 source_group("Source Files" FILES ${ENCODING_LIB_CPPS})
@@ -24,7 +22,6 @@ target_link_libraries(encoding
         PUBLIC
 
         PRIVATE
-        log
-        )
+        log)
 
 target_include_directories(encoding PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

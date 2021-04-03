@@ -1,3 +1,9 @@
+/**
+ * @file AKAZEKeypointDetectionAlgorithm.h.
+ *
+ * @brief
+ */
+
 #ifndef AKAZE_KEYPOINT_DETECTION_ALGORITHM_H
 #define AKAZE_KEYPOINT_DETECTION_ALGORITHM_H
 
@@ -5,12 +11,26 @@
 
 #include "IGPUAlgorithm.h"
 
+/**
+ * @namespace Algorithms
+ *
+ * @brief
+ */
 namespace Algorithms
 {
 
+/**
+ * @class AKAZEKeypointDetectionAlgorithm
+ *
+ * @brief
+ */
 class AKAZEKeypointDetectionAlgorithm : public IGPUAlgorithm
 {
-    /// AKAZE nonlinear diffusion filtering evolution
+    /**
+     * @struct TEvolution
+     *
+     * @brief AKAZE nonlinear diffusion filtering evolution
+     */
     struct TEvolution
     {
         /// First order spatial derivatives
@@ -50,25 +70,57 @@ class AKAZEKeypointDetectionAlgorithm : public IGPUAlgorithm
         size_t sigmaSize_ = 0;
     };
 
+    /**
+     * @enum DIFFUSIVITY_TYPE
+     *
+     * @brief
+     */
     enum DIFFUSIVITY_TYPE
     {
+        ///
         PM_G1 = 0,
+
+        ///
         PM_G2 = 1,
+
+        ///
         WEICKERT = 2,
+
+        ///
         CHARBONNIER = 3
     };
 
+    /**
+     * @enum DESCRIPTOR_TYPE
+     *
+     * @brief
+     */
     enum DESCRIPTOR_TYPE
     {
+        ///
         MLDB = 5
     };
 
 public:
 
+    /**
+     * @brief
+     *
+     * @param config
+     */
     AKAZEKeypointDetectionAlgorithm(const std::shared_ptr<Config::JsonConfig>& config);
 
+    /**
+     * @brief
+     */
     ~AKAZEKeypointDetectionAlgorithm();
 
+    /**
+     * @brief
+     *
+     * @param processingData
+     * @return
+     */
     bool Process(std::shared_ptr<DataStructures::ProcessingData>& processingData) override;
 
 

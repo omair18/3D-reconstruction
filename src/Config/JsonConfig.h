@@ -360,26 +360,26 @@ public:
     std::shared_ptr<JsonConfig> operator[] (const std::string& key) const;
 
     /**
-     * @brief
+     * @brief Value setting operator. Copies information from other-param JSON config to current JSON config.
      *
-     * @param other
-     * @return
+     * @param other - JSON config for being copied
+     * @return L-value reference to the current JSON config.
      */
     JsonConfig& operator=(const JsonConfig& other);
 
     /**
-     * @brief
+     * @brief Value setting operator. Moves information from other-param JSON config to current JSON config.
      *
-     * @param other
-     * @return
+     * @param other - JSON config to move
+     * @return L-value reference to the current JSON config.
      */
     JsonConfig& operator=(JsonConfig&& other) noexcept;
 
     /**
-     * @brief
+     * @brief Equation operator. Compares current JSON config whti other-param JSON config.
      *
-     * @param other
-     * @return
+     * @param other - Other JSON config to compare with
+     * @return True if configs have same information. Otherwise returns false.
      */
     bool operator==(const JsonConfig& other);
 

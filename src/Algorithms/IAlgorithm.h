@@ -9,11 +9,13 @@
 
 #include <memory>
 
+// forward declaration for DataStructures::ProcessingData
 namespace DataStructures
 {
     class ProcessingData;
 }
 
+// forward declaration for Config::JsonConfig
 namespace Config
 {
     class JsonConfig;
@@ -48,6 +50,11 @@ public:
      */
     virtual bool Process(std::shared_ptr<DataStructures::ProcessingData>& processingData) = 0;
 
+    /**
+     * @brief
+     *
+     * @param config
+     */
     virtual void Initialize(const std::shared_ptr<Config::JsonConfig>& config) = 0;
 
     /**
@@ -63,6 +70,7 @@ public:
 
 protected:
 
+    ///
     bool isGPURequired_ = false;
 };
 

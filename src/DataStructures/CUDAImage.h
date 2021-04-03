@@ -416,7 +416,7 @@ struct CUDAImage final
      * @param channels
      * @param type
      */
-    void CopyToRawHostPointer(void* dst, size_t width, size_t height, size_t channels, ELEMENT_TYPE type);
+    void CopyToRawHostPointer(void* dst, size_t width, size_t height, size_t channels, ELEMENT_TYPE type) const;
 
     /**
      * @brief
@@ -428,7 +428,7 @@ struct CUDAImage final
      * @param type
      * @param cudaStream
      */
-    void CopyToRawHostPointerAsync(void* dst, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, void* cudaStream = nullptr);
+    void CopyToRawHostPointerAsync(void* dst, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, void* cudaStream = nullptr) const;
 
     /// Device pointer
 

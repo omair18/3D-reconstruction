@@ -8,24 +8,55 @@
 namespace Decoding
 {
 
-void OpenCVImageDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::Mat &decodedData)
+OpenCVImageDecoder::~OpenCVImageDecoder() noexcept(false)
 {
+
+}
+
+bool OpenCVImageDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::Mat &decodedData)
+{
+    LOG_TRACE() << "Decoding image with OpenCV decoder";
     std::vector<char> buffer(data, data  + size);
     decodedData = cv::imdecode(buffer, cv::IMREAD_UNCHANGED);
+    if(!decodedData.empty())
+    {
+        LOG_TRACE() << "Image was successfully decoded.";
+        return true;
+    }
+    else
+    {
+        LOG_ERROR() << "Failed to decode image.";
+        return false;
+    }
 }
 
-void OpenCVImageDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::cuda::GpuMat &decodedImage)
+bool OpenCVImageDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::cuda::GpuMat &decodedImage)
 {
     cv::Mat decodedFrame;
-    Decode(data, size, decodedFrame);
-    decodedImage.upload(decodedFrame);
+    if(Decode(data, size, decodedFrame))
+    {
+        decodedImage.upload(decodedFrame);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+
 }
 
-void OpenCVImageDecoder::Decode(const unsigned char *data, unsigned long long int size, DataStructures::CUDAImage &decodedImage)
+bool OpenCVImageDecoder::Decode(const unsigned char *data, unsigned long long int size, DataStructures::CUDAImage &decodedImage)
 {
     cv::cuda::GpuMat gpuImage;
-    Decode(data, size, gpuImage);
-    decodedImage.MoveFromGpuMat(gpuImage);
+    if(Decode(data, size, gpuImage))
+    {
+        decodedImage.MoveFromGpuMat(gpuImage);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 bool OpenCVImageDecoder::IsInitialized()

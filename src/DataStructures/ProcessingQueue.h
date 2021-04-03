@@ -1,3 +1,9 @@
+/**
+ * @file ProcessingQueue.h.
+ *
+ * @brief
+ */
+
 #ifndef PROCESSING_QUEUE_H
 #define PROCESSING_QUEUE_H
 
@@ -7,6 +13,11 @@
 #include <thread>
 #include <utility>
 
+/**
+ * @namespace DataStructures
+ *
+ * @brief
+ */
 namespace DataStructures
 {
 
@@ -25,8 +36,8 @@ public:
     /**
      * @brief
      *
-     * @param
-     * @param
+     * @param name
+     * @param maxSize
      */
     ProcessingQueue(std::string name, int maxSize) :
     name_(std::move(name)), maxSize_(maxSize)
@@ -57,32 +68,9 @@ public:
     }
 
     /**
-     * @brief
-     *
-     * @param element
-     */
-    void PutAsync(const Type& element)
-    {
-        std::thread([&]()
-        {
-            {
-                std::unique_lock<std::mutex> lock(dequeMutex_);
-                dequeNotFullCV_.wait(lock, [&]()
-                {
-                    return deque_.size() < maxSize_;
-                });
-                deque_.push_back(element);
-            }
-            dequeNotEmptyCV_.notify_one();
-        }).detach();
-    }
-
-
-
-    /**
      * @brief Get an element from the queue
      *
-     * @return element
+     * @param element
      */
     void Get(Type& element)
     {
@@ -98,31 +86,9 @@ public:
     }
 
     /**
-     * @brief Try to get a product from the queue
-     *
-     * @param element
-     * @return True if it succeeds, false if it fails.
-     */
-    bool TryGet(Type& element)
-    {
-        std::lock_guard<std::mutex> lock(dequeMutex_);
-        if (!deque_.empty())
-        {
-            element = deque_.front();
-            deque_.pop_front();
-            dequeNotFullCV_.notify_one();
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    /**
      * @brief Clear the queue
      */
-    inline void Clear()
+    void Clear()
     {
         std::lock_guard<std::mutex> lock(dequeMutex_);
         deque_.clear();

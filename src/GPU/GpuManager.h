@@ -39,39 +39,45 @@ class GpuManager
 public:
 
     /**
-     * @brief
+     * @brief Finds all CUDA-capable devices and sets information about them to the cudaCapableDevices_
      */
     void UpdateCUDACapableDevicesList();
 
     /**
-     * @brief
+     * @brief Returns amount of CUDA-capable devices in case of success. In other case returns 0 and puts a record
+     * in a log file with ERROR severity.
      *
-     * @return
+     * @return Amount of CUDA-capable devices.
      */
     unsigned int GetCUDACapableDevicesAmount();
 
     /**
-     * @brief
+     * @brief Returns CUDA-capable devices list.
      *
-     * @return
+     * @return CUDA-capable devices list.
      */
     const std::vector<GPU>& GetCUDACapableDevicesList();
 
     /**
-     * @brief
+     * @brief Selects GPU from all CUDA-capable devices according to GPU selection policy.
      *
-     * @param serviceConfig
-     * @return
+     * @param serviceConfig - service configuration with GPU selection policy
+     * @return L-value reference to matching GPU.
      */
     GPU& SelectMatchingGPU(const std::shared_ptr<Config::JsonConfig>& serviceConfig);
 
     /**
      * @brief Selects gpu-param as current GPU for all service's processors.
      *
-     * @param gpu - CUDA-capable device to be used.
+     * @param gpu - CUDA-capable device to be used
      */
     void SetDevice(GPU& gpu);
 
+    /**
+     * @brief Provides a constant shared pointer to a current CUDA-capable device selected by SetDevice method.
+     *
+     * @return Constant shared pointer to a current CUDA-capable device selected by SetDevice method.
+     */
     const std::shared_ptr<GPU>& GetCurrentGPU();
 
 private:
@@ -79,7 +85,7 @@ private:
     /// List of CUDA-capable devices
     std::vector<GPU> cudaCapableDevices_;
 
-    ///
+    /// A pointer to a GPU selected by method SetDevice
     std::shared_ptr<GPU> selectedGPU_;
 };
 

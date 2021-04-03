@@ -9,8 +9,13 @@ set(ALGORITHMS_LIB_HEADERS
         Decoding/CUDAImageDecodingAlgorithm.h
         Photogrammetry/DatasetCollectingAlgorithm.h
         Photogrammetry/AKAZEKeypointDetectionAlgorithm.h
+        Photogrammetry/MeshReconstructionAlgorithm.h
+        Photogrammetry/MeshRefinementAlgorithm.h
+        Photogrammetry/MeshTexturingAlgorithm.h
+        Photogrammetry/PointCloudDensificationAlgorithm.h
         ImageProcessing/CUDAResizeAlgorithm.h
-        ImageProcessing/CUDAConvolutionAlgorithm.h)
+        ImageProcessing/CUDAConvolutionAlgorithm.h
+        ImageProcessing/CUDAImageBinarizationAlgorithm.h)
 
 set(ALGORITHMS_LIB_CPPS
         AlgorithmFactory.cpp
@@ -19,8 +24,13 @@ set(ALGORITHMS_LIB_CPPS
         Decoding/CUDAImageDecodingAlgorithm.cpp
         Photogrammetry/DatasetCollectingAlgorithm.cpp
         Photogrammetry/AKAZEKeypointDetectionAlgorithm.cpp
+        Photogrammetry/MeshReconstructionAlgorithm.cpp
+        Photogrammetry/MeshRefinementAlgorithm.cpp
+        Photogrammetry/MeshTexturingAlgorithm.cpp
+        Photogrammetry/PointCloudDensificationAlgorithm.cpp
         ImageProcessing/CUDAResizeAlgorithm.cpp
-        ImageProcessing/CUDAConvolutionAlgorithm.cpp ../Storage/FilesystemStorage.cpp ../Storage/FilesystemStorage.h ../Storage/AmazonBucketStorage.cpp ../Storage/AmazonBucketStorage.h ../Storage/IO/PLYModel.cpp ../Storage/IO/PLYModel.h Decoding/ImageDecodingAlgorithm.cpp Decoding/ImageDecodingAlgorithm.h)
+        ImageProcessing/CUDAConvolutionAlgorithm.cpp
+        ImageProcessing/CUDAImageBinarizationAlgorithm.cpp)
 
 source_group("Header Files" FILES ${ALGORITHMS_LIB_HEADERS})
 source_group("Source Files" FILES ${ALGORITHMS_LIB_CPPS})
@@ -37,7 +47,6 @@ target_link_libraries(algorithms
         networking
         datastructures
         log
-        opencv_core
-        )
+        opencv_core)
 
 target_include_directories(algorithms PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

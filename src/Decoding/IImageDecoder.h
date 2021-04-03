@@ -1,18 +1,23 @@
+/**
+ * @file IImageDecoder.h.
+ *
+ * @brief Declares a class of IImageDecoder. This is a base class for all image decoders.
+ */
+
 #ifndef INTERFACE_IMAGE_DECODER_H
 #define INTERFACE_IMAGE_DECODER_H
 
-//
+// forward declaration for cv::Mat and cv::cuda::GpuMat
 namespace cv
 {
     class Mat;
-
     namespace cuda
     {
         class GpuMat;
     }
 }
 
-//
+// forward declaration for DataStructures::CUDAImage
 namespace DataStructures
 {
     struct CUDAImage;
@@ -21,7 +26,7 @@ namespace DataStructures
 /**
  * @namespace Decoding
  *
- * @brief
+ * @brief Namespace of libdecoding library.
  */
 namespace Decoding
 {
@@ -29,69 +34,72 @@ namespace Decoding
 /**
  * @class IImageDecoder
  *
- * @brief
+ * @brief This is a base class for all image decoders.
  */
 class IImageDecoder
 {
 public:
 
     /**
-     * @brief
+     * @brief Default constructor.
      */
     IImageDecoder() = default;
 
     /**
-     * @brief
+     * @brief Default destructor.
      */
-    virtual ~IImageDecoder() = default;
+    virtual ~IImageDecoder() noexcept(false) {;};
 
     /**
-     * @brief
+     * @brief Decodes image from raw host pointer and stores decoded image to decodedImage-param.
      *
-     * @param data
-     * @param size
-     * @param decodedImage
+     * @param data - Host raw pointer to data for decoding
+     * @param size - Size of data in bytes
+     * @param decodedImage - Decoded image
+     * @return True if decoding was successful. Otherwise returns false.
      */
-    virtual void Decode(const unsigned char* data, unsigned long long size, cv::Mat& decodedImage) = 0;
+    virtual bool Decode(const unsigned char* data, unsigned long long size, cv::Mat& decodedImage) = 0;
 
     /**
-     * @brief
+     * @brief Decodes image from raw host pointer and stores decoded image to decodedImage-param.
      *
-     * @param data
-     * @param size
-     * @param decodedImage
+     * @param data - Host raw pointer to data for decoding
+     * @param size - Size of data in bytes
+     * @param decodedImage - Decoded image
+     * @return True if decoding was successful. Otherwise returns false.
      */
-    virtual void Decode(const unsigned char* data, unsigned long long size, cv::cuda::GpuMat& decodedImage) = 0;
+    virtual bool Decode(const unsigned char* data, unsigned long long size, cv::cuda::GpuMat& decodedImage) = 0;
 
     /**
-     * @brief
+     * @brief Decodes image from raw host pointer and stores decoded image to decodedImage-param.
      *
-     * @param data
-     * @param size
-     * @param decodedImage
+     * @param data - Host raw pointer to data for decoding
+     * @param size - Size of data in bytes
+     * @param decodedImage - Decoded image
+     * @return True if decoding was successful. Otherwise returns false.
      */
-    virtual void Decode(const unsigned char* data, unsigned long long size, DataStructures::CUDAImage& decodedImage) = 0;
+    virtual bool Decode(const unsigned char* data, unsigned long long size, DataStructures::CUDAImage& decodedImage) = 0;
 
     /**
-     * @brief
+     * @brief Initializes backend of image decoder.
      */
     virtual void Initialize() = 0;
 
     /**
-     * @brief
+     * @brief Checks weather image decoder is initialized.
      *
-     * @return
+     * @return True if image decoder's backend is initialized. Otherwise returns false.
      */
     virtual bool IsInitialized() = 0;
 
 protected:
 
     /**
-     * @brief
+     * @brief Allocates buffer for storing the result of decoding.
      *
-     * @param width
-     * @param height
-     * @param channels
+     * @param width - Width of image that will be decoded
+     * @param height - Height of image that will be decoded
+     * @param channels - Number of channels of image that will be decoded
      */
     virtual void AllocateBuffer(int width, int height, int channels) = 0;
 

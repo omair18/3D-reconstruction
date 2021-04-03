@@ -1,3 +1,10 @@
+/**
+ * @file OpenCVImageDecoder.h.
+ *
+ * @brief Declares a class of OpenCVImageDecoder. This decoder uses OpenCV backend and decodes most of image formats
+ * on CPU.
+ */
+
 #ifndef OPENCV_IMAGE_DECODER_H
 #define OPENCV_IMAGE_DECODER_H
 
@@ -6,7 +13,7 @@
 /**
  * @namespace Decoding
  *
- * @brief
+ * @brief Namespace of libdecoding library.
  */
 namespace Decoding
 {
@@ -14,69 +21,74 @@ namespace Decoding
 /**
  * @class OpenCVImageDecoder
  *
- * @brief
+ * @brief This decoder uses OpenCV backend and decodes most of image formats on CPU.
  */
 class OpenCVImageDecoder final : public IImageDecoder
 {
 public:
 
     /**
-     * @brief
+     * @brief Default constructor.
      */
     OpenCVImageDecoder() = default;
 
     /**
-     * @brief
+     * @brief Default destructor.
      */
-    ~OpenCVImageDecoder() override = default;
+    ~OpenCVImageDecoder() noexcept(false) override;
 
     /**
-     * @brief
+     * @brief Decodes image from raw host pointer and stores decoded image to decodedImage-param.
      *
-     * @param data
-     * @param size
-     * @param decodedData
+     * @param data - Host raw pointer to data for decoding
+     * @param size - Size of data in bytes
+     * @param decodedData - Decoded image
+     * @return True if decoding was successful. Otherwise returns false.
      */
-    void Decode(const unsigned char* data, unsigned long long size, cv::Mat& decodedData) override;
+    bool Decode(const unsigned char* data, unsigned long long size, cv::Mat& decodedData) override;
 
     /**
-     * @brief
+     * @brief Decodes image from raw host pointer and stores decoded image to decodedImage-param.
      *
-     * @param data
-     * @param size
-     * @param decodedData
+     * @param data - Host raw pointer to data for decoding
+     * @param size - Size of data in bytes
+     * @param decodedData - Decoded image
+     * @return True if decoding was successful. Otherwise returns false.
      */
-    void Decode(const unsigned char* data, unsigned long long size, cv::cuda::GpuMat& decodedData) override;
+    bool Decode(const unsigned char* data, unsigned long long size, cv::cuda::GpuMat& decodedData) override;
 
     /**
-     * @brief
+     * @brief Decodes image from raw host pointer and stores decoded image to decodedImage-param.
      *
-     * @param data
-     * @param size
-     * @param decodedImage
+     * @param data - Host raw pointer to data for decoding
+     * @param size - Size of data in bytes
+     * @param decodedData - Decoded image
+     * @return True if decoding was successful. Otherwise returns false.
      */
-    void Decode(const unsigned char* data, unsigned long long size, DataStructures::CUDAImage& decodedImage) override;
+    bool Decode(const unsigned char* data, unsigned long long size, DataStructures::CUDAImage& decodedImage) override;
 
     /**
-     * @brief
+     * @brief OpenCV image decoder doesn't require initialization. This method just creates records in a log file with
+     * TRACE severity with messages that decoder was initialized.
      */
     void Initialize() override;
 
     /**
-     * @brief
+     * @brief Checks weather image decoder is initialized. OpenCV image decoder is always initialized.
      *
-     * @return
+     * @return True is all cases.
      */
     bool IsInitialized() override;
 
 private:
 
     /**
-     * @brief
+     * @brief OpenCV image decodes doesn't use buffer for image decoding. Calling of this method will create a
+     * record in log file with WARNING severity.
      *
-     * @param width
-     * @param height
-     * @param channels
+     * @param width - Any integral number
+     * @param height - Any integral number
+     * @param channels - Any integral number
      */
     void AllocateBuffer(int width, int height, int channels) override;
 };

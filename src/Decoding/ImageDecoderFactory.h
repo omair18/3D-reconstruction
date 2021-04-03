@@ -1,3 +1,9 @@
+/**
+ * @file ImageDecoderFactory.h.
+ *
+ * @brief
+ */
+
 #ifndef IMAGE_DECODER_FACTORY_H
 #define IMAGE_DECODER_FACTORY_H
 
@@ -6,7 +12,7 @@
 /**
  * @namespace Decoding
  *
- * @brief
+ * @brief Namespace of libdecoding library.
  */
 namespace Decoding
 {

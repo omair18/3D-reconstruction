@@ -1,3 +1,10 @@
+/**
+ * @file NvJPEGHardwareImageDecoder.h.
+ *
+ * @brief Declares a class of NvJPEGHardwareImageDecoder. This decoder uses NvJPEG hardware backend and decodes image with JPEG format
+ * on GPU.
+ */
+
 #ifndef NVJPEG_HARDWARE_IMAGE_DECODER_H
 #define NVJPEG_HARDWARE_IMAGE_DECODER_H
 
@@ -6,7 +13,7 @@
 /**
  * @namespace Decoding
  *
- * @brief
+ * @brief Namespace of libdecoding library.
  */
 namespace Decoding
 {
@@ -14,78 +21,83 @@ namespace Decoding
 /**
  * @class NvJPEGHardwareImageDecoder
  *
- * @brief
+ * @brief This decoder uses NvJPEG hardware backend and decodes image with JPEG format on GPU.
  */
 class NvJPEGHardwareImageDecoder final : public NvJPEGImageDecoder
 {
 public:
 
     /**
-     * @brief
+     * @brief Constructor.
      *
-     * @param cudaStream
+     * @param cudaStream - CUDA stream of GPU processor
      */
     explicit NvJPEGHardwareImageDecoder(cudaStream_t cudaStream);
 
     /**
-     * @brief
-     *
-     * @param data
-     * @param size
-     * @param decodedData
+     * @brief Destructor.
      */
-    void Decode(const unsigned char* data, unsigned long long size, cv::Mat& decodedData) override;
+    ~NvJPEGHardwareImageDecoder() noexcept(false) override;
 
     /**
-     * @brief
+     * @brief Decodes image from raw host pointer and stores decoded image to decodedImage-param.
      *
-     * @param data
-     * @param size
-     * @param decodedData
+     * @param data - Host raw pointer to data for decoding
+     * @param size - Size of data in bytes
+     * @param decodedData - Decoded image
+     * @return True if decoding was successful. Otherwise returns false.
      */
-    void Decode(const unsigned char* data, unsigned long long size, cv::cuda::GpuMat& decodedData) override;
+    bool Decode(const unsigned char* data, unsigned long long size, cv::Mat& decodedData) override;
 
     /**
-     * @brief
+     * @brief Decodes image from raw host pointer and stores decoded image to decodedImage-param.
      *
-     * @param data
-     * @param size
-     * @param decodedImage
+     * @param data - Host raw pointer to data for decoding
+     * @param size - Size of data in bytes
+     * @param decodedData - Decoded image
+     * @return True if decoding was successful. Otherwise returns false.
      */
-    void Decode(const unsigned char* data, unsigned long long size, DataStructures::CUDAImage& decodedImage) override;
+    bool Decode(const unsigned char* data, unsigned long long size, cv::cuda::GpuMat& decodedData) override;
 
     /**
-     * @brief
+     * @brief Decodes image from raw host pointer and stores decoded image to decodedImage-param.
+     *
+     * @param data - Host raw pointer to data for decoding
+     * @param size - Size of data in bytes
+     * @param decodedData - Decoded image
+     * @return True if decoding was successful. Otherwise returns false.
+     */
+    bool Decode(const unsigned char* data, unsigned long long size, DataStructures::CUDAImage& decodedImage) override;
+
+    /**
+     * @brief Initializes backend of image decoder.
      */
     void Initialize() override;
 
     /**
-     * @brief
+     * @brief Checks weather image decoder is initialized.
      *
-     * @return
+     * @return True if image decoder's backend is initialized. Otherwise returns false.
      */
     bool IsInitialized() override;
-
-    /**
-     * @brief
-     */
-    ~NvJPEGHardwareImageDecoder() override = default;
 
 private:
 
     /**
-     * @brief
+     * @brief Allocates buffer for storing the result of decoding on GPU.
      *
-     * @param width
-     * @param height
-     * @param channels
+     * @param width - Width of image that will be decoded
+     * @param height - Height of image that will be decoded
+     * @param channels - Number of channels of image that will be decoded
      */
     void AllocateBuffer(int width, int height, int channels) override;
 
     /**
-     * @brief
+     * @brief Initializes internal structures of NvJPEG library and prepares decoder for image decoding.
+     *
+     * @return True if initialization was successful. Otherwise returns false.
      */
-    void InitDecoder();
+    bool InitDecoder();
 };
 
 }

@@ -16,7 +16,7 @@ target_link_libraries(gpu
         PUBLIC
 
         PRIVATE
-        ${CUDA_LIBRARIES}
+        ${CUDA_CUDART_LIBRARY}
         log
         config)
 

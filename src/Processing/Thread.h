@@ -1,3 +1,9 @@
+/**
+ * @file Thread.h.
+ *
+ * @brief
+ */
+
 #ifndef THREAD_H
 #define THREAD_H
 
@@ -8,49 +14,97 @@
 
 #include "IThread.h"
 
+/**
+ * @namespace Processing
+ *
+ * @brief
+ */
 namespace Processing
 {
 
+/**
+ * @class Thread
+ *
+ * @brief
+ */
 class Thread final : public IThread
 {
+
 public:
 
+    /**
+     * @brief
+     */
     Thread();
 
+    /**
+     * @brief
+     */
     ~Thread() override;
 
+    /**
+     * @brief
+     */
     void Start() override;
 
+    /**
+     * @brief
+     */
     void Stop() override;
 
+    /**
+     * @brief
+     */
     void Destroy();
 
+    /**
+     * @brief
+     *
+     * @return
+     */
     bool IsStarted() override;
 
+    /**
+     * @brief
+     *
+     * @param function
+     */
     void SetExecutableFunction(std::function<void ()> function);
 
 private:
 
+    /**
+     * @brief
+     */
     void Execute();
 
+    /**
+     * @brief
+     */
     void ExecuteInternal() override;
 
-    /// Thread
+    ///
     std::thread thread_;
 
+    ///
     std::mutex startMutex_;
 
+    ///
     std::atomic_bool isStarted_;
 
+    ///
     std::atomic_bool needToStop_;
 
+    ///
     std::atomic_bool needToStart_;
 
+    ///
     std::atomic_bool isDestroyed_;
 
-    /// The condition variable
+    ///
     std::condition_variable startCondition_;
 
+    ///
     std::function<void ()> executableFunction_;
 
 };

@@ -50,3 +50,8 @@ target_link_libraries(test_scharr_filter
 
 add_executable(test_cuda_image_descriptor test_cuda_image_descriptor.cpp)
 target_link_libraries(test_cuda_image_descriptor datastructures)
+
+add_executable(test_image_decoders test_image_decoders.cpp)
+target_link_libraries(test_image_decoders log decoding datastructures ${CUDA_LIBRARIES} opencv_core
+        opencv_imgcodecs
+        opencv_highgui)

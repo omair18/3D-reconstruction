@@ -45,13 +45,13 @@ struct GPU
     /// Bandwidth of GPU memory in GB/s.
     double memoryBandwidth_;
 
-    ///
+    /// Maximum resident threads per multiprocessor.
     int maxThreadsPerMultiprocessor_;
 
-    ///
+    ///  Maximum number of threads per block.
     int maxThreadsPerBlock_;
 
-    ///
+    /// Shared memory available per block in bytes.
     std::size_t sharedMemPerBlock_;
 
 };

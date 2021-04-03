@@ -1,3 +1,10 @@
+/**
+ * @file NvJPEG2kImageDecoder.h.
+ *
+ * @brief @brief Declares a class of NvJPEG2kImageDecoder. This decoder uses NvJPEG2K backend and
+ * decodes image with JPEG2000 format on GPU.
+ */
+
 #ifndef NVJPEG2K_DECODER_H
 #define NVJPEG2K_DECODER_H
 
@@ -8,7 +15,7 @@
 /**
  * @namespace Decoding
  *
- * @brief
+ * @brief Namespace of libdecoding library.
  */
 namespace Decoding
 {
@@ -16,50 +23,53 @@ namespace Decoding
 /**
  * @class NvJPEG2kImageDecoder
  *
- * @brief
+ * @brief This decoder uses NvJPEG2K backend and decodes image with JPEG2000 format on GPU.
  */
 class NvJPEG2kImageDecoder final : public IImageDecoder
 {
 public:
 
     /**
-     * @brief
+     * @brief Constructor.
      *
-     * @param cudaStream
+     * @param cudaStream - CUDA stream of GPU processor
      */
     explicit NvJPEG2kImageDecoder(cudaStream_t cudaStream);
 
     /**
-     * @brief
+     * @brief Destructor.
      */
-    ~NvJPEG2kImageDecoder() override;
+    ~NvJPEG2kImageDecoder() noexcept(false) override;
 
     /**
-     * @brief
+     * @brief Decodes image from raw host pointer and stores decoded image to decodedImage-param.
      *
-     * @param data
-     * @param size
-     * @param decodedData
+     * @param data - Host raw pointer to data for decoding
+     * @param size - Size of data in bytes
+     * @param decodedData - Decoded image
+     * @return True if decoding was successful. Otherwise returns false.
      */
-    void Decode(const unsigned char* data, unsigned long long size, cv::Mat& decodedData) override;
+    bool Decode(const unsigned char* data, unsigned long long size, cv::Mat& decodedData) override;
 
     /**
-     * @brief
+     * @brief Decodes image from raw host pointer and stores decoded image to decodedImage-param.
      *
-     * @param data
-     * @param size
-     * @param decodedData
+     * @param data - Host raw pointer to data for decoding
+     * @param size - Size of data in bytes
+     * @param decodedData - Decoded image
+     * @return True if decoding was successful. Otherwise returns false.
      */
-    void Decode(const unsigned char* data, unsigned long long size, cv::cuda::GpuMat& decodedData) override;
+    bool Decode(const unsigned char* data, unsigned long long size, cv::cuda::GpuMat& decodedData) override;
 
     /**
-     * @brief
+     * @brief Decodes image from raw host pointer and stores decoded image to decodedImage-param.
      *
-     * @param data
-     * @param size
-     * @param decodedImage
+     * @param data - Host raw pointer to data for decoding
+     * @param size - Size of data in bytes
+     * @param decodedData - Decoded image
+     * @return True if decoding was successful. Otherwise returns false.
      */
-    void Decode(const unsigned char* data, unsigned long long size, DataStructures::CUDAImage& decodedImage) override;
+    bool Decode(const unsigned char* data, unsigned long long size, DataStructures::CUDAImage& decodedImage) override;
 
     /**
      * @brief
@@ -81,8 +91,9 @@ private:
      * @param data
      * @param size
      * @param outputImage
+     * @return
      */
-    void DecodeInternal(const unsigned char* data, unsigned long long size, DataStructures::CUDAImage& outputImage);
+    bool DecodeInternal(const unsigned char* data, unsigned long long size, DataStructures::CUDAImage& outputImage);
 
     /**
      * @brief
@@ -95,17 +106,13 @@ private:
 
     /**
      * @brief
+     *
+     * @return
      */
-    void InitDecoder();
+    bool InitDecoder();
 
     ///
     cudaStream_t cudaStream_;
-
-    ///
-    nvjpeg2kStatus_t state_{};
-
-    ///
-    nvjpeg2kStatus_t decoupledState_{};
 
     ///
     nvjpeg2kHandle_t handle_{};
@@ -114,14 +121,18 @@ private:
     nvjpeg2kDecodeState_t decodeState_{};
 
     ///
-    nvjpeg2kStream_t jpegStream_;
+    nvjpeg2kStream_t jpeg2kStream_{};
 
     ///
-    nvjpeg2kImage_t imageBuffer_{};
+    unsigned char* buffer_;
 
     ///
     size_t bufferSize_;
 
+    ///
+    size_t bufferPitch_;
+
+    ///
     bool initialized_;
 
 };

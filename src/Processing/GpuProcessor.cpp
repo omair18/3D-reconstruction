@@ -17,7 +17,7 @@ GpuProcessor::GpuProcessor(const std::shared_ptr<Config::JsonConfig> &config, co
 IProcessor(config, queueManager)
 {
     cudaError_t status;
-    status = cudaStreamCreate(&cudaStream_);
+    status = cudaStreamCreateWithFlags(&cudaStream_, cudaStreamNonBlocking);
     if(status != cudaError::cudaSuccess)
     {
         LOG_ERROR() << "Failed to create CUDA stream for GPU processor " << name_ <<". Details: "

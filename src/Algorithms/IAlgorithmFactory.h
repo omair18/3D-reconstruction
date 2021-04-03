@@ -9,11 +9,13 @@
 
 #include <memory>
 
+// forward declaration for Config::JsonConfig
 namespace Config
 {
     class JsonConfig;
 }
 
+// forward declaration for GPU::GpuManager
 namespace GPU
 {
     class GpuManager;
@@ -27,6 +29,11 @@ namespace GPU
 namespace Algorithms
 {
 
+/**
+ * @class IAlgorithm
+ *
+ * @brief
+ */
 class IAlgorithm;
 
 /**
