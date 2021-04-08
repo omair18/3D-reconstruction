@@ -1,10 +1,9 @@
 #include <cuda_runtime.h>
 
 #include "NvJPEG2kImageDecoder.h"
+#include "NvJPEG2KChannelMerging.h"
 #include "CUDAImage.h"
 #include "Logger.h"
-
-#include <opencv2/highgui.hpp>
 
 #define CHECK_NVJPEG2K(status)                                              \
 {                                                                           \
@@ -20,10 +19,8 @@ namespace Decoding
 
 NvJPEG2kImageDecoder::NvJPEG2kImageDecoder(cudaStream_t cudaStream) :
 cudaStream_(cudaStream),
-bufferSize_(0),
 initialized_(false),
-buffer_(nullptr),
-bufferPitch_(0)
+bufferChannels_(0)
 {
 
 }
@@ -45,14 +42,17 @@ NvJPEG2kImageDecoder::~NvJPEG2kImageDecoder() noexcept(false)
         }
 
         cudaError_t cudaStatus;
-        if (buffer_)
+        for(auto& channelBuffer : bufferChannels_)
         {
-            cudaStatus = cudaFree(buffer_);
-            if(cudaStatus != cudaError_t::cudaSuccess)
+            if (channelBuffer)
             {
-                LOG_ERROR() << "Failed to release NvJPEG2K buffer. Error " << static_cast<int>(cudaStatus) << ": "
-                << cudaGetErrorName(cudaStatus) << " - " << cudaGetErrorString(cudaStatus);
-                throw std::runtime_error("CUDA error");
+                cudaStatus = cudaFree(channelBuffer);
+                if(cudaStatus != cudaError_t::cudaSuccess)
+                {
+                    LOG_ERROR() << "Failed to release NvJPEG2K buffer. Error " << static_cast<int>(cudaStatus) << ": "
+                                << cudaGetErrorName(cudaStatus) << " - " << cudaGetErrorString(cudaStatus);
+                    throw std::runtime_error("CUDA error");
+                }
             }
         }
 
@@ -60,48 +60,76 @@ NvJPEG2kImageDecoder::~NvJPEG2kImageDecoder() noexcept(false)
     }
 }
 
-void NvJPEG2kImageDecoder::AllocateBuffer(int width, int height, int channels)
+void NvJPEG2kImageDecoder::AllocateBuffer(int width, int height, int channels, size_t elementSize)
 {
     if(!initialized_)
     {
         LOG_ERROR() << "NvJPEG2K image decoder must be initialized before allocating buffer.";
         return;
     }
-    size_t imageSize = width * height * channels;
+    size_t imageChannelSize = width * height;
     cudaError_t cudaStatus;
-    if(imageSize > bufferSize_)
+
+    for(int i = 0; i < channels; i++)
     {
-        LOG_TRACE() << "Allocating buffer for image " << width << "x" << height << " with " << channels << "channel(s)."
-        << " Previous buffer size: " << bufferSize_;
-        if (buffer_)
+        if(i == bufferChannels_.size())
         {
-            if((cudaStatus = cudaFree(buffer_)) != cudaError_t::cudaSuccess)
+            LOG_TRACE() << "Allocating buffer fow channel " << i << "of image " << width << "x" << height;
+            unsigned char* gpuData = nullptr;
+            size_t gpuDataSize = 0;
+            size_t gpuDataPitch = 0;
+
+            cudaStatus = cudaMallocPitch(&gpuData, &gpuDataPitch, width * elementSize, height);
+            if(cudaStatus == cudaError_t::cudaSuccess)
             {
-                LOG_ERROR() << "Failed to release previous NvJPEG2K buffer. Error " << static_cast<int>(cudaStatus)
-                << ": " << cudaGetErrorName(cudaStatus) << " - " << cudaGetErrorString(cudaStatus);
-                throw std::runtime_error("CUDA error.");
+                LOG_TRACE() << "Successfully allocated NvJPEG2K channel buffer for image " << width << "x" << height;
+                gpuDataSize = gpuDataPitch * height;
+                bufferChannels_.push_back(gpuData);
+                bufferChannelsSizes_.push_back(gpuDataSize);
+                bufferChannelsPitches_.push_back(gpuDataPitch);
             }
             else
             {
-                LOG_TRACE() << "Previous NvJPEG2K buffer with size " << bufferSize_ << " bytes was successfully released.";
+                LOG_ERROR() << "Failed to allocate NvJPEG2K channel buffer for image " << width << "x" << height << "." \
+                " CUDA error " << static_cast<int>(cudaStatus) << ": " << cudaGetErrorName(cudaStatus) << " - "
+                << cudaGetErrorString(cudaStatus);
+                throw std::runtime_error("CUDA error.");
             }
-        }
-        if((cudaStatus = cudaMallocPitch(&buffer_, &bufferPitch_, width * channels, height)) != cudaError_t::cudaSuccess)
-        {
-            LOG_ERROR() << "Failed to allocate pitched NvJPEG2K buffer. Error " << static_cast<int>(cudaStatus) << ": "
-            << cudaGetErrorName(cudaStatus) << " - " << cudaGetErrorString(cudaStatus);
-            throw std::runtime_error("CUDA error.");
         }
         else
         {
-            bufferSize_ = bufferPitch_ * height;
-            LOG_TRACE() << "Allocated net pitched NvJPEG2K buffer. Buffer size: " << bufferSize_ << ", pitch: "
-            << bufferPitch_;
+            if(bufferChannelsSizes_[i] < imageChannelSize)
+            {
+                LOG_TRACE() << "Channel buffer " << i << " is too small for image " << width << "x" <<height << ". " \
+                "Reallocating buffer for this channel";
+
+                cudaStatus = cudaFree(bufferChannels_[i]);
+                if(cudaStatus != cudaError_t::cudaSuccess)
+                {
+                    LOG_ERROR() << "Failed to release previous channel buffer. CUDA error " << static_cast<int>(cudaStatus)
+                    << ": " << cudaGetErrorName(cudaStatus) << " - " << cudaGetErrorString(cudaStatus);
+                    throw std::runtime_error("CUDA error");
+                }
+
+                cudaStatus = cudaMallocPitch(&bufferChannels_[i], &bufferChannelsPitches_[i], width * elementSize, height);
+                if(cudaStatus == cudaError_t::cudaSuccess)
+                {
+                    LOG_TRACE() << "Successfully allocated NvJPEG2K channel buffer for image " << width << "x" << height;
+                    bufferChannelsSizes_[i] = bufferChannelsPitches_[i] * height;
+                }
+                else
+                {
+                    LOG_ERROR() << "Failed to allocate NvJPEG2K channel buffer for image " << width << "x" << height
+                    << ". CUDA error " << static_cast<int>(cudaStatus) << ": " << cudaGetErrorName(cudaStatus) << " - "
+                    << cudaGetErrorString(cudaStatus);
+                    throw std::runtime_error("CUDA error.");
+                }
+            }
+            else
+            {
+                LOG_TRACE() << "Using existing buffer for image decoding.";
+            }
         }
-    }
-    else
-    {
-        LOG_TRACE() << "Using existing buffer for image decoding.";
     }
 }
 
@@ -206,37 +234,27 @@ bool NvJPEG2kImageDecoder::DecodeInternal(const unsigned char *data, unsigned lo
 
     AllocateBuffer(static_cast<int>(imageInfo.image_width),
                    static_cast<int>(imageInfo.image_height),
-                   static_cast<int>(imageInfo.num_components));
+                   static_cast<int>(imageInfo.num_components),
+                   channelInfo.precision / 8);
 
     nvjpeg2kImage_t decodedImage;
 
-    decodedImage.num_components = 1;
+    decodedImage.num_components = imageInfo.num_components;
     decodedImage.pixel_type = channelInfo.precision == 8 ? nvjpeg2kImageType_t::NVJPEG2K_UINT8 : nvjpeg2kImageType_t::NVJPEG2K_UINT16;
-    decodedImage.pitch_in_bytes = &bufferPitch_;
-    decodedImage.pixel_data = (void**)(&buffer_);
+    decodedImage.pitch_in_bytes = bufferChannelsPitches_.data();
+    decodedImage.pixel_data = (void**)bufferChannels_.data();
 
     CHECK_NVJPEG2K(nvjpeg2kDecode(handle_, decodeState_, jpeg2kStream_, &decodedImage, cudaStream_))
 
-    DataStructures::CUDAImage CUDAImage;
-    CUDAImage.gpuData_ = buffer_;
-    CUDAImage.width_ = imageInfo.image_width;
-    CUDAImage.height_ = imageInfo.image_height;
-    CUDAImage.channels_ = imageInfo.num_components;
-    CUDAImage.pitch_ = bufferPitch_;
-    CUDAImage.elementType_ = DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_8U;
-    CUDAImage.pitchedAllocation_ = true;
-    CUDAImage.allocatedBytes_ = bufferPitch_ * imageInfo.image_height;
+    outputImage.AllocateAsync(imageInfo.image_width, imageInfo.image_height, imageInfo.num_components,
+                              channelInfo.precision == 8 ? DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_8U :
+                              DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_16U, true, cudaStream_);
 
-    outputImage.CopyFromCUDAImageAsync(CUDAImage, cudaStream_);
+    MergeChannels(imageInfo.image_width, imageInfo.image_height, imageInfo.num_components,
+                  channelInfo.precision, outputImage.pitch_, (void**)bufferChannels_.data(), bufferChannelsPitches_.data(),
+                  outputImage.gpuData_, cudaStream_);
 
-    cudaStreamSynchronize(cudaStream_);
-    cv::Mat test;
-    CUDAImage.CopyToCvMat(test);
-
-    cv::imshow("after decoding", test);
-    cv::waitKey(0);
-
-    CUDAImage.gpuData_ = nullptr;
+    cudaError_t status = cudaStreamSynchronize(cudaStream_);
 
     return true;
 }

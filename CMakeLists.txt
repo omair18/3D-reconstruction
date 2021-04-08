@@ -13,11 +13,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CUDA_STANDARD 17)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 set(CMAKE_CUDA_FLAGS
-        "${CMAKE_CUDA_FLAGS}
-        -std=c++17
-        -gencode arch=compute_61,code=[sm_61,compute_61]
-        -gencode arch=compute_75,code=[sm_75,compute_75]
-        -gencode arch=compute_80,code=[sm_80,compute_80]
+        "${CMAKE_CUDA_FLAGS} \
+        -std=c++17 \
+        -gencode arch=compute_61,code=[sm_61,compute_61] \
+        -gencode arch=compute_75,code=[sm_75,compute_75] \
+        -gencode arch=compute_80,code=[sm_80,compute_80] \
         -gencode arch=compute_86,code=[sm_86,compute_86]")
 set(CUDA_VERBOSE_BUILD ON)
 

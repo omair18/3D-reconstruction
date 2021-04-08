@@ -80,17 +80,6 @@ public:
      */
     bool IsInitialized() override;
 
-private:
-
-    /**
-     * @brief OpenCV image decodes doesn't use buffer for image decoding. Calling of this method will create a
-     * record in log file with WARNING severity.
-     *
-     * @param width - Any integral number
-     * @param height - Any integral number
-     * @param channels - Any integral number
-     */
-    void AllocateBuffer(int width, int height, int channels) override;
 };
 
 }

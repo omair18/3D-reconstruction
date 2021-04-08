@@ -4,14 +4,16 @@ set(DECODING_LIB_HEADERS
         OpenCVImageDecoder.h
         NvJPEGImageDecoder.h
         NvJPEGHardwareImageDecoder.h
-        NvJPEG2kImageDecoder.h)
+        NvJPEG2kImageDecoder.h
+        NvJPEG2KChannelMerging.h)
 
 set(DECODING_LIB_CPPS
         ImageDecoderFactory.cpp
         OpenCVImageDecoder.cpp
         NvJPEGImageDecoder.cpp
         NvJPEGHardwareImageDecoder.cpp
-        NvJPEG2kImageDecoder.cpp)
+        NvJPEG2kImageDecoder.cpp
+        NvJPEG2KChannelMerging.cu)
 
 source_group("Header Files" FILES ${DECODING_LIB_HEADERS})
 source_group("Source Files" FILES ${DECODING_LIB_CPPS})

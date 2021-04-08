@@ -2,7 +2,7 @@ include_directories(${LIBRARIES_PATH}/aws/include)
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${CUDA_INCLUDE_DIRS})
 
-add_executable(http_server_test http_server_test.cpp test_cuda_image_descriptor.cpp)
+add_executable(http_server_test http_server_test.cpp test_cuda_image_descriptor.cpp test_cuda_kernel_cpu_model.cpp)
 target_link_libraries(http_server_test Boost::system pthread ssl crypto)
 
 add_executable(test test.cpp)
@@ -55,3 +55,5 @@ add_executable(test_image_decoders test_image_decoders.cpp)
 target_link_libraries(test_image_decoders log decoding datastructures ${CUDA_LIBRARIES} opencv_core
         opencv_imgcodecs
         opencv_highgui)
+
+add_executable(test_cuda_kernel_cpu_model test_cuda_kernel_cpu_model.cpp)

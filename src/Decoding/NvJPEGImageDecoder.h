@@ -102,7 +102,7 @@ protected:
      * @param height - Height of image that will be decoded
      * @param channels - Number of channels of image that will be decoded
      */
-    void AllocateBuffer(int width, int height, int channels) override;
+    virtual void AllocateBuffer(int width, int height, int channels);
 
     /// Decoding state handle identifier. It is used to store intermediate information between decoding phases
     nvjpegJpegState_t state_{};

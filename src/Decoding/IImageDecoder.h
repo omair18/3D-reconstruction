@@ -92,17 +92,6 @@ public:
      */
     virtual bool IsInitialized() = 0;
 
-protected:
-
-    /**
-     * @brief Allocates buffer for storing the result of decoding.
-     *
-     * @param width - Width of image that will be decoded
-     * @param height - Height of image that will be decoded
-     * @param channels - Number of channels of image that will be decoded
-     */
-    virtual void AllocateBuffer(int width, int height, int channels) = 0;
-
 };
 
 }

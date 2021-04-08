@@ -9,6 +9,7 @@
 #define NVJPEG2K_DECODER_H
 
 #include <nvjpeg2k.h>
+#include <vector>
 
 #include "IImageDecoder.h"
 
@@ -27,6 +28,7 @@ namespace Decoding
  */
 class NvJPEG2kImageDecoder final : public IImageDecoder
 {
+
 public:
 
     /**
@@ -72,67 +74,68 @@ public:
     bool Decode(const unsigned char* data, unsigned long long size, DataStructures::CUDAImage& decodedImage) override;
 
     /**
-     * @brief
+     * @brief Initializes backend of image decoder.
      */
     void Initialize() override;
 
     /**
-     * @brief
+     * @brief Checks weather image decoder is initialized.
      *
-     * @return
+     * @return True if image decoder's backend is initialized. Otherwise returns false.
      */
     bool IsInitialized() override;
 
 private:
 
     /**
-     * @brief
+     * @brief Decodes image from raw host pointer and stores decoded image to decodedImage-param.
      *
-     * @param data
-     * @param size
-     * @param outputImage
-     * @return
+     * @param data - Host raw pointer to data for decoding
+     * @param size - Size of data in bytes
+     * @param decodedData - Decoded image
+     * @return True if decoding was successful. Otherwise returns false.
      */
     bool DecodeInternal(const unsigned char* data, unsigned long long size, DataStructures::CUDAImage& outputImage);
 
     /**
-     * @brief
+     * @brief Allocates buffer for storing the result of decoding on GPU.
      *
-     * @param width
-     * @param height
-     * @param channels
+     * @param width - Width of image that will be decoded
+     * @param height - Height of image that will be decoded
+     * @param channels - Number of channels of image that will be decoded
+     * @param elementSize - Size of single element for storing
      */
-    void AllocateBuffer(int width, int height, int channels) override;
+    void AllocateBuffer(int width, int height, int channels, size_t elementSize);
 
     /**
-     * @brief
+     * @brief Initializes internal structures of NvJPEG library and prepares decoder for image decoding.
      *
-     * @return
+     * @return True if initialization was successful. Otherwise returns false.
      */
     bool InitDecoder();
 
-    ///
+    /// CUDA stream of GPU processor
     cudaStream_t cudaStream_;
 
-    ///
+    /// NvJPEG2K handle. For internal usage.
     nvjpeg2kHandle_t handle_{};
 
-    ///
+    /// Contains intermediate decode information. For internal usage.
     nvjpeg2kDecodeState_t decodeState_{};
 
-    ///
+    /// NvJPEG2K stream for parsing image parameters on CPU.
     nvjpeg2kStream_t jpeg2kStream_{};
 
-    ///
-    unsigned char* buffer_;
+    /// Vector of GPU pointers to channel buffers
+    std::vector<unsigned char*> bufferChannels_;
 
-    ///
-    size_t bufferSize_;
+    /// Vector of channel buffers pitches
+    std::vector<size_t> bufferChannelsPitches_;
 
-    ///
-    size_t bufferPitch_;
+    /// Vector of channel buffers sizes
+    std::vector<size_t> bufferChannelsSizes_;
 
-    ///
+    /// Initialization flag
     bool initialized_;
 
 };
