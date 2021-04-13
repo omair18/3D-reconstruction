@@ -6,7 +6,9 @@ set(ALGORITHMS_LIB_HEADERS
         AlgorithmFactory.h
         KafkaIO/KafkaConsumptionAlgorithm.h
         KafkaIO/KafkaProducingAlgorithm.h
+        KafkaIO/KafkaMessageParsingAlgorithm.h
         Decoding/CUDAImageDecodingAlgorithm.h
+        Decoding/CpuImageDecodingAlgorithm.h
         Photogrammetry/DatasetCollectingAlgorithm.h
         Photogrammetry/AKAZEKeypointDetectionAlgorithm.h
         Photogrammetry/MeshReconstructionAlgorithm.h
@@ -21,7 +23,9 @@ set(ALGORITHMS_LIB_CPPS
         AlgorithmFactory.cpp
         KafkaIO/KafkaConsumptionAlgorithm.cpp
         KafkaIO/KafkaProducingAlgorithm.cpp
+        KafkaIO/KafkaMessageParsingAlgorithm.cpp
         Decoding/CUDAImageDecodingAlgorithm.cpp
+        Decoding/CpuImageDecodingAlgorithm.cpp
         Photogrammetry/DatasetCollectingAlgorithm.cpp
         Photogrammetry/AKAZEKeypointDetectionAlgorithm.cpp
         Photogrammetry/MeshReconstructionAlgorithm.cpp
@@ -30,7 +34,7 @@ set(ALGORITHMS_LIB_CPPS
         Photogrammetry/PointCloudDensificationAlgorithm.cpp
         ImageProcessing/CUDAResizeAlgorithm.cpp
         ImageProcessing/CUDAConvolutionAlgorithm.cpp
-        ImageProcessing/CUDAImageBinarizationAlgorithm.cpp)
+        ImageProcessing/CUDAImageBinarizationAlgorithm.cpp KafkaIO/KafkaMessageParsingAlgorithm.cpp KafkaIO/KafkaMessageParsingAlgorithm.h)
 
 source_group("Header Files" FILES ${ALGORITHMS_LIB_HEADERS})
 source_group("Source Files" FILES ${ALGORITHMS_LIB_CPPS})

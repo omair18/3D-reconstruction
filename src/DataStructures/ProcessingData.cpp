@@ -73,30 +73,4 @@ void ProcessingData::SetReconstructionParams(std::shared_ptr<Config::JsonConfig>
     reconstructionParams_ = std::move(params);
 }
 
-CUDAImage &ProcessingData::GetDecodedImage()
-{
-    return decodedImage_;
-}
-
-void ProcessingData::SetDecodedImage(const CUDAImage &image)
-{
-    decodedImage_.CopyFromCUDAImage(image);
-}
-
-void ProcessingData::SetDecodedImage(CUDAImage &&image) noexcept
-{
-    decodedImage_.MoveFromCUDAImage(image);
-}
-
-void ProcessingData::SetDecodedImageAsync(const CUDAImage &image, void *cudaStream)
-{
-    decodedImage_.CopyFromCUDAImageAsync(image, cudaStream);
-}
-
-void ProcessingData::SetDecodedImageAsync(CUDAImage &&image, void *cudaStream) noexcept
-{
-    decodedImage_.MoveFromCUDAImageAsync(image, cudaStream);
-}
-
-
 }

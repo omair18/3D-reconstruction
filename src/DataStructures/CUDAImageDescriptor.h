@@ -8,6 +8,8 @@
 #ifndef CUDA_IMAGE_DESCRIPTOR_H
 #define CUDA_IMAGE_DESCRIPTOR_H
 
+#include <vector>
+
 #include "CUDAImage.h"
 
 /**
@@ -34,8 +36,22 @@ public:
 
     /**
      * @brief
+     *
+     * @param other
      */
-    ~CUDAImageDescriptor();
+    CUDAImageDescriptor(const CUDAImageDescriptor& other) = default;
+
+    /**
+     * @brief
+     *
+     * @param other
+     */
+    CUDAImageDescriptor(CUDAImageDescriptor&& other) noexcept;
+
+    /**
+     * @brief
+     */
+    ~CUDAImageDescriptor() = default;
 
     /**
      * @brief
@@ -51,7 +67,7 @@ public:
      * @param other
      * @return
      */
-    CUDAImageDescriptor& operator=(const CUDAImageDescriptor& other);
+    CUDAImageDescriptor& operator=(const CUDAImageDescriptor& other) = default;
 
     /**
      * @brief
@@ -87,7 +103,7 @@ public:
      *
      * @return
      */
-    int GetFrameId() noexcept;
+    [[nodiscard]] int GetFrameId() const noexcept;
 
     /**
      * @brief
@@ -101,7 +117,7 @@ public:
      *
      * @return
      */
-    int GetCameraId() noexcept;
+    int GetCameraId() const noexcept;
 
     /**
      * @brief
@@ -115,15 +131,68 @@ public:
      *
      * @return
      */
-    int GetTimestamp() noexcept;
+    [[nodiscard]] unsigned long GetTimestamp() const noexcept;
 
     /**
      * @brief
      *
      * @param timestamp
      */
-    void SetTimestamp(int timestamp);
+    void SetTimestamp(unsigned long timestamp);
 
+    /**
+     * @brief
+     *
+     * @return
+     */
+    [[nodiscard]] float GetFocalLength() const noexcept;
+
+    /**
+     * @brief
+     *
+     * @param focalLength
+     */
+    void SetFocalLength(float focalLength);
+
+    /**
+     * @brief
+     *
+     * @return
+     */
+    [[nodiscard]] float GetSensorSize() const noexcept;
+
+    /**
+     * @brief
+     *
+     * @param sensorSize
+     */
+    void SetSensorSize(float sensorSize);
+
+    /**
+     * @brief
+     *
+     * @return
+     */
+    const std::vector<unsigned char>& GetRawImageData() noexcept;
+
+    /**
+     * @brief
+     *
+     * @param rawImageData
+     */
+    void SetRawImageData(const std::vector<unsigned char>& rawImageData);
+
+    /**
+     * @brief
+     *
+     * @param rawImageData
+     */
+    void SetRawImageData(std::vector<unsigned char>&& rawImageData) noexcept;
+
+    /**
+     * @brief
+     */
+    void ClearRawImageData() noexcept;
 
 private:
 
@@ -137,11 +206,16 @@ private:
     int cameraId_;
 
     ///
-    int timestamp_;
+    unsigned long timestamp_;
 
+    ///
     float focalLength_;
 
+    ///
     float sensorSize_;
+
+    ///
+    std::vector<unsigned char> rawImageData_;
 };
 
 }

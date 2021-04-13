@@ -272,7 +272,15 @@ public:
      *
      * @return Value of current node as int32_t or 0
      */
-    std::int32_t ToInt();
+    std::int32_t ToInt32();
+
+    /**
+     * @brief Converts value at current node to int64_t. If the value at current node is not an int32_t,
+     * returns 0 and puts a record to log file with ERROR severity.
+     *
+     * @return Value of current node as int64_t or 0
+     */
+    std::int64_t ToInt64();
 
     /**
      * @brief Converts value at current node to string. If the value at current node is not a string,
@@ -382,6 +390,13 @@ public:
      * @return True if configs have same information. Otherwise returns false.
      */
     bool operator==(const JsonConfig& other);
+
+    /**
+     * @brief Checks weather current JSON config contains any data.
+     *
+     * @return True if current JSON config doesn't contain any data.
+     */
+    bool Empty();
 
 private:
 

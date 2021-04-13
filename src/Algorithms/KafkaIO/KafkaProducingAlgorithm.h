@@ -47,7 +47,7 @@ public:
     /**
      * @brief
      */
-    ~KafkaProducingAlgorithm() override;
+    ~KafkaProducingAlgorithm() override = default;
 
     /**
      * @brief

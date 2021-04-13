@@ -1,15 +1,15 @@
 /**
- * @file CUDAImageDecodingAlgorithm.h.
+ * @file CpuImageDecodingAlgorithm.h.
  *
  * @brief
  */
 
-#ifndef IMAGE_DECODING_ALGORITHM_H
-#define IMAGE_DECODING_ALGORITHM_H
+#ifndef CPU_IMAGE_DECODING_ALGORITHM_H
+#define CPU_IMAGE_DECODING_ALGORITHM_H
 
 #include <vector>
 
-#include "IGPUAlgorithm.h"
+#include "ICPUAlgorithm.h"
 
 // forward declaration for Decoding::IImageDecoder
 namespace Decoding
@@ -26,11 +26,11 @@ namespace Algorithms
 {
 
 /**
- * @class CUDAImageDecodingAlgorithm
+ * @class CpuImageDecodingAlgorithm
  *
  * @brief
  */
-class CUDAImageDecodingAlgorithm : public IGPUAlgorithm
+class CpuImageDecodingAlgorithm : public ICPUAlgorithm
 {
 
 public:
@@ -42,12 +42,14 @@ public:
      * @param gpuManager
      * @param cudaStream
      */
-    CUDAImageDecodingAlgorithm(const std::shared_ptr<Config::JsonConfig>& config, [[maybe_unused]] const std::unique_ptr<GPU::GpuManager>& gpuManager, [[maybe_unused]] void* cudaStream);
+    CpuImageDecodingAlgorithm(const std::shared_ptr<Config::JsonConfig>& config,
+                              [[maybe_unused]] const std::unique_ptr<GPU::GpuManager>& gpuManager,
+                              [[maybe_unused]] void* cudaStream);
 
     /**
      * @brief
      */
-    ~CUDAImageDecodingAlgorithm() override = default;
+    ~CpuImageDecodingAlgorithm() override = default;
 
     /**
      * @brief
@@ -83,14 +85,10 @@ private:
     ///
     std::vector<std::shared_ptr<Decoding::IImageDecoder>> decoders_;
 
-    ///
     bool removeSourceData_;
-
-    ///
-    void* cudaStream_;
 
 };
 
 }
 
-#endif // IMAGE_DECODING_ALGORITHM_H
+#endif // CPU_IMAGE_DECODING_ALGORITHM_H

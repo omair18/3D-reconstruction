@@ -67,7 +67,7 @@ void WebServer::Initialize(const std::shared_ptr<Config::JsonConfig> &serviceCon
     if(ValidateServerConfiguration(webServerConfig))
     {
         address_ = (*webServerConfig)[Config::ConfigNodes::NetworkingConfig::WebServerConfig::IpAddress]->ToString();
-        port_ = (*webServerConfig)[Config::ConfigNodes::NetworkingConfig::WebServerConfig::Port]->ToInt();
+        port_ = (*webServerConfig)[Config::ConfigNodes::NetworkingConfig::WebServerConfig::Port]->ToInt32();
 
     }
 }

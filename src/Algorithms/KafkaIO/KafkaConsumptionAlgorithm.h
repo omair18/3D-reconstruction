@@ -39,14 +39,12 @@ public:
      * @param gpuManager
      * @param cudaStream
      */
-    KafkaConsumptionAlgorithm(const std::shared_ptr<Config::JsonConfig>& config,
-                              [[maybe_unused]] const std::unique_ptr<GPU::GpuManager>& gpuManager,
-                              [[maybe_unused]] void* cudaStream);
+    KafkaConsumptionAlgorithm(const std::shared_ptr<Config::JsonConfig>& config, [[maybe_unused]] const std::unique_ptr<GPU::GpuManager>& gpuManager, [[maybe_unused]] void* cudaStream);
 
     /**
      * @brief
      */
-    ~KafkaConsumptionAlgorithm() override;
+    ~KafkaConsumptionAlgorithm() override = default;
 
     /**
      * @brief

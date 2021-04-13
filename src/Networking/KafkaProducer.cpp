@@ -70,7 +70,7 @@ bool Networking::KafkaProducer::Initialize(const std::shared_ptr<Config::JsonCon
 
     auto topics = (*kafkaConfig)[Config::ConfigNodes::NetworkingConfig::KafkaProducerConfig::Topics]->ToVectorString();
     auto brokersList = (*kafkaConfig)[Config::ConfigNodes::NetworkingConfig::KafkaProducerConfig::Brokers]->ToVectorString();
-    auto timeoutMs = (*kafkaConfig)[Config::ConfigNodes::NetworkingConfig::KafkaProducerConfig::Timeout]->ToInt();
+    auto timeoutMs = (*kafkaConfig)[Config::ConfigNodes::NetworkingConfig::KafkaProducerConfig::Timeout]->ToInt32();
     std::string errorString;
 
     std::string brokersListString;

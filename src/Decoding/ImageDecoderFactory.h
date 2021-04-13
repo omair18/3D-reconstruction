@@ -37,7 +37,10 @@ enum DecoderType
     NVJPEG_HARDWARE_IMAGE_DECODER,
 
     /// Image decoder with NvJPEG2000 backend (GPU)
-    NVJPEG2K_IMAGE_DECODER
+    NVJPEG2K_IMAGE_DECODER,
+
+    /// Unknown decoder
+    UNKNOWN_DECODER
 };
 
 /**

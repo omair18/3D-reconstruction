@@ -161,7 +161,7 @@ GPU& GpuManager::SelectMatchingGPU(const std::shared_ptr<Config::JsonConfig>& se
         }
         else
         {
-            auto id = (*gpuConfig)[Config::ConfigNodes::ServiceConfig::GpuConfig::Id]->ToInt();
+            auto id = (*gpuConfig)[Config::ConfigNodes::ServiceConfig::GpuConfig::Id]->ToInt32();
             if (cudaCapableDevices_.size() <= id)
             {
                 LOG_ERROR() << "Invalid service GPU configuration. There is no GPU with id=" << id << ".";

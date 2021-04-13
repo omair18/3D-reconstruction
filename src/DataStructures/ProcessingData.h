@@ -133,43 +133,6 @@ public:
      */
     void SetReconstructionParams(std::shared_ptr<Config::JsonConfig>&& params) noexcept;
 
-    /**
-     * @brief
-     *
-     * @return
-     */
-    CUDAImage& GetDecodedImage();
-
-    /**
-     * @brief
-     *
-     * @param image
-     */
-    void SetDecodedImage(const CUDAImage& image);
-
-    /**
-     * @brief
-     *
-     * @param image
-     */
-    void SetDecodedImage(CUDAImage&& image) noexcept;
-
-    /**
-     * @brief
-     *
-     * @param image
-     * @param cudaStream
-     */
-    void SetDecodedImageAsync(const CUDAImage& image, void* cudaStream);
-
-    /**
-     * @brief
-     *
-     * @param image
-     * @param cudaStream
-     */
-    void SetDecodedImageAsync(CUDAImage&& image, void* cudaStream) noexcept;
-
 private:
 
     ///
@@ -180,9 +143,6 @@ private:
 
     ///
     ModelDataset modelDataset_;
-
-    ///
-    CUDAImage decodedImage_;
 
 };
 

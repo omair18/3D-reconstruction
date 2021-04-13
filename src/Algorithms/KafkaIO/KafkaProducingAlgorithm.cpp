@@ -16,11 +16,6 @@ ICPUAlgorithm()
     Initialize(config);
 }
 
-KafkaProducingAlgorithm::~KafkaProducingAlgorithm()
-{
-
-}
-
 bool KafkaProducingAlgorithm::Process(std::shared_ptr<DataStructures::ProcessingData> &processingData)
 {
     auto& message = processingData->GetKafkaMessage();

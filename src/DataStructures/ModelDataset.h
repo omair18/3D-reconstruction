@@ -44,7 +44,10 @@ public:
     enum ProcessingStatus
     {
         ///
-        COLLECTING = 0,
+        RECEIVED = 0,
+
+        ///
+        COLLECTING,
 
         ///
         PROCESSING,
@@ -59,7 +62,21 @@ public:
     /**
      * @brief
      */
-    ModelDataset() = default;
+    ModelDataset();
+
+    /**
+     * @brief
+     *
+     * @param other
+     */
+    ModelDataset(const ModelDataset& other) = default;
+
+    /**
+     * @brief
+     *
+     * @param other
+     */
+    ModelDataset(ModelDataset&& other) noexcept;
 
     /**
      * @brief
@@ -72,7 +89,7 @@ public:
      * @param other
      * @return
      */
-    ModelDataset& operator=(const ModelDataset& other);
+    ModelDataset& operator=(const ModelDataset& other) = default;
 
     /**
      * @brief
@@ -80,14 +97,14 @@ public:
      * @param other
      * @return
      */
-    ModelDataset& operator=(ModelDataset&& other);
+    ModelDataset& operator=(ModelDataset&& other) noexcept;
 
     /**
      * @brief
      *
      * @return
      */
-    const std::string& GetUUID();
+    const std::string& GetUUID() noexcept;
 
     /**
      * @brief
@@ -95,6 +112,20 @@ public:
      * @param UUID
      */
     void SetUUID(const std::string& UUID);
+
+    /**
+     * @brief
+     *
+     * @param UUID
+     */
+    void SetUUID(std::string&& UUID);
+
+    /**
+     * @brief
+     *
+     * @param status
+     */
+    void SetProcessingStatus(ProcessingStatus status) noexcept;
 
     /**
      * @brief
@@ -117,6 +148,48 @@ public:
      */
     const std::vector<CUDAImageDescriptor>& GetImagesDescriptors() noexcept;
 
+    /**
+     * @brief
+     *
+     * @param imagesDescriptors
+     */
+    void SetImagesDescriptors(const std::vector<CUDAImageDescriptor>& imagesDescriptors);
+
+    /**
+     * @brief
+     *
+     * @param imagesDescriptors
+     */
+    void SetImagesDescriptors(std::vector<CUDAImageDescriptor>&& imagesDescriptors) noexcept;
+
+    /**
+     * @brief
+     *
+     * @return
+     */
+    [[nodiscard]] int GetTotalFramesAmount() const noexcept;
+
+    /**
+     * @brief
+     *
+     * @param totalFramesAmount
+     */
+    void SetTotalFramesAmount(int totalFramesAmount) noexcept;
+
+    /**
+     * @brief
+     *
+     * @return
+     */
+    [[nodiscard]] int GetTotalSize() const noexcept;
+
+    /**
+     * @brief
+     *
+     * @param totalSize
+     */
+    void SetTotalSize(int totalSize);
+
 private:
 
     ///
@@ -126,7 +199,7 @@ private:
     std::string UUID_;
 
     ///
-    int total_;
+    int totalFramesAmount_;
 
     ///
     int totalSize_;

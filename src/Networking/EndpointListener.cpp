@@ -10,7 +10,7 @@ namespace Networking
 {
 
 EndpointListener::EndpointListener(const std::shared_ptr<Config::JsonConfig> &config) :
-        ioContext_((*config)[Config::ConfigNodes::NetworkingConfig::WebServerConfig::ThreadPoolSize]->ToInt()),
+        ioContext_((*config)[Config::ConfigNodes::NetworkingConfig::WebServerConfig::ThreadPoolSize]->ToInt32()),
         sslIoContext_(boost::asio::ssl::context::method::tlsv12)
 {
     InitializeIoContext(config);

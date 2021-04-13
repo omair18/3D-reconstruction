@@ -43,10 +43,10 @@ int main(int argc, char** argv)
 
     boost::program_options::store(boost::program_options::parse_command_line(argc, argv, options), paramsMap);
 
-    if (paramsMap.count("help"))
+    if (paramsMap.count("help") || argc < 2)
     {
         std::clog << options << std::endl;
-        return EXIT_FAILURE;
+        return EXIT_SUCCESS;
     }
 
     boost::program_options::notify(paramsMap);

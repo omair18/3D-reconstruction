@@ -254,8 +254,6 @@ bool NvJPEG2kImageDecoder::DecodeInternal(const unsigned char *data, unsigned lo
                   channelInfo.precision, outputImage.pitch_, (void**)bufferChannels_.data(), bufferChannelsPitches_.data(),
                   outputImage.gpuData_, cudaStream_);
 
-    cudaError_t status = cudaStreamSynchronize(cudaStream_);
-
     return true;
 }
 

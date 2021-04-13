@@ -8,7 +8,7 @@
 namespace DataStructures
 {
 
-size_t GetTypeSize(CUDAImage::ELEMENT_TYPE type)
+static size_t GetTypeSize(CUDAImage::ELEMENT_TYPE type)
 {
     switch (type)
     {
@@ -34,7 +34,7 @@ size_t GetTypeSize(CUDAImage::ELEMENT_TYPE type)
     }
 }
 
-std::pair<CUDAImage::ELEMENT_TYPE, size_t> ConvertCvTypeToCUDAImageElementTypeAndChannels(int type)
+static std::pair<CUDAImage::ELEMENT_TYPE, size_t> ConvertCvTypeToCUDAImageElementTypeAndChannels(int type)
 {
     switch (type)
     {
@@ -107,7 +107,7 @@ std::pair<CUDAImage::ELEMENT_TYPE, size_t> ConvertCvTypeToCUDAImageElementTypeAn
     }
 }
 
-int ConvertCUDAImageElementTypeAndChannelsToCvType(CUDAImage::ELEMENT_TYPE type, size_t channels)
+static int ConvertCUDAImageElementTypeAndChannelsToCvType(CUDAImage::ELEMENT_TYPE type, size_t channels)
 {
     if(type == CUDAImage::ELEMENT_TYPE::TYPE_8U)
     {
@@ -208,7 +208,7 @@ int ConvertCUDAImageElementTypeAndChannelsToCvType(CUDAImage::ELEMENT_TYPE type,
     return -1;
 }
 
-double BytesToMB(size_t bytes)
+static double BytesToMB(size_t bytes)
 {
     return bytes / 1024. / 1024.;
 }

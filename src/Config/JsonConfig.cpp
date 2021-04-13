@@ -361,7 +361,7 @@ float JsonConfig::ToFloat()
     }
 }
 
-std::int32_t JsonConfig::ToInt()
+std::int32_t JsonConfig::ToInt32()
 {
     std::int32_t result = 0;
     try
@@ -372,6 +372,21 @@ std::int32_t JsonConfig::ToInt()
     catch (std::exception& e)
     {
         LOG_ERROR() << "Failed to convert value " << (*value_) << " to int32_t: " << e.what();
+        return result;
+    }
+}
+
+std::int64_t JsonConfig::ToInt64()
+{
+    std::int32_t result = 0;
+    try
+    {
+        result = value_->to_number<std::int64_t>();
+        return result;
+    }
+    catch (std::exception& e)
+    {
+        LOG_ERROR() << "Failed to convert value " << (*value_) << " to int64_t: " << e.what();
         return result;
     }
 }
@@ -612,6 +627,26 @@ bool JsonConfig::operator==(const JsonConfig &other)
     }
 
     return *value_ == *other.value_;
+}
+
+bool JsonConfig::Empty()
+{
+    if(!value_)
+    {
+        return true;
+    }
+    if (value_->is_object())
+    {
+        return value_->as_object().empty();
+    }
+    else if (value_->is_array())
+    {
+        return value_->as_array().empty();
+    }
+    else
+    {
+        return false;
+    }
 }
 
 }

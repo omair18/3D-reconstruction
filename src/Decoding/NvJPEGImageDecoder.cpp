@@ -125,7 +125,7 @@ void NvJPEGImageDecoder::AllocateBuffer(int width, int height, int channels)
     cudaError_t cudaStatus;
     if(imageSize > bufferSize_)
     {
-        LOG_TRACE() << "Allocating buffer for image " << width << "x" << height << " with " << channels << "channel(s)."
+        LOG_TRACE() << "Allocating buffer for image " << width << "x" << height << " with " << channels << " channel(s)."
         << " Previous buffer size: " << bufferSize_;
         if (imageBuffer_.channel[0])
         {

@@ -108,6 +108,7 @@ void GpuProcessor::Initialize()
 
             if(outputQueue_ && wasProcessingSuccessful)
             {
+                cudaStreamSynchronize(cudaStream_);
                 outputQueue_->Put(processingData);
             }
 

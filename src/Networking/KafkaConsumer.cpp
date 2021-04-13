@@ -102,8 +102,8 @@ bool Networking::KafkaConsumer::Initialize(const std::shared_ptr<Config::JsonCon
     auto topics = (*kafkaConfig)[Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::Topics]->ToVectorString();
     auto brokersList = (*kafkaConfig)[Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::Brokers]->ToVectorString();
     bool enablePartitionEOF = (*kafkaConfig)[Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::EnablePartitionEOF]->ToBool();
-    auto timeoutMs = (*kafkaConfig)[Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::Timeout]->ToInt();
-    auto groupId = (*kafkaConfig)[Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::GroupId]->ToInt();
+    auto timeoutMs = (*kafkaConfig)[Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::Timeout]->ToInt32();
+    auto groupId = (*kafkaConfig)[Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::GroupId]->ToInt32();
 
     std::string errorString;
 

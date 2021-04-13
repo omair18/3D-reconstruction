@@ -8,17 +8,10 @@
 namespace Algorithms
 {
 
-KafkaConsumptionAlgorithm::KafkaConsumptionAlgorithm(const std::shared_ptr<Config::JsonConfig>& config,
-                                                     [[maybe_unused]] const std::unique_ptr<GPU::GpuManager>& gpuManager,
-                                                     [[maybe_unused]] void* cudaStream) :
+KafkaConsumptionAlgorithm::KafkaConsumptionAlgorithm(const std::shared_ptr<Config::JsonConfig>& config, [[maybe_unused]] const std::unique_ptr<GPU::GpuManager>& gpuManager, [[maybe_unused]] void* cudaStream) :
 ICPUAlgorithm()
 {
     Initialize(config);
-}
-
-KafkaConsumptionAlgorithm::~KafkaConsumptionAlgorithm()
-{
-
 }
 
 bool KafkaConsumptionAlgorithm::Process(std::shared_ptr<DataStructures::ProcessingData>& processingData)

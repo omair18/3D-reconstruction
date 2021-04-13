@@ -53,7 +53,7 @@ void ProcessingQueueManager::Initialize(const std::shared_ptr<Config::JsonConfig
     for(auto& queueConfig : queuesConfigs)
     {
         auto queueName = (*queueConfig)[Config::ConfigNodes::ServiceConfig::QueueConfig::Name]->ToString();
-        auto queueSize = (*queueConfig)[Config::ConfigNodes::ServiceConfig::QueueConfig::Size]->ToInt();
+        auto queueSize = (*queueConfig)[Config::ConfigNodes::ServiceConfig::QueueConfig::Size]->ToInt32();
         AddQueue(queueName, queueSize);
     }
 }

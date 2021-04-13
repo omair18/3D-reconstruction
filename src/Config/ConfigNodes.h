@@ -111,6 +111,18 @@ namespace Config
             }
         }
 
+        namespace DecodingConfig
+        {
+            const inline static std::string& Name = ServiceConfig::PipelineConfig::Name;
+            namespace DecodersNames
+            {
+                const inline static std::string OpenCV = "OPENCV";
+                const inline static std::string NvJPEG = "NVJPEG";
+                const inline static std::string NvJPEGHardware = "NVJPEG_HARDWARE";
+                const inline static std::string NvJPEG2K = "NVJPEG2K";
+            }
+        }
+
         namespace AlgorithmsConfig
         {
 
@@ -123,9 +135,10 @@ namespace Config
                 // Kafka IO
                 const inline static std::string KafkaConsumptionAlgorithm = "kafkaConsumptionAlgorithm";
                 const inline static std::string KafkaProducingAlgorithm = "kafkaProducingAlgorithm";
+                const inline static std::string KafkaMessageParsingAlgorithm = "kafkaMessageParsingAlgorithm";
 
                 // Decoding
-                const inline static std::string CpuImageDecodingAlgorithm = "CpuImageDecodingAlgorithm";
+                const inline static std::string CpuImageDecodingAlgorithm = "cpuImageDecodingAlgorithm";
                 const inline static std::string CUDAImageDecodingAlgorithm = "CUDAImageDecodingAlgorithm";
 
                 // Image processing
@@ -154,12 +167,14 @@ namespace Config
 
             namespace CpuImageDecodingAlgorithmConfig
             {
-
+                const inline static std::string Decoders = "decoders";
+                const inline static std::string RemoveSourceData = "removeSourceData";
             }
 
             namespace CUDAImageDecodingAlgorithmConfig
             {
-
+                const inline static std::string& Decoders = CpuImageDecodingAlgorithmConfig::Decoders;
+                const inline static std::string& RemoveSourceData = CpuImageDecodingAlgorithmConfig::RemoveSourceData;
             }
 
             namespace CUDAConvolutionAlgorithmConfig
@@ -181,7 +196,7 @@ namespace Config
             const inline static std::string Timestamp = "timestamp";
             const inline static std::string UUID = "UUID";
             const inline static std::string FrameID = "frameID";
-            const inline static std::string framesTotal = "framesTotal";
+            const inline static std::string FramesTotal = "framesTotal";
             const inline static std::string FocalLength = "focalLength";
             const inline static std::string SensorSize = "sensorSize";
         }

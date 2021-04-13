@@ -3,20 +3,21 @@
 #include "NvJPEG2KChannelMerging.h"
 #include "Logger.h"
 
+#define ELEMENTS_PER_THREAD 4
+
 __global__ void MergeChannels8UKernel(int width, int height, int outputPitch, int channels, void** gpuArrayOfChannels, const size_t* gpuArrayOfChannelPitches, void* output)
 {
     const unsigned int threadId = threadIdx.x + blockIdx.x * blockDim.x;
-    const unsigned int elementsPerThread = 4;
     const unsigned int taskSize = width * height;
-    const unsigned int elementId = threadId * elementsPerThread;
+    const unsigned int elementId = threadId * ELEMENTS_PER_THREAD;
     const unsigned int elementRow = elementId / width;
     const unsigned int elementColumn = elementId - (elementRow * width);
 
     if(elementId < taskSize)
     {
-        for(unsigned int element = 0; element < elementsPerThread; ++element)
+        for(unsigned int channel = 0; channel < channels; ++channel)
         {
-            for(unsigned int channel = 0; channel < channels; ++channel)
+            for(unsigned int element = 0; element < ELEMENTS_PER_THREAD; ++element)
             {
                 ((unsigned char*)output)[elementRow * outputPitch + elementColumn * channels + element * channels + channel] =
                 ((unsigned char**)(gpuArrayOfChannels))[channels - 1 - channel][elementRow * gpuArrayOfChannelPitches[channels - 1 - channel] + elementColumn + element];
@@ -28,17 +29,16 @@ __global__ void MergeChannels8UKernel(int width, int height, int outputPitch, in
 __global__ void MergeChannels16UKernel(int width, int height, int outputPitch, int channels, void** gpuArrayOfChannels, const size_t* gpuArrayOfChannelPitches, void* output)
 {
     const unsigned int threadId = threadIdx.x + blockIdx.x * blockDim.x;
-    const unsigned short elementsPerThread = 4;
     const unsigned int taskSize = width * height;
-    const unsigned int elementId = threadId * elementsPerThread;
+    const unsigned int elementId = threadId * ELEMENTS_PER_THREAD;
     const unsigned int elementRow = elementId / width;
     const unsigned int elementColumn = elementId - (elementRow * width);
 
     if(elementId < taskSize)
     {
-        for(unsigned int element = 0; element < elementsPerThread; ++element)
+        for(unsigned int channel = 0; channel < channels; ++channel)
         {
-            for(unsigned int channel = 0; channel < channels; ++channel)
+            for(unsigned int element = 0; element < ELEMENTS_PER_THREAD; ++element)
             {
                 ((unsigned short*)output)[elementRow * outputPitch + elementColumn * channels + element * channels + channel] =
                         ((unsigned short**)(gpuArrayOfChannels))[channels - 1 - channel][elementRow * gpuArrayOfChannelPitches[channels - 1 - channel] + elementColumn + element];
@@ -55,12 +55,11 @@ namespace Decoding
         // 1 thread - 4 elements
         // 1 block - 256 threads
 
-        const int elementsPerThread = 4;
         const int threadsPerBlock = 256;
         const int taskSize = width * height;
 
         dim3 blockDim(threadsPerBlock);
-        dim3 gridDim( (taskSize + threadsPerBlock * elementsPerThread - 1) / (threadsPerBlock * elementsPerThread));
+        dim3 gridDim( (taskSize + threadsPerBlock * ELEMENTS_PER_THREAD - 1) / (threadsPerBlock * ELEMENTS_PER_THREAD));
 
         void* gpuChannelsArray = nullptr;
         size_t* gpuArrayOfPitches = nullptr;
