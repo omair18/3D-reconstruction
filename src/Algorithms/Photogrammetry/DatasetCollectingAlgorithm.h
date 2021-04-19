@@ -47,7 +47,7 @@ public:
     /**
      * @brief
      */
-    ~DatasetCollectingAlgorithm();
+    ~DatasetCollectingAlgorithm() override;
 
     /**
      * @brief
@@ -66,7 +66,7 @@ public:
 
 private:
 
-    std::unordered_map<std::string, std::tuple<>>;
+    std::unordered_map<std::string, std::pair<unsigned long, const std::shared_ptr<DataStructures::ProcessingData>>> datasets_;
 };
 
 }

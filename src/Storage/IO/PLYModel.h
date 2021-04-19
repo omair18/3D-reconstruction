@@ -7,6 +7,9 @@
 #ifndef PLY_MODEL_H
 #define PLY_MODEL_H
 
+#include <string>
+#include <vector>
+
 /**
  * @namespace Storage
  *
@@ -23,9 +26,7 @@ namespace Storage
 class PLYModel
 {
 
-public:
 
-private:
 
 };
 
