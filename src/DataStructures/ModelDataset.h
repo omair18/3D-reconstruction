@@ -104,7 +104,7 @@ public:
      *
      * @return
      */
-    const std::string& GetUUID() noexcept;
+    [[nodiscard]] const std::string& GetUUID() const noexcept;
 
     /**
      * @brief
@@ -132,21 +132,21 @@ public:
      *
      * @return
      */
-    std::string GetProcessingStatusString();
+    [[nodiscard]] std::string GetProcessingStatusString() const;
 
     /**
      * @brief
      *
      * @return
      */
-    ProcessingStatus GetProcessingStatus();
+    [[nodiscard]] ProcessingStatus GetProcessingStatus() const;
 
     /**
      * @brief
      *
      * @return
      */
-    const std::vector<CUDAImageDescriptor>& GetImagesDescriptors() noexcept;
+    [[nodiscard]] const std::vector<CUDAImageDescriptor>& GetImagesDescriptors() const noexcept;
 
     /**
      * @brief

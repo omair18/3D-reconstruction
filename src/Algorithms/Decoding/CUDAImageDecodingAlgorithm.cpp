@@ -46,11 +46,10 @@ cudaStream_(cudaStream)
     InitializeInternal(config);
 }
 
-bool CUDAImageDecodingAlgorithm::Process(std::shared_ptr<DataStructures::ProcessingData> &processingData)
+bool CUDAImageDecodingAlgorithm::Process(const std::shared_ptr<DataStructures::ProcessingData> &processingData)
 {
     auto& dataset = processingData->GetModelDataset();
-    auto& modifiableDataset = const_cast<DataStructures::ModelDataset&>(dataset);
-    auto& imageDescriptors = modifiableDataset.GetImagesDescriptors();
+    auto& imageDescriptors = dataset.GetImagesDescriptors();
 
     if(imageDescriptors.empty())
     {
@@ -64,11 +63,9 @@ bool CUDAImageDecodingAlgorithm::Process(std::shared_ptr<DataStructures::Process
         if(decodingStatus)
         {
             LOG_TRACE() << "Decoding image " << imageDescriptor.GetFrameId() << "/" << dataset.GetTotalFramesAmount()
-            << " of dataset " << modifiableDataset.GetUUID() << " ...";
-            auto& imageDescriptorModifiable = const_cast<DataStructures::CUDAImageDescriptor&>(imageDescriptor);
-            auto& rawImageData = imageDescriptorModifiable.GetRawImageData();
-            auto& CUDAImage = imageDescriptorModifiable.GetCUDAImage();
-            auto& CUDAImageModifiable = const_cast<DataStructures::CUDAImage&>(CUDAImage);
+            << " of dataset " << dataset.GetUUID() << " ...";
+            auto& rawImageData = imageDescriptor.GetRawImageData();
+            DataStructures::CUDAImage image;
             decodingStatus = false;
 
             if (rawImageData.empty())
@@ -79,7 +76,7 @@ bool CUDAImageDecodingAlgorithm::Process(std::shared_ptr<DataStructures::Process
 
             for(auto& decoder : decoders_)
             {
-                decodingStatus = decoder->Decode(rawImageData.data(), rawImageData.size(), CUDAImageModifiable);
+                decodingStatus = decoder->Decode(rawImageData.data(), rawImageData.size(), image);
                 if(decodingStatus)
                 {
                     break;
@@ -89,7 +86,8 @@ bool CUDAImageDecodingAlgorithm::Process(std::shared_ptr<DataStructures::Process
             if(decodingStatus)
             {
                 LOG_TRACE() << "Decoding image " << imageDescriptor.GetFrameId() << "/" << dataset.GetTotalFramesAmount()
-                << " of dataset " << modifiableDataset.GetUUID() << " was successful.";
+                << " of dataset " << dataset.GetUUID() << " was successful.";
+                imageDescriptor.Set
                 if(removeSourceData_)
                 {
                     imageDescriptorModifiable.SetRawImageData({});
@@ -98,7 +96,7 @@ bool CUDAImageDecodingAlgorithm::Process(std::shared_ptr<DataStructures::Process
             else
             {
                 LOG_TRACE() << "Failed to decode image " << imageDescriptor.GetFrameId() << "/"
-                << dataset.GetTotalFramesAmount() << " of dataset " << modifiableDataset.GetUUID() << ".";
+                << dataset.GetTotalFramesAmount() << " of dataset " << dataset.GetUUID() << ".";
             }
         }
         else

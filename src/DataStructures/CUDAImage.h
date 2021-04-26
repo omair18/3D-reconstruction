@@ -109,7 +109,7 @@ struct CUDAImage final
      * @param other
      * @return
      */
-    CUDAImage& operator=(CUDAImage&& other);
+    CUDAImage& operator=(CUDAImage&& other) noexcept(false);
 
     /**
      * @brief

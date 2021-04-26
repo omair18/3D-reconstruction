@@ -45,9 +45,9 @@ public:
     DatasetCollectingAlgorithm(const std::shared_ptr<Config::JsonConfig>& config, [[maybe_unused]] const std::unique_ptr<GPU::GpuManager>& gpuManager, [[maybe_unused]] void* cudaStream);
 
     /**
-     * @brief
+     * @brief Default destructor.
      */
-    ~DatasetCollectingAlgorithm() override;
+    ~DatasetCollectingAlgorithm() override = default;
 
     /**
      * @brief
@@ -66,7 +66,24 @@ public:
 
 private:
 
+    /**
+     * @brief
+     *
+     * @param config
+     */
+    static void ValidateConfig(const std::shared_ptr<Config::JsonConfig>& config);
+
+    /**
+     * @brief
+     *
+     * @param config
+     */
+    void InitializeInternal(const std::shared_ptr<Config::JsonConfig>& config);
+
+    ///
     std::unordered_map<std::string, std::pair<unsigned long, const std::shared_ptr<DataStructures::ProcessingData>>> datasets_;
+
+    unsigned long expireTimeoutSeconds_;
 };
 
 }

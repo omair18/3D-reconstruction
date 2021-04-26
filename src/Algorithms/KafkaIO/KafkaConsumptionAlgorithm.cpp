@@ -14,7 +14,7 @@ ICPUAlgorithm()
     Initialize(config);
 }
 
-bool KafkaConsumptionAlgorithm::Process(std::shared_ptr<DataStructures::ProcessingData>& processingData)
+bool KafkaConsumptionAlgorithm::Process(const std::shared_ptr<DataStructures::ProcessingData>& processingData)
 {
     auto message = consumer_->Consume();
     if(message->Empty())

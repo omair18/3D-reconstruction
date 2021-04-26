@@ -2,7 +2,7 @@ include_directories(${LIBRARIES_PATH}/aws/include)
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${CUDA_INCLUDE_DIRS})
 
-add_executable(http_server_test http_server_test.cpp test_cuda_image_descriptor.cpp test_cuda_kernel_cpu_model.cpp)
+add_executable(http_server_test http_server_test.cpp test_cuda_image_descriptor.cpp test_cuda_kernel_cpu_model.cpp test_cuda_akaze.cpp test_npp_grayscale.cpp)
 target_link_libraries(http_server_test Boost::system pthread ssl crypto)
 
 add_executable(test test.cpp)
@@ -42,6 +42,7 @@ add_executable(test_scharr_filter test_scharr_filter.cpp)
 target_link_libraries(test_scharr_filter
         ${CUDA_nppc_LIBRARY}
         ${CUDA_nppig_LIBRARY}
+        ${CUDA_CUDART_LIBRARY}
         opencv_core
         opencv_imgcodecs
         opencv_highgui
@@ -57,3 +58,33 @@ target_link_libraries(test_image_decoders log decoding datastructures ${CUDA_LIB
         opencv_highgui)
 
 add_executable(test_cuda_kernel_cpu_model test_cuda_kernel_cpu_model.cpp)
+
+add_executable(test_npp_grayscale test_npp_grayscale.cpp)
+target_link_libraries(test_npp_grayscale
+        opencv_core
+        opencv_imgcodecs
+        opencv_highgui
+        opencv_imgproc
+        ${CUDA_CUDART_LIBRARY}
+        ${CUDA_nppc_LIBRARY}
+        ${CUDA_nppicc_LIBRARY})
+
+add_executable(test_akaze
+        test_cuda_akaze.cpp
+        cuda_test_kernels.h
+        cuda_test_kernels.cu)
+
+target_link_libraries(test_akaze
+        log
+        datastructures
+        ${CUDA_nppc_LIBRARY}
+        ${CUDA_nppig_LIBRARY}
+        ${CUDA_nppif_LIBRARY}
+        ${CUDA_nppicc_LIBRARY}
+        ${CUDA_nppist_LIBRARY}
+        ${CUDA_nppidei_LIBRARY}
+        ${CUDA_nppial_LIBRARY}
+        ${CUDA_CUDART_LIBRARY}
+        opencv_core
+        opencv_imgcodecs
+        opencv_highgui)

@@ -34,7 +34,7 @@ set(ALGORITHMS_LIB_CPPS
         Photogrammetry/PointCloudDensificationAlgorithm.cpp
         ImageProcessing/CUDAResizeAlgorithm.cpp
         ImageProcessing/CUDAConvolutionAlgorithm.cpp
-        ImageProcessing/CUDAImageBinarizationAlgorithm.cpp KafkaIO/KafkaMessageParsingAlgorithm.cpp KafkaIO/KafkaMessageParsingAlgorithm.h)
+        ImageProcessing/CUDAImageBinarizationAlgorithm.cpp)
 
 source_group("Header Files" FILES ${ALGORITHMS_LIB_HEADERS})
 source_group("Source Files" FILES ${ALGORITHMS_LIB_CPPS})

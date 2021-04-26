@@ -45,7 +45,7 @@ decoders_()
     InitializeInternal(config);
 }
 
-bool CpuImageDecodingAlgorithm::Process(std::shared_ptr<DataStructures::ProcessingData> &processingData)
+bool CpuImageDecodingAlgorithm::Process(const std::shared_ptr<DataStructures::ProcessingData> &processingData)
 {
     auto& dataset = processingData->GetModelDataset();
     auto& modifiableDataset = const_cast<DataStructures::ModelDataset&>(dataset);

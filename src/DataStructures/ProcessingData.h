@@ -75,7 +75,14 @@ public:
      *
      * @return
      */
-    const ModelDataset& GetModelDataset();
+    [[nodiscard]] const std::shared_ptr<ModelDataset>& GetModelDataset() const noexcept;
+
+    /**
+     * @brief
+     *
+     * @param dataset
+     */
+    void SetModelDataset(const std::shared_ptr<ModelDataset>& dataset);
 
     /**
      * @brief
@@ -89,6 +96,13 @@ public:
      *
      * @param dataset
      */
+    void SetModelDataset(std::shared_ptr<ModelDataset>&& dataset) noexcept;
+
+    /**
+     * @brief
+     *
+     * @param dataset
+     */
     void SetModelDataset(ModelDataset&& dataset) noexcept;
 
     /**
@@ -96,7 +110,7 @@ public:
      *
      * @return
      */
-    const std::shared_ptr<Networking::KafkaMessage>& GetKafkaMessage();
+    [[nodiscard]] const std::shared_ptr<Networking::KafkaMessage>& GetKafkaMessage() const;
 
     /**
      * @brief
@@ -117,7 +131,7 @@ public:
      *
      * @return
      */
-    const std::shared_ptr<Config::JsonConfig>& GetReconstructionParams();
+    [[nodiscard]] const std::shared_ptr<Config::JsonConfig>& GetReconstructionParams() const;
 
     /**
      * @brief
@@ -136,13 +150,13 @@ public:
 private:
 
     ///
-    std::shared_ptr<Config::JsonConfig> reconstructionParams_;
+    std::shared_ptr<Config::JsonConfig> reconstructionParams_ = nullptr;
 
     ///
-    std::shared_ptr<Networking::KafkaMessage> kafkaMessage_;
+    std::shared_ptr<Networking::KafkaMessage> kafkaMessage_ = nullptr;
 
     ///
-    ModelDataset modelDataset_;
+    std::shared_ptr<ModelDataset> modelDataset_ = nullptr;
 
 };
 

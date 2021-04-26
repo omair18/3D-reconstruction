@@ -28,6 +28,7 @@ target_link_libraries(datastructures
         log
         opencv_core
         config
+        networking
         ${CUDA_CUDART_LIBRARY})
 
 

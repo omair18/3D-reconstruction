@@ -21,7 +21,7 @@ void KafkaMessageParsingAlgorithm::Initialize(const std::shared_ptr<Config::Json
     InitializeInternal();
 }
 
-bool KafkaMessageParsingAlgorithm::Process(std::shared_ptr<DataStructures::ProcessingData> &processingData)
+bool KafkaMessageParsingAlgorithm::Process(const std::shared_ptr<DataStructures::ProcessingData> &processingData)
 {
     auto& message = processingData->GetKafkaMessage();
     if(!message)
@@ -113,8 +113,7 @@ bool KafkaMessageParsingAlgorithm::Process(std::shared_ptr<DataStructures::Proce
         DataStructures::ModelDataset dataset;
 
         auto& rawImageData = message->GetData();
-        auto& modifiableRawImageData = const_cast<std::vector<unsigned char>&>(rawImageData);
-        imageDescriptor.SetRawImageData(std::move(modifiableRawImageData));
+        imageDescriptor.SetRawImageData(std::move(rawImageData));
 
         imageDescriptor.SetCameraId(cameraId);
         imageDescriptor.SetTimestamp(timeStamp);

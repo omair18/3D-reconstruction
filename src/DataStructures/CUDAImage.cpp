@@ -210,10 +210,10 @@ static int ConvertCUDAImageElementTypeAndChannelsToCvType(CUDAImage::ELEMENT_TYP
 
 static double BytesToMB(size_t bytes)
 {
-    return bytes / 1024. / 1024.;
+    return static_cast<double>(bytes) / 1024. / 1024.;
 }
 
-DataStructures::CUDAImage::CUDAImage() :
+CUDAImage::CUDAImage() :
 width_(0),
 height_(0),
 pitch_(0),
@@ -274,7 +274,7 @@ void CUDAImage::Allocate(unsigned int width, unsigned int height, unsigned int c
     allocatedBytes_ = pitch_ * height_;
 }
 
-void DataStructures::CUDAImage::AllocateAsync(unsigned int width, unsigned int height, unsigned int channels, ELEMENT_TYPE type, bool pitchedAllocation, void* cudaStream)
+void CUDAImage::AllocateAsync(unsigned int width, unsigned int height, unsigned int channels, ELEMENT_TYPE type, bool pitchedAllocation, void* cudaStream)
 {
     cudaError_t status;
     if(gpuData_)
@@ -319,19 +319,19 @@ void DataStructures::CUDAImage::AllocateAsync(unsigned int width, unsigned int h
     allocatedBytes_ = pitch_ * height_;
 }
 
-void DataStructures::CUDAImage::Release()
+void CUDAImage::Release()
 {
     auto status = cudaFree(gpuData_);
     if(status != cudaError_t::cudaSuccess)
     {
-        LOG_ERROR() << "Failed to release " << (allocatedBytes_ / 1024. / 1024.) << " MB of GPU memory. "
+        LOG_ERROR() << "Failed to release " << BytesToMB(allocatedBytes_) << " MB of GPU memory. "
         << "CUDA error " << static_cast<int>(status) << " - " << cudaGetErrorName(status)
         << ": " << cudaGetErrorString(status);
         throw std::runtime_error("CUDA error.");
     }
     else
     {
-        LOG_TRACE() << "Successfully released " << (allocatedBytes_ / 1024. / 1024.) << " MB of GPU memory." ;
+        LOG_TRACE() << "Successfully released " << BytesToMB(allocatedBytes_) << " MB of GPU memory." ;
     }
     gpuData_ = nullptr;
     width_ = 0;
@@ -343,19 +343,19 @@ void DataStructures::CUDAImage::Release()
     allocatedBytes_ = 0;
 }
 
-void DataStructures::CUDAImage::ReleaseAsync(void* cudaStream)
+void CUDAImage::ReleaseAsync(void* cudaStream)
 {
     auto status = cudaFreeAsync(gpuData_, (cudaStream_t)cudaStream);
     if(status != cudaError_t::cudaSuccess)
     {
-        LOG_ERROR() << "Failed to release " << (allocatedBytes_ / 1024. / 1024.) << " MB of GPU memory asynchronously. "
+        LOG_ERROR() << "Failed to release " << BytesToMB(allocatedBytes_) << " MB of GPU memory asynchronously. "
                     << "CUDA error " << static_cast<int>(status) << " - " << cudaGetErrorName(status)
                     << ": " << cudaGetErrorString(status);
         throw std::runtime_error("CUDA error.");
     }
     else
     {
-        LOG_TRACE() << "Successfully released " << (allocatedBytes_ / 1024. / 1024.) << " MB of GPU memory asynchronously.";
+        LOG_TRACE() << "Successfully released " << BytesToMB(allocatedBytes_) << " MB of GPU memory asynchronously.";
     }
     gpuData_ = nullptr;
     width_ = 0;
@@ -367,7 +367,7 @@ void DataStructures::CUDAImage::ReleaseAsync(void* cudaStream)
     allocatedBytes_ = 0;
 }
 
-DataStructures::CUDAImage::CUDAImage(const DataStructures::CUDAImage &other)
+CUDAImage::CUDAImage(const CUDAImage& other)
 {
     Allocate(other.width_, other.height_, other.channels_, other.elementType_, other.pitchedAllocation_);
     auto status = cudaMemcpy2D(gpuData_, pitch_, other.gpuData_, other.pitch_, other.width_ * other.channels_ * GetTypeSize(other.elementType_),
@@ -380,7 +380,7 @@ DataStructures::CUDAImage::CUDAImage(const DataStructures::CUDAImage &other)
     }
 }
 
-DataStructures::CUDAImage::CUDAImage(DataStructures::CUDAImage &&other) noexcept
+CUDAImage::CUDAImage(CUDAImage&& other) noexcept
 {
     width_ = other.width_;
     height_ = other.height_;
@@ -401,7 +401,7 @@ DataStructures::CUDAImage::CUDAImage(DataStructures::CUDAImage &&other) noexcept
     other.pitchedAllocation_ = false;
 }
 
-DataStructures::CUDAImage::~CUDAImage()
+CUDAImage::~CUDAImage()
 {
     if(gpuData_)
     {
@@ -409,7 +409,7 @@ DataStructures::CUDAImage::~CUDAImage()
     }
 }
 
-DataStructures::CUDAImage &DataStructures::CUDAImage::operator=(const DataStructures::CUDAImage &other)
+CUDAImage& CUDAImage::operator=(const CUDAImage& other)
 {
     if (this == &other)
     {
@@ -419,7 +419,7 @@ DataStructures::CUDAImage &DataStructures::CUDAImage::operator=(const DataStruct
     return *this;
 }
 
-DataStructures::CUDAImage &DataStructures::CUDAImage::operator=(DataStructures::CUDAImage &&other)
+CUDAImage& CUDAImage::operator=(CUDAImage&& other) noexcept(false)
 {
     if (gpuData_ == other.gpuData_)
     {
@@ -429,7 +429,7 @@ DataStructures::CUDAImage &DataStructures::CUDAImage::operator=(DataStructures::
     return *this;
 }
 
-DataStructures::CUDAImage &DataStructures::CUDAImage::operator=(const cv::cuda::GpuMat &other)
+CUDAImage& CUDAImage::operator=(const cv::cuda::GpuMat& other)
 {
     if (this == reinterpret_cast<const CUDAImage*>(&other))
     {
@@ -439,7 +439,7 @@ DataStructures::CUDAImage &DataStructures::CUDAImage::operator=(const cv::cuda::
     return *this;
 }
 
-DataStructures::CUDAImage &DataStructures::CUDAImage::operator=(cv::cuda::GpuMat &&other)
+CUDAImage& CUDAImage::operator=(cv::cuda::GpuMat&& other)
 {
     if (gpuData_ == other.data)
     {
@@ -449,7 +449,7 @@ DataStructures::CUDAImage &DataStructures::CUDAImage::operator=(cv::cuda::GpuMat
     return *this;
 }
 
-DataStructures::CUDAImage &DataStructures::CUDAImage::operator=(const cv::Mat &other)
+CUDAImage& CUDAImage::operator=(const cv::Mat& other)
 {
     if (&other == (cv::Mat*)this)
     {
@@ -459,13 +459,13 @@ DataStructures::CUDAImage &DataStructures::CUDAImage::operator=(const cv::Mat &o
     return *this;
 }
 
-DataStructures::CUDAImage &DataStructures::CUDAImage::operator=(cv::Mat &&other) noexcept
+CUDAImage& CUDAImage::operator=(cv::Mat&& other) noexcept
 {
     MoveFromCvMat(other);
     return *this;
 }
 
-bool DataStructures::CUDAImage::operator==(const DataStructures::CUDAImage &other) const
+bool CUDAImage::operator==(const CUDAImage& other) const
 {
     return width_ == other.width_ &&
          height_ == other.height_ &&
@@ -474,7 +474,7 @@ bool DataStructures::CUDAImage::operator==(const DataStructures::CUDAImage &othe
          elementType_ == other.elementType_;
 }
 
-bool DataStructures::CUDAImage::operator==(const cv::cuda::GpuMat& other) const
+bool CUDAImage::operator==(const cv::cuda::GpuMat& other) const
 {
     return width_ == static_cast<size_t>(other.cols) &&
            height_ == static_cast<size_t>(other.rows) &&
@@ -483,7 +483,7 @@ bool DataStructures::CUDAImage::operator==(const cv::cuda::GpuMat& other) const
            GetTypeSize(elementType_) == other.elemSize1();
 }
 
-void DataStructures::CUDAImage::MoveFromGpuMat(cv::cuda::GpuMat &src)
+void CUDAImage::MoveFromGpuMat(cv::cuda::GpuMat& src)
 {
     if(gpuData_ == src.data)
     {
@@ -514,7 +514,7 @@ void DataStructures::CUDAImage::MoveFromGpuMat(cv::cuda::GpuMat &src)
     src.flags = 0;
 }
 
-void DataStructures::CUDAImage::CopyFromGpuMat(const cv::cuda::GpuMat &src)
+void CUDAImage::CopyFromGpuMat(const cv::cuda::GpuMat& src)
 {
     bool pitchedAllocation = src.cols * src.channels() * src.elemSize1() != src.step;
     auto [type, channels] = ConvertCvTypeToCUDAImageElementTypeAndChannels(src.type());
@@ -541,13 +541,21 @@ void DataStructures::CUDAImage::CopyFromGpuMat(const cv::cuda::GpuMat &src)
     }
 }
 
-void DataStructures::CUDAImage::MoveFromCvMat(cv::Mat &src)
+void CUDAImage::MoveFromCvMat(cv::Mat& src)
 {
     CopyFromCvMat(src);
+
     src.release();
+    src.data = nullptr;
+    src.datastart = nullptr;
+    src.dataend = nullptr;
+    src.cols = 0;
+    src.rows = 0;
+    src.step = 0;
+    src.flags = 0;
 }
 
-void DataStructures::CUDAImage::CopyFromCvMat(const cv::Mat &src)
+void CUDAImage::CopyFromCvMat(const cv::Mat& src)
 {
     auto [type, channels] = ConvertCvTypeToCUDAImageElementTypeAndChannels(src.type());
     if(gpuData_)
@@ -572,12 +580,12 @@ void DataStructures::CUDAImage::CopyFromCvMat(const cv::Mat &src)
     }
 }
 
-bool DataStructures::CUDAImage::Empty() const
+bool CUDAImage::Empty() const
 {
     return gpuData_ == nullptr;
 }
 
-void DataStructures::CUDAImage::CopyFromRawHostPointer(void* src, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, bool pitchedAllocation)
+void CUDAImage::CopyFromRawHostPointer(void* src, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, bool pitchedAllocation)
 {
     if(gpuData_)
     {
@@ -602,7 +610,7 @@ void DataStructures::CUDAImage::CopyFromRawHostPointer(void* src, size_t width, 
 
 }
 
-void DataStructures::CUDAImage::MoveFromGpuMatAsync(cv::cuda::GpuMat &src, void *cudaStream)
+void CUDAImage::MoveFromGpuMatAsync(cv::cuda::GpuMat& src, void* cudaStream)
 {
     if(gpuData_ == src.data)
     {
@@ -616,31 +624,25 @@ void DataStructures::CUDAImage::MoveFromGpuMatAsync(cv::cuda::GpuMat &src, void 
 
     auto [type, channels] = ConvertCvTypeToCUDAImageElementTypeAndChannels(src.type());
 
-    std::swap(gpuData_, src.data);
+    gpuData_ = src.data;
+    width_ = src.cols;
+    height_ = src.rows;
+    pitch_ = src.step;
+    elementType_ = type;
+    channels_ = channels;
+    pitchedAllocation_ = width_ * channels_ * GetTypeSize(elementType_) != pitch_;
+    allocatedBytes_ = pitch_ * height_;
+
     src.data = nullptr;
     src.datastart = nullptr;
     src.dataend = nullptr;
-
-    width_ = src.cols;
     src.cols = 0;
-
-    height_ = src.rows;
     src.rows = 0;
-
-    channels_ = channels;
-
-    elementType_ = type;
-
-    pitch_ = src.step;
     src.step = 0;
-
     src.flags = 0;
-
-    pitchedAllocation_ = width_ * channels_ * GetTypeSize(type) != pitch_;
-    allocatedBytes_ = pitch_ * height_;
 }
 
-void DataStructures::CUDAImage::CopyFromGpuMatAsync(const cv::cuda::GpuMat &src, void *cudaStream)
+void CUDAImage::CopyFromGpuMatAsync(const cv::cuda::GpuMat& src, void* cudaStream)
 {
     bool pitchedAllocation = src.cols * src.channels() * src.elemSize1() != src.step;
     auto [type, channels] = ConvertCvTypeToCUDAImageElementTypeAndChannels(src.type());
@@ -661,13 +663,13 @@ void DataStructures::CUDAImage::CopyFromGpuMatAsync(const cv::cuda::GpuMat &src,
                  src.rows, cudaMemcpyKind::cudaMemcpyDeviceToDevice, (cudaStream_t)cudaStream);
     if(status != cudaError_t::cudaSuccess)
     {
-        LOG_ERROR() << "Failed to copy image's data from cv::cuda::GpuMat asyncronously. CUDA error " << static_cast<int>(status) << " - "
+        LOG_ERROR() << "Failed to copy image's data from cv::cuda::GpuMat asynchronously. CUDA error " << static_cast<int>(status) << " - "
         << cudaGetErrorName(status) <<": " << cudaGetErrorString(status);
         throw std::runtime_error("CUDA error.");
     }
 }
 
-void DataStructures::CUDAImage::MoveFromCvMatAsync(cv::Mat &src, void *cudaStream)
+void CUDAImage::MoveFromCvMatAsync(cv::Mat& src, void* cudaStream)
 {
     CopyFromCvMatAsync(src, cudaStream);
     src.data = nullptr;
@@ -681,7 +683,7 @@ void DataStructures::CUDAImage::MoveFromCvMatAsync(cv::Mat &src, void *cudaStrea
     src.flags = 0;
 }
 
-void DataStructures::CUDAImage::CopyFromCvMatAsync(const cv::Mat &src, void *cudaStream)
+void CUDAImage::CopyFromCvMatAsync(const cv::Mat& src, void* cudaStream)
 {
     auto [type, channels] = ConvertCvTypeToCUDAImageElementTypeAndChannels(src.type());
     if(gpuData_)
@@ -700,13 +702,13 @@ void DataStructures::CUDAImage::CopyFromCvMatAsync(const cv::Mat &src, void *cud
                  src.cols * src.channels() * src.elemSize1(), src.rows, cudaMemcpyKind::cudaMemcpyHostToDevice, (cudaStream_t)cudaStream);
     if(status != cudaError_t::cudaSuccess)
     {
-        LOG_ERROR() << "Failed to copy image's data from cv::Mat asyncronously. CUDA error " << static_cast<int>(status) << " - "
+        LOG_ERROR() << "Failed to copy image's data from cv::Mat asynchronously. CUDA error " << static_cast<int>(status) << " - "
         << cudaGetErrorName(status) <<": " << cudaGetErrorString(status);
         throw std::runtime_error("CUDA error.");
     }
 }
 
-void DataStructures::CUDAImage::CopyFromRawHostPointerAsync(void *src, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, bool pitchedAllocation, void *cudaStream)
+void CUDAImage::CopyFromRawHostPointerAsync(void* src, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, bool pitchedAllocation, void* cudaStream)
 {
     if(gpuData_)
     {
@@ -724,13 +726,13 @@ void DataStructures::CUDAImage::CopyFromRawHostPointerAsync(void *src, size_t wi
                  cudaMemcpyKind::cudaMemcpyHostToDevice, (cudaStream_t)cudaStream);
     if(status != cudaError_t::cudaSuccess)
     {
-        LOG_ERROR() << "Failed to copy image's data from raw host pointer asyncronously. CUDA error " << static_cast<int>(status) << " - "
+        LOG_ERROR() << "Failed to copy image's data from raw host pointer asynchronously. CUDA error " << static_cast<int>(status) << " - "
         << cudaGetErrorName(status) <<": " << cudaGetErrorString(status);
         throw std::runtime_error("CUDA error.");
     }
 }
 
-void DataStructures::CUDAImage::CopyToRawHostPointer(void *dst, size_t width, size_t height, size_t channels, ELEMENT_TYPE type) const
+void CUDAImage::CopyToRawHostPointer(void* dst, size_t width, size_t height, size_t channels, ELEMENT_TYPE type) const
 {
     if(gpuData_)
     {
@@ -749,12 +751,18 @@ void DataStructures::CUDAImage::CopyToRawHostPointer(void *dst, size_t width, si
     }
 }
 
-void DataStructures::CUDAImage::CopyToRawHostPointerAsync(void *dst, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, void *cudaStream) const
+void CUDAImage::CopyToRawHostPointerAsync(void* dst, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, void* cudaStream) const
 {
     if(gpuData_)
     {
-        cudaMemcpy2DAsync(dst, width * channels * GetTypeSize(type), gpuData_, pitch_, width_ * channels_ * GetTypeSize(elementType_),
+        auto status = cudaMemcpy2DAsync(dst, width * channels * GetTypeSize(type), gpuData_, pitch_, width_ * channels_ * GetTypeSize(elementType_),
                      height_, cudaMemcpyKind::cudaMemcpyDeviceToHost, (cudaStream_t)cudaStream);
+        if(status != cudaError_t::cudaSuccess)
+        {
+            LOG_ERROR() << "Failed to copy image's data to raw host asynchronously. CUDA error " << static_cast<int>(status) << " - "
+                        << cudaGetErrorName(status) <<": " << cudaGetErrorString(status);
+            throw std::runtime_error("CUDA error.");
+        }
     }
     else
     {
@@ -762,7 +770,7 @@ void DataStructures::CUDAImage::CopyToRawHostPointerAsync(void *dst, size_t widt
     }
 }
 
-void DataStructures::CUDAImage::MoveToCUDAImage(DataStructures::CUDAImage &dst)
+void CUDAImage::MoveToCUDAImage(CUDAImage& dst)
 {
     if (gpuData_ == dst.gpuData_)
     {
@@ -774,14 +782,14 @@ void DataStructures::CUDAImage::MoveToCUDAImage(DataStructures::CUDAImage &dst)
         dst.Release();
     }
 
-    std::swap(dst.width_, width_);
-    std::swap(dst.height_, height_);
-    std::swap(dst.pitch_, pitch_);
-    std::swap(dst.channels_, channels_);
-    std::swap(dst.elementType_, elementType_);
-    std::swap(dst.gpuData_, gpuData_);
-    std::swap(dst.allocatedBytes_, allocatedBytes_);
-    std::swap(dst.pitchedAllocation_, pitchedAllocation_);
+    dst.width_ = width_;
+    dst.height_ = height_;
+    dst.pitch_ = pitch_;
+    dst.channels_ = channels_;
+    dst.elementType_ = elementType_;
+    dst.gpuData_ = gpuData_;
+    dst.allocatedBytes_ = allocatedBytes_;
+    dst.pitchedAllocation_ = pitchedAllocation_;
 
     width_ = 0;
     height_ = 0;
@@ -793,7 +801,7 @@ void DataStructures::CUDAImage::MoveToCUDAImage(DataStructures::CUDAImage &dst)
     pitchedAllocation_ = false;
 }
 
-void DataStructures::CUDAImage::MoveToCUDAImageAsync(DataStructures::CUDAImage &dst, void *cudaStream)
+void CUDAImage::MoveToCUDAImageAsync(CUDAImage& dst, void* cudaStream)
 {
     if (gpuData_ == dst.gpuData_)
     {
@@ -805,14 +813,14 @@ void DataStructures::CUDAImage::MoveToCUDAImageAsync(DataStructures::CUDAImage &
         dst.ReleaseAsync(cudaStream);
     }
 
-    std::swap(dst.width_, width_);
-    std::swap(dst.height_, height_);
-    std::swap(dst.pitch_, pitch_);
-    std::swap(dst.channels_, channels_);
-    std::swap(dst.elementType_, elementType_);
-    std::swap(dst.gpuData_, gpuData_);
-    std::swap(dst.allocatedBytes_, allocatedBytes_);
-    std::swap(dst.pitchedAllocation_, pitchedAllocation_);
+    dst.width_ = width_;
+    dst.height_ = height_;
+    dst.pitch_ = pitch_;
+    dst.channels_ = channels_;
+    dst.elementType_ = elementType_;
+    dst.gpuData_ = gpuData_;
+    dst.allocatedBytes_ = allocatedBytes_;
+    dst.pitchedAllocation_ = pitchedAllocation_;
 
     width_ = 0;
     height_ = 0;
@@ -824,7 +832,7 @@ void DataStructures::CUDAImage::MoveToCUDAImageAsync(DataStructures::CUDAImage &
     pitchedAllocation_ = false;
 }
 
-void DataStructures::CUDAImage::CopyToCUDAImage(DataStructures::CUDAImage &dst) const
+void CUDAImage::CopyToCUDAImage(CUDAImage& dst) const
 {
     if (gpuData_ == dst.gpuData_)
     {
@@ -857,7 +865,7 @@ void DataStructures::CUDAImage::CopyToCUDAImage(DataStructures::CUDAImage &dst) 
     dst.channels_ = channels_;
 }
 
-void DataStructures::CUDAImage::CopyToCUDAImageAsync(DataStructures::CUDAImage &dst, void* cudaStream) const
+void CUDAImage::CopyToCUDAImageAsync(DataStructures::CUDAImage& dst, void* cudaStream) const
 {
     if (gpuData_ == dst.gpuData_)
     {
@@ -890,7 +898,7 @@ void DataStructures::CUDAImage::CopyToCUDAImageAsync(DataStructures::CUDAImage &
     dst.channels_ = channels_;
 }
 
-void DataStructures::CUDAImage::MoveFromCUDAImage(DataStructures::CUDAImage &src)
+void CUDAImage::MoveFromCUDAImage(DataStructures::CUDAImage& src)
 {
     if (gpuData_ == src.gpuData_)
     {
@@ -902,14 +910,14 @@ void DataStructures::CUDAImage::MoveFromCUDAImage(DataStructures::CUDAImage &src
         Release();
     }
 
-    std::swap(width_, src.width_);
-    std::swap(height_, src.height_);
-    std::swap(pitch_, src.pitch_);
-    std::swap(channels_, src.channels_);
-    std::swap(elementType_, src.elementType_);
-    std::swap(gpuData_, src.gpuData_);
-    std::swap(allocatedBytes_, src.allocatedBytes_);
-    std::swap(pitchedAllocation_, src.pitchedAllocation_);
+    width_ = src.width_;
+    height_ = src.height_;
+    pitch_ = src.pitch_;
+    channels_ = src.channels_;
+    elementType_ = src.elementType_;
+    gpuData_ = src.gpuData_;
+    allocatedBytes_ = src.allocatedBytes_;
+    pitchedAllocation_ = src.pitchedAllocation_;
 
     src.width_ = 0;
     src.height_ = 0;
@@ -921,7 +929,7 @@ void DataStructures::CUDAImage::MoveFromCUDAImage(DataStructures::CUDAImage &src
     src.pitchedAllocation_ = false;
 }
 
-void DataStructures::CUDAImage::MoveFromCUDAImageAsync(DataStructures::CUDAImage &src, void *cudaStream)
+void CUDAImage::MoveFromCUDAImageAsync(DataStructures::CUDAImage& src, void* cudaStream)
 {
     if (gpuData_ == src.gpuData_)
     {
@@ -933,14 +941,14 @@ void DataStructures::CUDAImage::MoveFromCUDAImageAsync(DataStructures::CUDAImage
         ReleaseAsync(cudaStream);
     }
 
-    std::swap(width_, src.width_);
-    std::swap(height_, src.height_);
-    std::swap(pitch_, src.pitch_);
-    std::swap(channels_, src.channels_);
-    std::swap(elementType_, src.elementType_);
-    std::swap(gpuData_, src.gpuData_);
-    std::swap(allocatedBytes_, src.allocatedBytes_);
-    std::swap(pitchedAllocation_, src.pitchedAllocation_);
+    width_ = src.width_;
+    height_ = src.height_;
+    pitch_ = src.pitch_;
+    channels_ = src.channels_;
+    elementType_ = src.elementType_;
+    gpuData_ = src.gpuData_;
+    allocatedBytes_ = src.allocatedBytes_;
+    pitchedAllocation_ = src.pitchedAllocation_;
 
     src.width_ = 0;
     src.height_ = 0;
@@ -954,7 +962,7 @@ void DataStructures::CUDAImage::MoveFromCUDAImageAsync(DataStructures::CUDAImage
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void DataStructures::CUDAImage::CopyFromCUDAImage(const DataStructures::CUDAImage& src)
+void CUDAImage::CopyFromCUDAImage(const DataStructures::CUDAImage& src)
 {
     if(gpuData_ == src.gpuData_)
     {
@@ -982,7 +990,7 @@ void DataStructures::CUDAImage::CopyFromCUDAImage(const DataStructures::CUDAImag
     }
 }
 
-void DataStructures::CUDAImage::CopyFromCUDAImageAsync(const DataStructures::CUDAImage& src, void* cudaStream)
+void CUDAImage::CopyFromCUDAImageAsync(const DataStructures::CUDAImage& src, void* cudaStream)
 {
     if(gpuData_ == src.gpuData_)
     {
@@ -1011,47 +1019,47 @@ void DataStructures::CUDAImage::CopyFromCUDAImageAsync(const DataStructures::CUD
     }
 }
 
-void DataStructures::CUDAImage::CopyFromRawDevicePointer(void *src, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, bool pitchedAllocation)
+void CUDAImage::CopyFromRawDevicePointer(void* src, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, bool pitchedAllocation)
 {
 
 }
 
-void DataStructures::CUDAImage::CopyFromRawDevicePointerAsync(void *src, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, bool pitchedAllocation, void *cudaStream)
+void CUDAImage::CopyFromRawDevicePointerAsync(void* src, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, bool pitchedAllocation, void* cudaStream)
 {
 
 }
 
-void DataStructures::CUDAImage::CopyToRawDevicePointer(void *dst, size_t width, size_t height, size_t channels, ELEMENT_TYPE type)
+void CUDAImage::CopyToRawDevicePointer(void* dst, size_t width, size_t height, size_t channels, ELEMENT_TYPE type)
 {
 
 }
 
-void DataStructures::CUDAImage::CopyToRawDevicePointerAsync(void *dst, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, void *cudaStream)
+void CUDAImage::CopyToRawDevicePointerAsync(void* dst, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, void* cudaStream)
 {
 
 }
 
-void CUDAImage::MoveToGpuMat(cv::cuda::GpuMat &dst)
+void CUDAImage::MoveToGpuMat(cv::cuda::GpuMat& dst)
 {
 
 }
 
-void CUDAImage::MoveToGpuMatAsync(cv::cuda::GpuMat &dst, void *cudaStream)
+void CUDAImage::MoveToGpuMatAsync(cv::cuda::GpuMat& dst, void* cudaStream)
 {
 
 }
 
-void CUDAImage::CopyToGpuMat(cv::cuda::GpuMat &dst)
+void CUDAImage::CopyToGpuMat(cv::cuda::GpuMat& dst)
 {
 
 }
 
-void CUDAImage::CopyToGpuMatAsync(cv::cuda::GpuMat &dst, void *cudaStream)
+void CUDAImage::CopyToGpuMatAsync(cv::cuda::GpuMat& dst, void* cudaStream)
 {
 
 }
 
-void CUDAImage::MoveToCvMat(cv::Mat &dst)
+void CUDAImage::MoveToCvMat(cv::Mat& dst)
 {
     auto cvType = ConvertCUDAImageElementTypeAndChannelsToCvType(elementType_, channels_);
     dst = cv::Mat(height_, width_, cvType);
@@ -1066,7 +1074,7 @@ void CUDAImage::MoveToCvMat(cv::Mat &dst)
     Release();
 }
 
-void CUDAImage::MoveToCvMatAsync(cv::Mat &dst, void *cudaStream)
+void CUDAImage::MoveToCvMatAsync(cv::Mat& dst, void* cudaStream)
 {
     auto cvType = ConvertCUDAImageElementTypeAndChannelsToCvType(elementType_, channels_);
     dst = cv::Mat(height_, width_, cvType);
@@ -1081,7 +1089,7 @@ void CUDAImage::MoveToCvMatAsync(cv::Mat &dst, void *cudaStream)
     ReleaseAsync(cudaStream);
 }
 
-void CUDAImage::CopyToCvMat(cv::Mat &dst) const
+void CUDAImage::CopyToCvMat(cv::Mat& dst) const
 {
     auto cvType = ConvertCUDAImageElementTypeAndChannelsToCvType(elementType_, channels_);
     dst = cv::Mat(height_, width_, cvType);
@@ -1095,7 +1103,7 @@ void CUDAImage::CopyToCvMat(cv::Mat &dst) const
     }
 }
 
-void CUDAImage::CopyToCvMatAsync(cv::Mat &dst, void *cudaStream) const
+void CUDAImage::CopyToCvMatAsync(cv::Mat& dst, void* cudaStream) const
 {
     auto cvType = ConvertCUDAImageElementTypeAndChannelsToCvType(elementType_, channels_);
     dst = cv::Mat(height_, width_, cvType);

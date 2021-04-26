@@ -48,7 +48,7 @@ public:
      * @param processingData
      * @return
      */
-    virtual bool Process(std::shared_ptr<DataStructures::ProcessingData>& processingData) = 0;
+    virtual bool Process(const std::shared_ptr<DataStructures::ProcessingData>& processingData) = 0;
 
     /**
      * @brief

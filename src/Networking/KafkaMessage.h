@@ -93,28 +93,28 @@ public:
      * @param other
      * @return
      */
-    bool operator==(const KafkaMessage& other);
+    bool operator==(const KafkaMessage& other) const;
 
     /**
      * @brief
      *
      * @return
      */
-    bool Empty();
+    bool Empty() const;
 
     /**
      * @brief
      *
      * @return
      */
-    const std::vector<unsigned char>& GetData();
+    const std::vector<unsigned char>& GetData() const;
 
     /**
      * @brief
      *
      * @return
      */
-    const std::shared_ptr<Config::JsonConfig>& GetKey();
+    const std::shared_ptr<Config::JsonConfig>& GetKey() const;
 
     /**
      * @brief

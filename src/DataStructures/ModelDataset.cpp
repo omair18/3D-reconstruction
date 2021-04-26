@@ -39,22 +39,22 @@ void DataStructures::ModelDataset::SetUUID(const std::string &UUID)
     UUID_ = UUID;
 }
 
-const std::string &DataStructures::ModelDataset::GetUUID() noexcept
+const std::string &DataStructures::ModelDataset::GetUUID() const noexcept
 {
     return UUID_;
 }
 
-std::string DataStructures::ModelDataset::GetProcessingStatusString()
+std::string DataStructures::ModelDataset::GetProcessingStatusString() const
 {
     return statusNames.at(status_);
 }
 
-DataStructures::ModelDataset::ProcessingStatus DataStructures::ModelDataset::GetProcessingStatus()
+DataStructures::ModelDataset::ProcessingStatus DataStructures::ModelDataset::GetProcessingStatus() const
 {
     return status_;
 }
 
-const std::vector<CUDAImageDescriptor> &ModelDataset::GetImagesDescriptors() noexcept
+const std::vector<CUDAImageDescriptor> &ModelDataset::GetImagesDescriptors() const noexcept
 {
     return imagesDescriptors_;
 }
@@ -79,7 +79,7 @@ void ModelDataset::SetProcessingStatus(ModelDataset::ProcessingStatus status) no
     status_ = status;
 }
 
-void ModelDataset::SetImagesDescriptors(const std::vector<CUDAImageDescriptor> &imagesDescriptors)
+void ModelDataset::SetImagesDescriptors(const std::vector<CUDAImageDescriptor>& imagesDescriptors)
 {
     imagesDescriptors_ = imagesDescriptors;
 }

@@ -19,7 +19,6 @@ target_link_libraries(utils
 
     PRIVATE
     Boost::stacktrace_addr2line
-    log
-    )
+    log)
 
 target_include_directories(utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

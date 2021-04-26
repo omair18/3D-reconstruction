@@ -20,6 +20,7 @@ int main()
     status = cudaMemcpy2D(gpuData, pitch, image.data, width * channels * elementSize, width * channels * elementSize, height, cudaMemcpyKind::cudaMemcpyHostToDevice);
 
 
+
     status = cudaFree(gpuData);
     return 0;
 }

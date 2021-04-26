@@ -9,6 +9,7 @@
 #define CUDA_IMAGE_DESCRIPTOR_H
 
 #include <vector>
+#include <memory>
 
 #include "CUDAImage.h"
 
@@ -39,7 +40,7 @@ public:
      *
      * @param other
      */
-    CUDAImageDescriptor(const CUDAImageDescriptor& other) = default;
+    CUDAImageDescriptor(const CUDAImageDescriptor& other);
 
     /**
      * @brief
@@ -67,7 +68,7 @@ public:
      * @param other
      * @return
      */
-    CUDAImageDescriptor& operator=(const CUDAImageDescriptor& other) = default;
+    CUDAImageDescriptor& operator=(const CUDAImageDescriptor& other);
 
     /**
      * @brief
@@ -82,7 +83,7 @@ public:
      *
      * @return
      */
-    const CUDAImage& GetCUDAImage();
+    [[nodiscard]] const std::unique_ptr<CUDAImage>& GetCUDAImage() const;
 
     /**
      * @brief
@@ -97,6 +98,20 @@ public:
      * @param image
      */
     void SetCUDAImage(CUDAImage&& image) noexcept;
+
+    /**
+     * @brief
+     *
+     * @param image
+     */
+    void SetCUDAImage(const std::unique_ptr<CUDAImage>& image);
+
+    /**
+     * @brief
+     *
+     * @param image
+     */
+    void SetCUDAImage(std::unique_ptr<CUDAImage>&& image) noexcept;
 
     /**
      * @brief
@@ -117,7 +132,7 @@ public:
      *
      * @return
      */
-    int GetCameraId() const noexcept;
+    [[nodiscard]] int GetCameraId() const noexcept;
 
     /**
      * @brief
@@ -173,7 +188,7 @@ public:
      *
      * @return
      */
-    const std::vector<unsigned char>& GetRawImageData() noexcept;
+    [[nodiscard]] const std::vector<unsigned char>& GetRawImageData() const noexcept;
 
     /**
      * @brief
@@ -197,7 +212,7 @@ public:
 private:
 
     ///
-    CUDAImage image_;
+    std::unique_ptr<CUDAImage> image_;
 
     ///
     int frameId_;

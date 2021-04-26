@@ -1,49 +1,79 @@
 #include "ProcessingData.h"
+#include "KafkaMessage.h"
+#include "JsonConfig.h"
 
 namespace DataStructures
 {
 
-ProcessingData::ProcessingData()
+ProcessingData::ProcessingData() :
+kafkaMessage_(nullptr),
+modelDataset_(nullptr),
+reconstructionParams_(nullptr)
 {
 
 }
 
 ProcessingData::ProcessingData(const DataStructures::ProcessingData& other)
 {
-
+    kafkaMessage_ = std::make_unique<Networking::KafkaMessage>(*other.kafkaMessage_);
+    modelDataset_ = std::make_unique<ModelDataset>(*other.modelDataset_);
+    reconstructionParams_ = std::make_shared<Config::JsonConfig>(*other.reconstructionParams_);
 }
 
 ProcessingData::ProcessingData(ProcessingData&& other) noexcept
 {
-
+    kafkaMessage_ = std::move(other.kafkaMessage_);
+    modelDataset_ = std::move(other.modelDataset_);
+    reconstructionParams_ = std::move(other.reconstructionParams_);
 }
 
 ProcessingData &ProcessingData::operator=(const ProcessingData& other)
 {
+    if (this == &other)
+    {
+        return *this;
+    }
+
+    kafkaMessage_ = std::make_unique<Networking::KafkaMessage>(*other.kafkaMessage_);
+    modelDataset_ = std::make_unique<ModelDataset>(*other.modelDataset_);
+    reconstructionParams_ = std::make_shared<Config::JsonConfig>(*other.reconstructionParams_);
     return *this;
 }
 
 ProcessingData &ProcessingData::operator=(ProcessingData&& other) noexcept
 {
+    kafkaMessage_ = std::move(other.kafkaMessage_);
+    modelDataset_ = std::move(other.modelDataset_);
+    reconstructionParams_ = std::move(other.reconstructionParams_);
     return *this;
 }
 
-const ModelDataset &ProcessingData::GetModelDataset()
+const std::shared_ptr<ModelDataset>& ProcessingData::GetModelDataset() const noexcept
 {
     return modelDataset_;
 }
 
 void ProcessingData::SetModelDataset(const ModelDataset &dataset)
 {
-    modelDataset_ = dataset;
+    modelDataset_ = std::make_shared<ModelDataset>(dataset);
 }
 
 void ProcessingData::SetModelDataset(ModelDataset &&dataset) noexcept
 {
-    modelDataset_ = std::move(dataset);
+    *modelDataset_ = std::move(dataset);
 }
 
-const std::shared_ptr<Networking::KafkaMessage> &ProcessingData::GetKafkaMessage()
+void ProcessingData::SetModelDataset(const std::shared_ptr<ModelDataset> &dataset)
+{
+
+}
+
+void ProcessingData::SetModelDataset(std::shared_ptr<ModelDataset> &&dataset) noexcept
+{
+
+}
+
+const std::shared_ptr<Networking::KafkaMessage> &ProcessingData::GetKafkaMessage() const
 {
     return kafkaMessage_;
 }
@@ -58,7 +88,7 @@ void ProcessingData::SetKafkaMessage(std::shared_ptr<Networking::KafkaMessage> &
     kafkaMessage_ = std::move(message);
 }
 
-const std::shared_ptr<Config::JsonConfig> &ProcessingData::GetReconstructionParams()
+const std::shared_ptr<Config::JsonConfig> &ProcessingData::GetReconstructionParams() const
 {
     return reconstructionParams_;
 }

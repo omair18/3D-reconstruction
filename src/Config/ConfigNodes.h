@@ -147,6 +147,10 @@ namespace Config
 
                 // Photogrammetry
                 const inline static std::string DatasetCollectingAlgorithm = "datasetCollectingAlgorithm";
+
+                const inline static std::string MeshReconstructionAlgorithm = "meshReconstructionAlgorithm";
+                const inline static std::string MeshRefinementAlgorithm = "meshRefinementAlgorithm";
+                const inline static std::string MeshTexturingAlgorithm = "meshTexturingAlgorithm";
             }
 
             namespace KafkaConsumptionAlgorithmConfig
@@ -185,6 +189,11 @@ namespace Config
             namespace CUDAResizeAlgorithmConfig
             {
 
+            }
+
+            namespace DatasetCollectingAlgorithm
+            {
+                const inline static std::string ExpireTimeout = "expireTimeout";
             }
 
 

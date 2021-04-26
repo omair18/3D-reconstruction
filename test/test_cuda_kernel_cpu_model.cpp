@@ -1,6 +1,8 @@
 #include <vector>
 #include <iostream>
+#include <cmath>
 
+/*
 void MergeChannels8UKernel(int id, int width, int height, int outputPitch, int channels, std::vector<std::vector<unsigned char>>& gpuArrayOfChannels, std::vector<size_t>& gpuArrayOfChannelPitches, std::vector<unsigned char>& output)
 {
     const unsigned int threadId = id;
@@ -22,9 +24,38 @@ void MergeChannels8UKernel(int id, int width, int height, int outputPitch, int c
         }
     }
 }
+*/
+
+/*
+void elementwise_divide_float(unsigned int threadId, const float divider, float* gpuData, size_t width, size_t pitch, size_t channels, const unsigned int taskSize)
+{
+    const unsigned int elementRow = threadId / (width * channels);
+    const unsigned int elementColumn = threadId - (elementRow * width * channels);
+    if(threadId < taskSize)
+    {
+        gpuData[elementRow * pitch / sizeof(float)+ elementColumn] /= divider;
+    }
+}
+*/
+
+void compute_gradients_kernel(unsigned int threadId, float* dataLx, float* dataLy, float* resultData, size_t width, size_t pitch, size_t channels, unsigned int taskSize)
+{
+    const unsigned int elementRow = threadId / (width * channels);
+    const unsigned int elementColumn = threadId - (elementRow * width * channels);
+
+    if(threadId < taskSize)
+    {
+        float dx = dataLx[elementRow * pitch + elementColumn];
+        float dy = dataLy[elementRow * pitch + elementColumn];
+        float grad = sqrtf(dx * dx + dy * dy);
+        resultData[elementRow * pitch + elementColumn] = grad;
+    }
+}
 
 int main()
 {
+    /*
+    /// channle merging
     std::vector<unsigned char> c1(1280*720, 1);
     std::vector<unsigned char> c2(1280*720, 2);
     std::vector<unsigned char> c3(1280*720, 3);
@@ -54,6 +85,33 @@ int main()
     {
         if(output[i] == 0)
             std::cout << i << std::endl;
+    }
+    */
+
+    /*
+    /// normalization
+    std::vector<float> test(3024*4032*3, 128);
+
+    for(unsigned int i = 0; i < 3024*4032*3; ++i)
+    {
+        elementwise_divide_float(i, 256., test.data(), 3024, 3024*3*sizeof(float), 3, 3024*4032*3);
+    }
+
+    for(unsigned int i = 0; i < 3024*4032*3; ++i)
+    {
+        if (test[i] != 128/256.)
+        {
+            std::cout << i << std::endl;
+        }
+    }
+*/
+    std::vector<float> Lx(3024*4032, 3);
+    std::vector<float> Ly(3024*4032, 4);
+    std::vector<float> result(3024*4032, 0);
+
+    for(unsigned int i = 0; i < 3024*4032; ++i)
+    {
+        compute_gradients_kernel(i, Lx.data(), Ly.data(), result.data(), )
     }
 
     return 0;
