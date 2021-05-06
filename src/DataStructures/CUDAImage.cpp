@@ -1117,4 +1117,14 @@ void CUDAImage::CopyToCvMatAsync(cv::Mat& dst, void* cudaStream) const
     }
 }
 
+bool CUDAImage::Allocated() const
+{
+    return gpuData_ != nullptr;
+}
+
+size_t CUDAImage::GetElementSize()  const
+{
+    return GetTypeSize(elementType_);
+}
+
 }

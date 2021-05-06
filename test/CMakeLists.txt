@@ -2,7 +2,7 @@ include_directories(${LIBRARIES_PATH}/aws/include)
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${CUDA_INCLUDE_DIRS})
 
-add_executable(http_server_test http_server_test.cpp test_cuda_image_descriptor.cpp test_cuda_kernel_cpu_model.cpp test_cuda_akaze.cpp test_npp_grayscale.cpp)
+add_executable(http_server_test http_server_test.cpp test_cuda_image_descriptor.cpp test_cuda_kernel_cpu_model.cpp test_cuda_akaze.cpp test_npp_grayscale.cpp test_npp_multiplication.cpp)
 target_link_libraries(http_server_test Boost::system pthread ssl crypto)
 
 add_executable(test test.cpp)
@@ -58,6 +58,8 @@ target_link_libraries(test_image_decoders log decoding datastructures ${CUDA_LIB
         opencv_highgui)
 
 add_executable(test_cuda_kernel_cpu_model test_cuda_kernel_cpu_model.cpp)
+target_link_libraries(test_cuda_kernel_cpu_model
+        opencv_core)
 
 add_executable(test_npp_grayscale test_npp_grayscale.cpp)
 target_link_libraries(test_npp_grayscale
@@ -88,3 +90,15 @@ target_link_libraries(test_akaze
         opencv_core
         opencv_imgcodecs
         opencv_highgui)
+
+add_executable(test_npp_multiplication test_npp_multiplication.cpp cuda_test_kernels.h cuda_test_kernels.cu)
+target_link_libraries(test_npp_multiplication
+        log
+        datastructures
+        ${CUDA_nppc_LIBRARY}
+        ${CUDA_nppicc_LIBRARY}
+        ${CUDA_nppist_LIBRARY}
+        ${CUDA_nppidei_LIBRARY}
+        ${CUDA_nppial_LIBRARY}
+        ${CUDA_CUDART_LIBRARY}
+        opencv_core)

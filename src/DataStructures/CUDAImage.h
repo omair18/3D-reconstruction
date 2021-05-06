@@ -485,6 +485,20 @@ struct CUDAImage final
      *
      * @return
      */
+    [[nodiscard]] bool Allocated() const;
+
+    /**
+     * @brief
+     *
+     * @return
+     */
+    [[nodiscard]] size_t GetElementSize() const;
+
+    /**
+     * @brief
+     *
+     * @return
+     */
     [[nodiscard]] bool Empty() const;
 
     ///

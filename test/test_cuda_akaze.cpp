@@ -13,7 +13,14 @@
 #include "CUDAImage.h"
 #include "Logger.h"
 
-/*
+void show_cuda_image(DataStructures::CUDAImage& image, const std::string& windowName)
+{
+    cv::Mat hostImage;
+    image.CopyToCvMat(hostImage);
+    cv::imshow(windowName, hostImage);
+    cv::waitKey(0);
+}
+
 //
 enum DESCRIPTOR_TYPE
 {
@@ -33,14 +40,24 @@ enum DIFFUSIVITY_TYPE
     CHARBONNIER = 3
 };
 
+struct Params
+{
+    int iNbOctave = 4; ///< Octave to process
+    int iNbSlicePerOctave = 4; ///< Levels per octave
+    float fSigma0 = 1.6f; ///< Initial sigma offset (used to suppress low level noise)
+    float fThreshold = 0.0008f;  ///< Hessian determinant threshold
+    float fDesc_factor = 1.f;   ///< Magnifier used to describe an interest point
+};
+
 struct AKAZEOptions
 {
+    int octaves = 4;                                          ///< Octave to process
     int omin;                                                 ///< Initial octave level (-1 means that the size of the input image is duplicated)
     int omax = 4;                                             ///< Maximum octave evolution of the image 2^sigma (coarsest scale sigma units)
     int nsublevels = 4;                                       ///< Default number of sublevels per scale level
     int img_width;                                            ///< Width of the input image
     int img_height;                                           ///< Height of the input image
-    float soffset = 1.6f;                                     ///< Base scale offset (sigma units)
+    float sigma0 = 1.6f;                                     ///< Base scale offset (sigma units) (used to suppress low level noise)
     float derivative_factor = 1.5f;                           ///< Factor for the multiscale derivatives
     float sderivatives = 1.0;                                 ///< Smoothing factor for the derivatives
     DIFFUSIVITY_TYPE diffusivity = DIFFUSIVITY_TYPE::PM_G2;   ///< Diffusivity type
@@ -61,6 +78,7 @@ struct AKAZEOptions
     int maxkeypoints = 16*8192;                               ///< Maximum number of keypoints allocated
 };
 
+/*
 /// AKAZE Timing structure
 struct AKAZETiming
 {
@@ -72,7 +90,7 @@ struct AKAZETiming
     double subpixel = 0.0;        ///< Subpixel refinement computation time in ms
     double descriptor = 0.0;      ///< Descriptors computation time in ms
 };
-
+*/
 struct TEvolution
 {
     DataStructures::CUDAImage Lx, Ly;                   ///< First order spatial derivatives
@@ -88,7 +106,7 @@ struct TEvolution
     size_t sublevel = 0;                                ///< Image sublevel in each octave
     size_t sigma_size = 0;                              ///< Integer sigma. For computing the feature detector responses
 };
-*/
+
 /*
 bool fed_is_prime_internal(const int number)
 {
@@ -204,15 +222,6 @@ int fed_tau_by_process_time(const float T, const int M, const float tau_max, con
     return fed_tau_by_cycle_time(T / (float)M, tau_max, reordering, tau);
 }
 */
-
-struct Params
-{
-    int iNbOctave = 4; ///< Octave to process
-    int iNbSlicePerOctave = 4; ///< Levels per octave
-    float fSigma0 = 1.6f; ///< Initial sigma offset (used to suppress low level noise)
-    float fThreshold = 0.0008f;  ///< Hessian determinant threshold
-    float fDesc_factor = 1.f;   ///< Magnifier used to describe an interest point
-};
 
 void checkCudaErrors(cudaError_t&& error)
 {
@@ -337,185 +346,370 @@ void ComputeGaussianKernel(std::vector<float>& kernel, float sigma, size_t kerne
     }
 */
 
+// Compute slice scale
+static inline float ComputeSigma( const float sigma0 , const int p , const int q , const int Q )
+{
+    if (p == 0 && q == 0 )
+        return sigma0;
+    else
+        return sigma0 * powf( 2.f , p + static_cast<float>( q ) / static_cast<float>( Q ) );
+}
+
+void ImageHalfSample(const DataStructures::CUDAImage& in, DataStructures::CUDAImage& out)
+{
+    const size_t outWidth = in.width_ / 2;
+    const size_t outHeight = in.height_ / 2;
+
+    if (!out.Allocated())
+    {
+        out.Allocate(outWidth, outHeight, in.channels_, in.elementType_, in.pitchedAllocation_);
+    }
+    else
+    {
+        if (out.allocatedBytes_ < (outWidth * outHeight * in.channels_ * in.GetElementSize()))
+        {
+            out.Allocate(outWidth, outHeight, in.channels_, in.elementType_, in.pitchedAllocation_);
+        }
+    }
+
+    linear_sampling_api((float*)in.gpuData_, (float*)out.gpuData_, in.width_, in.height_, in.pitch_, outWidth, outHeight, out.pitch_);
+
+}
+
+void PeronaMalikG1Diffusion(DataStructures::CUDAImage& Lx, DataStructures::CUDAImage& Ly, float contrastFactor, DataStructures::CUDAImage& out)
+{
+
+}
+
+void PeronaMalikG2Diffusion(DataStructures::CUDAImage& Lx, DataStructures::CUDAImage& Ly, float contrastFactor, DataStructures::CUDAImage& out)
+{
+
+}
+
+void WeickertDiffusion(DataStructures::CUDAImage& Lx, DataStructures::CUDAImage& Ly, float contrastFactor, DataStructures::CUDAImage& out)
+{
+
+}
+
+void CharbonnierDiffusion(DataStructures::CUDAImage& Lx, DataStructures::CUDAImage& Ly, float contrastFactor, DataStructures::CUDAImage& out)
+{
+
+}
+
+void LoadImage(const std::string& path, DataStructures::CUDAImage& out)
+{
+    cv::Mat image = cv::imread(path);
+    out.CopyFromCvMat(image);
+}
+
+void GrayScaleImage(const DataStructures::CUDAImage& input, DataStructures::CUDAImage& output)
+{
+    const std::vector<float> grayscaleCoefficients = {0.114f, 0.587f, 0.299f};
+
+    output.Allocate(input.width_, input.height_, 1, DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_8U, true);
+
+    NppiSize grayScaleRoi = { .width = (int)input.width_, .height = (int)input.height_ };
+
+    checkNppErrors(nppiColorToGray_8u_C3C1R(input.gpuData_, input.pitch_, output.gpuData_, output.pitch_, grayScaleRoi, grayscaleCoefficients.data()));
+}
+
+void ConvertToFloat(const DataStructures::CUDAImage& input, DataStructures::CUDAImage& output)
+{
+    NppiSize floatConvertionRoi = { .width = (int)input.width_, .height = (int)input.height_ };
+    output.Allocate(input.width_, input.height_, input.channels_, DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_32F, true);
+
+    checkNppErrors(nppiConvert_8u32f_C1R(input.gpuData_, input.pitch_, (float*)output.gpuData_, output.pitch_, floatConvertionRoi));
+}
+
+void NormalizeImage(const DataStructures::CUDAImage& input, DataStructures::CUDAImage& output)
+{
+    NppiSize normalizationRoi = { .width = (int)input.width_, .height = (int)input.height_ };
+    output.Allocate(input.width_, input.height_, input.channels_, input.elementType_, true);
+
+    checkNppErrors(nppiDivC_32f_C1R((float *)input.gpuData_, input.pitch_, 255.f, (float *)output.gpuData_, output.pitch_, normalizationRoi));
+}
+
+void NormalizeImage(DataStructures::CUDAImage& input)
+{
+    NppiSize normalizationRoi = { .width = (int)input.width_, .height = (int)input.height_ };
+    checkNppErrors(nppiDivC_32f_C1R((float *)input.gpuData_, input.pitch_, 255.f, (float *)input.gpuData_, input.pitch_, normalizationRoi));
+}
+
+DataStructures::CUDAImage verticalDeviceKernel;
+DataStructures::CUDAImage horizontalDeviceKernel;
+
+void ImageSeparableConvolution(const DataStructures::CUDAImage& input, DataStructures::CUDAImage& output, DataStructures::CUDAImage& temp, const std::vector<float>& hostHorizontalKernel, const std::vector<float>& hostVerticalKernel)
+{
+    NppiPoint srcOffset {.x = 0, .y = 0};
+    NppiSize convolutionRoi = { .width = (int)input.width_, .height = (int)input.height_ };
+
+    verticalDeviceKernel.CopyFromRawHostPointer(
+            (void*)hostVerticalKernel.data(),
+            hostVerticalKernel.size(),
+            1,
+            1,
+            DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_32F,
+            false);
+
+    horizontalDeviceKernel.CopyFromRawHostPointer(
+            (void*)hostHorizontalKernel.data(),
+            hostHorizontalKernel.size(),
+            1,
+            1,
+            DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_32F,
+            false);
+
+    checkNppErrors(nppiFilterRowBorder_32f_C1R((float*)input.gpuData_, input.pitch_, convolutionRoi, srcOffset, (float*)temp.gpuData_, temp.pitch_, convolutionRoi, (float *)verticalDeviceKernel.gpuData_, verticalDeviceKernel.width_, 0, NppiBorderType::NPP_BORDER_REPLICATE));
+
+    checkNppErrors(nppiFilterColumnBorder_32f_C1R((float*)temp.gpuData_, temp.pitch_, convolutionRoi, srcOffset, (float*)output.gpuData_, output.pitch_, convolutionRoi, (float*)horizontalDeviceKernel.gpuData_, horizontalDeviceKernel.width_, 0, NppiBorderType::NPP_BORDER_REPLICATE));
+
+    verticalDeviceKernel.Release();
+    horizontalDeviceKernel.Release();
+}
+
+// map <(sigma, size), kernel>
+std::map<std::pair<float, size_t>, std::vector<float>> gaussKernelsHorizontalCache;
+std::map<std::pair<float, size_t>, std::vector<float>> gaussKernelsVerticalCache;
+
+void ImageGaussianFilter(const DataStructures::CUDAImage& sourceImage, const float sigma, DataStructures::CUDAImage& output, DataStructures::CUDAImage& temp, const size_t kernelSizeX, const size_t kernelSizeY)
+{
+    auto gaussHorizontalKernelKey = std::make_pair(sigma, kernelSizeX);
+    auto gaussVerticalKernelKey = std::make_pair(sigma, kernelSizeY);
+
+    std::vector<float> horizontalGaussKernel;
+    std::vector<float> verticalGaussKernel;
+
+    if (gaussKernelsHorizontalCache.find(gaussHorizontalKernelKey) == gaussKernelsHorizontalCache.end())
+    {
+        ComputeGaussianKernel(horizontalGaussKernel, sigma, kernelSizeX);
+        gaussKernelsHorizontalCache.insert(std::make_pair(gaussHorizontalKernelKey, horizontalGaussKernel));
+    }
+    else
+    {
+        horizontalGaussKernel = gaussKernelsHorizontalCache[gaussHorizontalKernelKey];
+    }
+
+    if (gaussKernelsVerticalCache.find(gaussVerticalKernelKey) == gaussKernelsVerticalCache.end())
+    {
+        ComputeGaussianKernel(verticalGaussKernel, sigma, kernelSizeY);
+        gaussKernelsVerticalCache.insert(std::make_pair(gaussVerticalKernelKey, verticalGaussKernel));
+    }
+    else
+    {
+        verticalGaussKernel = gaussKernelsVerticalCache[gaussVerticalKernelKey];
+    }
+
+    ImageSeparableConvolution(sourceImage, output, temp, horizontalGaussKernel, verticalGaussKernel);
+}
+
+void ImageScharrXDerivative(const DataStructures::CUDAImage& input, DataStructures::CUDAImage& output, DataStructures::CUDAImage& temp, bool normalize)
+{
+    std::vector<float> scharrXHorizontalKernel = {-1.0f, 0.0f, 1.0f};
+    std::vector<float> scharrXVerticalKernel = {3.0f, 10.0f, 3.0f};
+
+    if (normalize)
+    {
+        for(auto& i : scharrXHorizontalKernel)
+        {
+            i /= 2;
+        }
+
+        for(auto& i : scharrXVerticalKernel)
+        {
+            i /= 16;
+        }
+    }
+
+    ImageSeparableConvolution(input, output, temp, scharrXHorizontalKernel, scharrXVerticalKernel);
+}
+
+void ImageScharrYDerivative(const DataStructures::CUDAImage& input, DataStructures::CUDAImage& output, DataStructures::CUDAImage& temp, bool normalize)
+{
+    std::vector<float> scharrYHorizontalKernel = {3.0f, 10.0f, 3.0f};
+    std::vector<float> scharrYVerticalKernel = {-1.0f, 0.0f, 1.0f};
+
+    if (normalize)
+    {
+        for(auto& i : scharrYHorizontalKernel)
+        {
+            i /= 16;
+        }
+
+        for(auto& i : scharrYVerticalKernel)
+        {
+            i /= 2;
+        }
+    }
+
+    ImageSeparableConvolution(input, output, temp, scharrYHorizontalKernel, scharrYVerticalKernel);
+}
+
+void ComputeAKAZESlice(const DataStructures::CUDAImage& src,
+                       DataStructures::CUDAImage& temp,
+                       const int p,
+                       const int q,
+                       AKAZEOptions& options,
+                       const float contrast_factor,
+                       DataStructures::CUDAImage& Li, // Diffusion image
+                       DataStructures::CUDAImage& Lx, // X derivatives
+                       DataStructures::CUDAImage& Ly, // Y derivatives
+                       DataStructures::CUDAImage& Lhess) // Det(Hessian)
+{
+    const float sigma_cur = ComputeSigma(options.sigma0 ,p ,q ,options.nsublevels );
+    const float ratioFactor = 1 << p; //pow(2,p);
+    const int sigma_scale = std::round(sigma_cur * options.derivative_factor / ratioFactor);
+
+    DataStructures::CUDAImage smoothed;
+    if (p == 0 && q == 0 )
+    {
+        // Compute new image
+
+        ImageGaussianFilter(src, options.sigma0, Li, temp, 0, 0);
+    }
+    else
+    {
+        // general case
+        DataStructures::CUDAImage in;
+        if (q == 0 )
+        {
+            ImageHalfSample(src, in );
+        }
+        else
+        {
+            in = src;
+        }
+
+        const float sigma_prev = ( q == 0 ) ? ComputeSigma(options.sigma0,p - 1, options.nsublevels - 1, options.nsublevels ) : ComputeSigma(options.sigma0, p, q - 1, options.nsublevels );
+
+        // Compute non linear timing between two consecutive slices
+        const float t_prev = 0.5f * ( sigma_prev * sigma_prev );
+        const float t_cur  = 0.5f * ( sigma_cur * sigma_cur );
+        const float total_cycle_time = t_cur - t_prev;
+
+        // Compute first derivatives (Scharr scale 1, non normalized) for diffusion coef
+        ImageGaussianFilter(in , 1.f , smoothed, temp, 0, 0 );
+
+        ImageScharrXDerivative(smoothed , Lx , false );
+        ImageScharrYDerivative(smoothed , Ly , false );
+
+        // Compute diffusion coefficient
+        DataStructures::CUDAImage& diff = smoothed; // diffusivity image (reuse existing memory)
+        ImagePeronaMalikG2DiffusionCoef( Lx , Ly , contrast_factor , diff );
+
+        // Compute FED cycles
+        std::vector<float> tau;
+        FEDCycleTimings( total_cycle_time , 0.25f , tau );
+        ImageFEDCycle( in , diff , tau );
+        Li = in; // evolution image
+    }
+
+    // Compute Hessian response
+    if (p == 0 && q == 0 )
+    {
+        smoothed = Li;
+    }
+    else
+    {
+        // Add a little smooth to image (for robustness of Scharr derivatives)
+        ImageGaussianFilter( Li , 1.f , smoothed, 0, 0 );
+    }
+
+    // Compute true first derivatives
+    ImageScaledScharrXDerivative( smoothed , Lx , sigma_scale );
+    ImageScaledScharrYDerivative( smoothed , Ly , sigma_scale );
+
+    // Second order spatial derivatives
+    Image<float> Lxx, Lyy, Lxy;
+    ImageScaledScharrXDerivative( Lx , Lxx , sigma_scale );
+    ImageScaledScharrYDerivative( Lx , Lxy , sigma_scale );
+    ImageScaledScharrYDerivative( Ly , Lyy , sigma_scale );
+
+    Lx *= static_cast<float>(sigma_scale);
+    Ly *= static_cast<float>(sigma_scale);
+
+    // Compute Determinant of the Hessian
+    Lhess.resize(Li.Width(), Li.Height());
+    const float sigma_size_quad = Square(sigma_scale) * Square(sigma_scale);
+    Lhess.array() = (Lxx.array()*Lyy.array()-Lxy.array().square())*sigma_size_quad;
+}
 
 int main()
 {
     LOGGER_INIT();
-    /// Prepare
-
-    cv::Mat image1 = cv::imread("/home/valera/Photo/30/IMG_20201011_131521.jpg");
-    //cv::imshow("test", image1);
-    cv::waitKey(0);
-
-    DataStructures::CUDAImage sourceImage;
-    sourceImage.CopyFromCvMat(image1);
-
-    checkCudaErrors(cudaDeviceSynchronize());
 
     cudaStream_t cudaStream;
     checkCudaErrors(cudaStreamCreateWithFlags(&cudaStream, cudaStreamNonBlocking));
 
+    /// Prepare
+
+    DataStructures::CUDAImage sourceImage;
+
+    LoadImage("/home/valera/Photo/30/IMG_20201011_131521.jpg", sourceImage);
 
     /// Now we have BGR image on GPU.
     /// Grayscaling
 
     DataStructures::CUDAImage grayImage;
-    grayImage.Allocate(sourceImage.width_, sourceImage.height_, 1, DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_8U, true);
-    std::vector<float> grayscaleCoefficients = {0.114f, 0.587f, 0.299f};
 
-    NppiSize grayScaleRoi = { .width = (int)sourceImage.width_, .height = (int)sourceImage.height_ };
-
-    checkNppErrors(nppiColorToGray_8u_C3C1R(sourceImage.gpuData_, sourceImage.pitch_, grayImage.gpuData_, grayImage.pitch_, grayScaleRoi, grayscaleCoefficients.data()));
+    GrayScaleImage(sourceImage, grayImage);
 
     /// Converting to float image
 
-    NppiSize floatConvertionRoi = grayScaleRoi;
     DataStructures::CUDAImage grayFloatImage;
-    grayFloatImage.Allocate(grayImage.width_, grayImage.height_, grayImage.channels_, DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_32F, true);
 
-    checkNppErrors(nppiConvert_8u32f_C1R(grayImage.gpuData_, grayImage.pitch_, (float *)grayFloatImage.gpuData_, grayFloatImage.pitch_, floatConvertionRoi));
+    ConvertToFloat(grayImage, grayFloatImage);
 
     /// Normalize float image
 
-    elementwise_divide_float_api(255., (float *)grayFloatImage.gpuData_, grayFloatImage.width_, grayFloatImage.height_, grayFloatImage.pitch_, grayFloatImage.channels_, cudaStream);
+    DataStructures::CUDAImage grayFloatNormalizedImage;
 
-    checkCudaErrors(cudaStreamSynchronize(cudaStream));
+    NormalizeImage(grayFloatImage, grayFloatNormalizedImage);
 
     /// Compute contrast factor
+
     Params params;
 
     float contrastFactor = 0;
-    const size_t nb_bin = 300;
 
-    DataStructures::CUDAImage smoothedGrayFloatImage;
+    DataStructures::CUDAImage smoothedGrayFloatNormalizedImage;
     DataStructures::CUDAImage tempImage;
 
-    tempImage.Allocate(grayFloatImage.width_, grayFloatImage.height_, grayFloatImage.channels_, grayFloatImage.elementType_, grayFloatImage.pitchedAllocation_);
-    smoothedGrayFloatImage.Allocate(grayFloatImage.width_, grayFloatImage.height_, grayFloatImage.channels_, grayFloatImage.elementType_, grayFloatImage.pitchedAllocation_);
+    tempImage.Allocate(grayFloatNormalizedImage.width_, grayFloatNormalizedImage.height_, grayFloatNormalizedImage.channels_, grayFloatNormalizedImage.elementType_, grayFloatNormalizedImage.pitchedAllocation_);
+    smoothedGrayFloatNormalizedImage.Allocate(grayFloatNormalizedImage.width_, grayFloatNormalizedImage.height_, grayFloatNormalizedImage.channels_, grayFloatNormalizedImage.elementType_, grayFloatNormalizedImage.pitchedAllocation_);
 
-    // map <(sigma, size), kernel>
-    std::map<std::pair<float, size_t>, std::vector<float>> gaussKernelsHorizontal;
-    std::map<std::pair<float, size_t>, std::vector<float>> gaussKernelsVertical;
+    ImageGaussianFilter(grayFloatNormalizedImage, 1.f, smoothedGrayFloatNormalizedImage, tempImage, 0, 0);
 
-    // compute gaussian kernel for separable convolution
-
-    float gaussSmoothSigma = 1.f;
-    size_t gaussSmoothKernelSize = 0; // automatic computation
-
-    auto gaussSmoothKernelKey = std::make_pair(gaussSmoothSigma, gaussSmoothKernelSize);
-    std::vector<float> horizontalGaussKernel;
-    std::vector<float> verticalGaussKernel;
-
-    ComputeGaussianKernel(verticalGaussKernel, gaussSmoothSigma, gaussSmoothKernelSize);
-    ComputeGaussianKernel(horizontalGaussKernel, gaussSmoothSigma, gaussSmoothKernelSize);
-
-    gaussKernelsHorizontal.insert(std::make_pair(gaussSmoothKernelKey, horizontalGaussKernel));
-    gaussKernelsVertical.insert(std::make_pair(gaussSmoothKernelKey, verticalGaussKernel));
-
-    //convolution step
-
-    NppiPoint srcOffset {.x = 0, .y = 0};
-    //prepare kernels
-    DataStructures::CUDAImage verticalKernel;
-    DataStructures::CUDAImage horizontalKernel;
-
-    verticalKernel.CopyFromRawHostPointer(
-            gaussKernelsVertical.at(gaussSmoothKernelKey).data(),
-            gaussKernelsVertical.at(gaussSmoothKernelKey).size(),
-            1,
-            1,
-            DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_32F,
-            false);
-
-    horizontalKernel.CopyFromRawHostPointer(
-            gaussKernelsHorizontal.at(gaussSmoothKernelKey).data(),
-            gaussKernelsHorizontal.at(gaussSmoothKernelKey).size(),
-            1,
-            1,
-            DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_32F,
-            false);
-
-    checkNppErrors(nppiFilterRowBorder_32f_C1R((float*)grayFloatImage.gpuData_, grayFloatImage.pitch_, floatConvertionRoi, srcOffset, (float*)tempImage.gpuData_, tempImage.pitch_, floatConvertionRoi, (float *)verticalKernel.gpuData_, verticalKernel.width_, 0, NppiBorderType::NPP_BORDER_REPLICATE));
-
-    checkNppErrors(nppiFilterColumnBorder_32f_C1R((float*)tempImage.gpuData_, tempImage.pitch_, floatConvertionRoi, srcOffset, (float*)smoothedGrayFloatImage.gpuData_, smoothedGrayFloatImage.pitch_, floatConvertionRoi, (float*)horizontalKernel.gpuData_, horizontalKernel.width_, 0, NppiBorderType::NPP_BORDER_REPLICATE));
-
-    verticalKernel.Release();
-    horizontalKernel.Release();
     // compute gradient
 
     DataStructures::CUDAImage Lx;
     DataStructures::CUDAImage Ly;
 
-    Lx.Allocate(smoothedGrayFloatImage.width_, smoothedGrayFloatImage.height_, smoothedGrayFloatImage.channels_, smoothedGrayFloatImage.elementType_, smoothedGrayFloatImage.pitchedAllocation_);
-    Ly.Allocate(smoothedGrayFloatImage.width_, smoothedGrayFloatImage.height_, smoothedGrayFloatImage.channels_, smoothedGrayFloatImage.elementType_, smoothedGrayFloatImage.pitchedAllocation_);
+    Lx.Allocate(smoothedGrayFloatNormalizedImage.width_, smoothedGrayFloatNormalizedImage.height_, smoothedGrayFloatNormalizedImage.channels_, smoothedGrayFloatNormalizedImage.elementType_, smoothedGrayFloatNormalizedImage.pitchedAllocation_);
+    Ly.Allocate(smoothedGrayFloatNormalizedImage.width_, smoothedGrayFloatNormalizedImage.height_, smoothedGrayFloatNormalizedImage.channels_, smoothedGrayFloatNormalizedImage.elementType_, smoothedGrayFloatNormalizedImage.pitchedAllocation_);
 
     // scharr filter for Lx
 
-    std::vector<float> scharrXHorizontalKernel = {-1.0f, 0.0f, 1.0f};
-    std::vector<float> scharrXVerticalKernel = {3.0f, 10.0f, 3.0f};
-
-    verticalKernel.CopyFromRawHostPointer(
-            scharrXVerticalKernel.data(),
-            scharrXVerticalKernel.size(),
-            1,
-            1,
-            DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_32F,
-            false);
-
-    horizontalKernel.CopyFromRawHostPointer(
-            scharrXHorizontalKernel.data(),
-            scharrXHorizontalKernel.size(),
-            1,
-            1,
-            DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_32F,
-            false);
-
-    checkNppErrors(nppiFilterRowBorder_32f_C1R((float*)smoothedGrayFloatImage.gpuData_, smoothedGrayFloatImage.pitch_, floatConvertionRoi, srcOffset, (float*)tempImage.gpuData_, tempImage.pitch_, floatConvertionRoi, (float*)verticalKernel.gpuData_, verticalKernel.width_, 0, NppiBorderType::NPP_BORDER_REPLICATE));
-
-    checkNppErrors(nppiFilterColumnBorder_32f_C1R((float*)tempImage.gpuData_, tempImage.pitch_, floatConvertionRoi, srcOffset, (float*)Lx.gpuData_, Lx.pitch_, floatConvertionRoi, (float*)horizontalKernel.gpuData_, horizontalKernel.width_, 0, NppiBorderType::NPP_BORDER_REPLICATE));
-
-    horizontalKernel.Release();
-    verticalKernel.Release();
+    ImageScharrXDerivative(smoothedGrayFloatNormalizedImage, Lx, tempImage, false);
 
     // scharr filter for Ly
 
-    std::vector<float> scharrYHorizontalKernel = {3.0f, 10.0f, 3.0f};
-    std::vector<float> scharrYVerticalKernel = {-1.0f, 0.0f, 1.0f};
+    ImageScharrYDerivative(smoothedGrayFloatNormalizedImage, Ly, tempImage, false);
 
-    verticalKernel.CopyFromRawHostPointer(
-            scharrYVerticalKernel.data(),
-            scharrYVerticalKernel.size(),
-            1,
-            1,
-            DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_32F,
-            false);
-
-    horizontalKernel.CopyFromRawHostPointer(
-            scharrYHorizontalKernel.data(),
-            scharrYHorizontalKernel.size(),
-            1,
-            1,
-            DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_32F,
-            false);
-
-    checkNppErrors(nppiFilterRowBorder_32f_C1R((float*)smoothedGrayFloatImage.gpuData_, smoothedGrayFloatImage.pitch_, floatConvertionRoi, srcOffset, (float*)tempImage.gpuData_, tempImage.pitch_, floatConvertionRoi, (float*)verticalKernel.gpuData_, verticalKernel.width_, 0, NppiBorderType::NPP_BORDER_REPLICATE));
-
-    checkNppErrors(nppiFilterColumnBorder_32f_C1R((float*)tempImage.gpuData_, tempImage.pitch_, floatConvertionRoi, srcOffset, (float*)Ly.gpuData_, Ly.pitch_, floatConvertionRoi, (float*)horizontalKernel.gpuData_, horizontalKernel.width_, 0, NppiBorderType::NPP_BORDER_REPLICATE));
-
-    horizontalKernel.Release();
-    verticalKernel.Release();
 
     compute_gradients_api((float*)Lx.gpuData_, (float*)Ly.gpuData_, (float*)tempImage.gpuData_, tempImage.width_, tempImage.height_, tempImage.pitch_, tempImage.channels_, cudaStream);
     checkCudaErrors(cudaStreamSynchronize(cudaStream));
-    checkCudaErrors(cudaDeviceSynchronize());
+
     //find max gradient
+
+    NppiSize maxGradientRoi = { .width = (int)smoothedGrayFloatNormalizedImage.width_, .height = (int)smoothedGrayFloatNormalizedImage.height_ };
+
     int scratchBufferSize = 0;
     float* maxGradientPtr = nullptr;
     checkCudaErrors(cudaMalloc(&maxGradientPtr, sizeof(float)));
-    checkNppErrors(nppiMaxGetBufferHostSize_32f_C1R(floatConvertionRoi, &scratchBufferSize));
+    checkNppErrors(nppiMaxGetBufferHostSize_32f_C1R(maxGradientRoi, &scratchBufferSize));
     DataStructures::CUDAImage scratchBuffer;
     scratchBuffer.Allocate(scratchBufferSize, 1, 1, DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_8U, false);
-    checkNppErrors(nppiMax_32f_C1R((float*)tempImage.gpuData_, tempImage.pitch_, floatConvertionRoi, scratchBuffer.gpuData_, maxGradientPtr));
+    checkNppErrors(nppiMax_32f_C1R((float*)tempImage.gpuData_, tempImage.pitch_, maxGradientRoi, scratchBuffer.gpuData_, maxGradientPtr));
     float maxGradient = 0;
     checkCudaErrors(cudaMemcpy(&maxGradient, maxGradientPtr, sizeof(float), cudaMemcpyKind::cudaMemcpyDeviceToHost));
     checkCudaErrors(cudaFree(maxGradientPtr));
@@ -536,21 +730,55 @@ int main()
     levelsGpu.CopyFromRawHostPointer(levels.data(), levels.size(), 1, 1, DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_32F, false);
     preprocess_histogram_api((float*)tempImage.gpuData_, tempImage.width_, tempImage.height_, tempImage.pitch_, nbins, maxGradient, cudaStream);
     checkCudaErrors(cudaStreamSynchronize(cudaStream));
-    checkNppErrors(nppiHistogramRangeGetBufferSize_32f_C1R(floatConvertionRoi, nbins + 1, &scratchBufferSize));
+    checkNppErrors(nppiHistogramRangeGetBufferSize_32f_C1R(maxGradientRoi, nbins + 1, &scratchBufferSize));
     scratchBuffer.Allocate(scratchBufferSize, 1, 1, DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_8U, false);
-    checkNppErrors(nppiHistogramRange_32f_C1R((float*)tempImage.gpuData_, tempImage.pitch_, floatConvertionRoi, (Npp32s*)histogramGpu.gpuData_, (float*)levelsGpu.gpuData_, nbins + 1, scratchBuffer.gpuData_));
+    checkNppErrors(nppiHistogramRange_32f_C1R((float*)tempImage.gpuData_, tempImage.pitch_, maxGradientRoi, (Npp32s*)histogramGpu.gpuData_, (float*)levelsGpu.gpuData_, nbins + 1, scratchBuffer.gpuData_));
     histogramGpu.CopyToRawHostPointer(histogram.data(), nbins + 1, 1, 1, DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_32S);
 
-    size_t
+    unsigned int amountOfPoints = sourceImage.width_ * sourceImage.height_;
+    const float percentile = 0.7;
+
+    int nthreshold = (int)(amountOfPoints * percentile);
+
+    int k, nelements = 0;
+    for (k = 0; nelements < nthreshold && k < nbins; k++)
+    {
+        nelements += histogram[k];
+    }
+
+    contrastFactor = (nelements < nthreshold ? 0.03f : maxGradient * ((float)k / nbins));
+
     /// Compute nonlinear scale space
+
+    AKAZEOptions options;
+    options.img_width = sourceImage.width_;
+    options.img_height = sourceImage.height_;
+
+    // Octave computation
+
+    DataStructures::CUDAImage* input = &grayFloatNormalizedImage;
+
+    std::vector<TEvolution> evolutions;         ///< Vector of nonlinear diffusion evolution
+
+    auto sublevelContrastFactor = contrastFactor;
+
+    for (int p = 0; p < options.octaves; ++p)
+    {
+        sublevelContrastFactor *= (p == 0 ? 1.0f : 0.75f);
+
+        for (int q = 0; q < options.nsublevels; ++q)
+        {
+            TEvolution evolution;
+
+
+        }
+    }
 
 
 
     /// Finalize
 
     checkCudaErrors(cudaStreamSynchronize(cudaStream));
-
-
     checkCudaErrors(cudaStreamDestroy(cudaStream));
     return 0;
 }
