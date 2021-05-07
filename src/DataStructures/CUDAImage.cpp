@@ -465,24 +465,6 @@ CUDAImage& CUDAImage::operator=(cv::Mat&& other) noexcept
     return *this;
 }
 
-bool CUDAImage::operator==(const CUDAImage& other) const
-{
-    return width_ == other.width_ &&
-         height_ == other.height_ &&
-         pitch_ == other.pitch_ &&
-         channels_ == other.channels_ &&
-         elementType_ == other.elementType_;
-}
-
-bool CUDAImage::operator==(const cv::cuda::GpuMat& other) const
-{
-    return width_ == static_cast<size_t>(other.cols) &&
-           height_ == static_cast<size_t>(other.rows) &&
-           pitch_ == other.step &&
-           channels_ == static_cast<size_t>(other.channels()) &&
-           GetTypeSize(elementType_) == other.elemSize1();
-}
-
 void CUDAImage::MoveFromGpuMat(cv::cuda::GpuMat& src)
 {
     if(gpuData_ == src.data)
@@ -539,6 +521,11 @@ void CUDAImage::CopyFromGpuMat(const cv::cuda::GpuMat& src)
         << cudaGetErrorName(status) <<": " << cudaGetErrorString(status);
         throw std::runtime_error("CUDA error.");
     }
+
+    width_ = src.cols;
+    height_ = src.rows;
+    channels_ = channels;
+    elementType_ = type;
 }
 
 void CUDAImage::MoveFromCvMat(cv::Mat& src)
@@ -578,6 +565,11 @@ void CUDAImage::CopyFromCvMat(const cv::Mat& src)
         << cudaGetErrorName(status) <<": " << cudaGetErrorString(status);
         throw std::runtime_error("CUDA error.");
     }
+
+    width_ = src.cols;
+    height_ = src.rows;
+    channels_ = channels;
+    elementType_ = type;
 }
 
 bool CUDAImage::Empty() const
@@ -608,6 +600,10 @@ void CUDAImage::CopyFromRawHostPointer(void* src, size_t width, size_t height, s
         throw std::runtime_error("CUDA error.");
     }
 
+    width_ = width;
+    height_ = height;
+    channels_ = channels;
+    elementType_ = type;
 }
 
 void CUDAImage::MoveFromGpuMatAsync(cv::cuda::GpuMat& src, void* cudaStream)
@@ -667,6 +663,11 @@ void CUDAImage::CopyFromGpuMatAsync(const cv::cuda::GpuMat& src, void* cudaStrea
         << cudaGetErrorName(status) <<": " << cudaGetErrorString(status);
         throw std::runtime_error("CUDA error.");
     }
+
+    width_ = src.cols;
+    height_ = src.rows;
+    channels_ = channels;
+    elementType_ = type;
 }
 
 void CUDAImage::MoveFromCvMatAsync(cv::Mat& src, void* cudaStream)
@@ -706,6 +707,11 @@ void CUDAImage::CopyFromCvMatAsync(const cv::Mat& src, void* cudaStream)
         << cudaGetErrorName(status) <<": " << cudaGetErrorString(status);
         throw std::runtime_error("CUDA error.");
     }
+
+    width_ = src.cols;
+    height_ = src.rows;
+    channels_ = channels;
+    elementType_ = type;
 }
 
 void CUDAImage::CopyFromRawHostPointerAsync(void* src, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, bool pitchedAllocation, void* cudaStream)
@@ -730,9 +736,14 @@ void CUDAImage::CopyFromRawHostPointerAsync(void* src, size_t width, size_t heig
         << cudaGetErrorName(status) <<": " << cudaGetErrorString(status);
         throw std::runtime_error("CUDA error.");
     }
+
+    width_ = width;
+    height_ = height;
+    channels_ = channels;
+    elementType_ = type;
 }
 
-void CUDAImage::CopyToRawHostPointer(void* dst, size_t width, size_t height, size_t channels, ELEMENT_TYPE type) const
+void CUDAImage::CopyToRawHostPointer(void* dst, size_t width, size_t channels, ELEMENT_TYPE type) const
 {
     if(gpuData_)
     {
@@ -740,7 +751,7 @@ void CUDAImage::CopyToRawHostPointer(void* dst, size_t width, size_t height, siz
                      height_, cudaMemcpyKind::cudaMemcpyDeviceToHost);
         if(status != cudaError_t::cudaSuccess)
         {
-            LOG_ERROR() << "Failed to copy image's data to raw host. CUDA error " << static_cast<int>(status) << " - "
+            LOG_ERROR() << "Failed to copy image's data to raw host pointer. CUDA error " << static_cast<int>(status) << " - "
             << cudaGetErrorName(status) <<": " << cudaGetErrorString(status);
             throw std::runtime_error("CUDA error.");
         }
@@ -751,7 +762,7 @@ void CUDAImage::CopyToRawHostPointer(void* dst, size_t width, size_t height, siz
     }
 }
 
-void CUDAImage::CopyToRawHostPointerAsync(void* dst, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, void* cudaStream) const
+void CUDAImage::CopyToRawHostPointerAsync(void* dst, size_t width, size_t channels, ELEMENT_TYPE type, void* cudaStream) const
 {
     if(gpuData_)
     {
@@ -759,7 +770,7 @@ void CUDAImage::CopyToRawHostPointerAsync(void* dst, size_t width, size_t height
                      height_, cudaMemcpyKind::cudaMemcpyDeviceToHost, (cudaStream_t)cudaStream);
         if(status != cudaError_t::cudaSuccess)
         {
-            LOG_ERROR() << "Failed to copy image's data to raw host asynchronously. CUDA error " << static_cast<int>(status) << " - "
+            LOG_ERROR() << "Failed to copy image's data to raw host pointer asynchronously. CUDA error " << static_cast<int>(status) << " - "
                         << cudaGetErrorName(status) <<": " << cudaGetErrorString(status);
             throw std::runtime_error("CUDA error.");
         }
@@ -888,7 +899,7 @@ void CUDAImage::CopyToCUDAImageAsync(DataStructures::CUDAImage& dst, void* cudaS
                                height_, cudaMemcpyKind::cudaMemcpyDeviceToDevice, (cudaStream_t)cudaStream);
     if(status != cudaError_t::cudaSuccess)
     {
-        LOG_ERROR() << "Failed to copy image's data asyncronously. CUDA error " << static_cast<int>(status) << " - "
+        LOG_ERROR() << "Failed to copy image's data asynchronously. CUDA error " << static_cast<int>(status) << " - "
                     << cudaGetErrorName(status) <<": " << cudaGetErrorString(status);
         throw std::runtime_error("CUDA error.");
     }
@@ -960,8 +971,6 @@ void CUDAImage::MoveFromCUDAImageAsync(DataStructures::CUDAImage& src, void* cud
     src.pitchedAllocation_ = false;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 void CUDAImage::CopyFromCUDAImage(const DataStructures::CUDAImage& src)
 {
     if(gpuData_ == src.gpuData_)
@@ -988,6 +997,11 @@ void CUDAImage::CopyFromCUDAImage(const DataStructures::CUDAImage& src)
                     << cudaGetErrorName(status) <<": " << cudaGetErrorString(status);
         throw std::runtime_error("CUDA error.");
     }
+
+    width_ = src.width_;
+    height_ = src.height_;
+    channels_ = src.channels_;
+    elementType_ = src.elementType_;
 }
 
 void CUDAImage::CopyFromCUDAImageAsync(const DataStructures::CUDAImage& src, void* cudaStream)
@@ -1017,52 +1031,258 @@ void CUDAImage::CopyFromCUDAImageAsync(const DataStructures::CUDAImage& src, voi
                     << cudaGetErrorName(status) <<": " << cudaGetErrorString(status);
         throw std::runtime_error("CUDA error.");
     }
+
+    width_ = src.width_;
+    height_ = src.height_;
+    channels_ = src.channels_;
+    elementType_ = src.elementType_;
 }
 
 void CUDAImage::CopyFromRawDevicePointer(void* src, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, bool pitchedAllocation)
 {
+    if(gpuData_)
+    {
+        bool needReallocation = allocatedBytes_ < width * height * channels * GetTypeSize(type);
+        if(needReallocation)
+        {
+            Allocate(width, height, channels, type, pitchedAllocation);
+        }
+    }
+    else
+    {
+        Allocate(width, height, channels, type, pitchedAllocation);
+    }
+    auto status = cudaMemcpy2D(gpuData_, pitch_, src, width * channels * GetTypeSize(type), width * channels * GetTypeSize(type), height,
+                                    cudaMemcpyKind::cudaMemcpyDeviceToDevice);
+    if(status != cudaError_t::cudaSuccess)
+    {
+        LOG_ERROR() << "Failed to copy image's data from raw device pointer. CUDA error " << static_cast<int>(status) << " - "
+                    << cudaGetErrorName(status) <<": " << cudaGetErrorString(status);
+        throw std::runtime_error("CUDA error.");
+    }
 
+    width_ = width;
+    height_ = height;
+    channels_ = channels;
+    elementType_ = type;
 }
 
 void CUDAImage::CopyFromRawDevicePointerAsync(void* src, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, bool pitchedAllocation, void* cudaStream)
 {
+    if(gpuData_)
+    {
+        bool needReallocation = allocatedBytes_ < width * height * channels * GetTypeSize(type);
+        if(needReallocation)
+        {
+            AllocateAsync(width, height, channels, type, pitchedAllocation, cudaStream);
+        }
+    }
+    else
+    {
+        AllocateAsync(width, height, channels, type, pitchedAllocation, cudaStream);
+    }
+    auto status = cudaMemcpy2DAsync(gpuData_, pitch_, src, width * channels * GetTypeSize(type), width * channels * GetTypeSize(type), height,
+                               cudaMemcpyKind::cudaMemcpyDeviceToDevice, (cudaStream_t)cudaStream);
+    if(status != cudaError_t::cudaSuccess)
+    {
+        LOG_ERROR() << "Failed to copy image's data from raw device pointer asynchronously. CUDA error "
+        << static_cast<int>(status) << " - " << cudaGetErrorName(status) <<": " << cudaGetErrorString(status);
+        throw std::runtime_error("CUDA error.");
+    }
 
+    width_ = width;
+    height_ = height;
+    channels_ = channels;
+    elementType_ = type;
 }
 
-void CUDAImage::CopyToRawDevicePointer(void* dst, size_t width, size_t height, size_t channels, ELEMENT_TYPE type)
+void CUDAImage::CopyToRawDevicePointer(void* dst, size_t width, size_t channels, ELEMENT_TYPE type) const
 {
-
+    if(gpuData_)
+    {
+        auto status = cudaMemcpy2D(dst, width * channels * GetTypeSize(type), gpuData_, pitch_, width_ * channels_ * GetTypeSize(elementType_),
+                                   height_, cudaMemcpyKind::cudaMemcpyDeviceToDevice);
+        if(status != cudaError_t::cudaSuccess)
+        {
+            LOG_ERROR() << "Failed to copy image's data to raw device pointer. CUDA error "
+            << static_cast<int>(status) << " - " << cudaGetErrorName(status) <<": " << cudaGetErrorString(status);
+            throw std::runtime_error("CUDA error.");
+        }
+    }
+    else
+    {
+        LOG_WARNING() << "Nothing to copy. Image is empty.";
+    }
 }
 
-void CUDAImage::CopyToRawDevicePointerAsync(void* dst, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, void* cudaStream)
+void CUDAImage::CopyToRawDevicePointerAsync(void* dst, size_t width, size_t channels, ELEMENT_TYPE type, void* cudaStream) const
 {
-
+    if(gpuData_)
+    {
+        auto status = cudaMemcpy2DAsync(dst, width * channels * GetTypeSize(type), gpuData_, pitch_, width_ * channels_ * GetTypeSize(elementType_),
+                                   height_, cudaMemcpyKind::cudaMemcpyDeviceToDevice, (cudaStream_t)cudaStream);
+        if(status != cudaError_t::cudaSuccess)
+        {
+            LOG_ERROR() << "Failed to copy image's data to raw device pointer asynchronously. CUDA error "
+                        << static_cast<int>(status) << " - " << cudaGetErrorName(status) <<": " << cudaGetErrorString(status);
+            throw std::runtime_error("CUDA error.");
+        }
+    }
+    else
+    {
+        LOG_WARNING() << "Nothing to copy. Image is empty.";
+    }
 }
 
 void CUDAImage::MoveToGpuMat(cv::cuda::GpuMat& dst)
 {
+    if (!dst.empty())
+    {
+        auto status = cudaFree(dst.data);
 
+        if(status != cudaError_t::cudaSuccess)
+        {
+            LOG_ERROR() << "Failed to release cv::cuda::GpuMat data. CUDA error "
+                        << static_cast<int>(status) << " - " << cudaGetErrorName(status) << ": " << cudaGetErrorString(status);
+            throw std::runtime_error("CUDA error.");
+        }
+    }
+    auto cvType = ConvertCUDAImageElementTypeAndChannelsToCvType(elementType_, channels_);
+    dst.cols = static_cast<int>(width_);
+    dst.rows = static_cast<int>(height_);
+    dst.step = pitch_;
+    dst.flags = cv::Mat::MAGIC_VAL + (cvType & cv::Mat::TYPE_MASK);
+    dst.data = gpuData_;
+    dst.datastart = gpuData_;
+    dst.dataend = gpuData_;
+
+    size_t minstep = width_ * GetTypeSize(elementType_);
+
+    dst.dataend += pitch_ * (height_ - 1) + minstep;
+
+    width_ = 0;
+    height_ = 0;
+    pitch_ = 0;
+    channels_ = 0;
+    elementType_ = TYPE_UNKNOWN;
+    gpuData_ = nullptr;
+    allocatedBytes_= 0;
+    pitchedAllocation_ = false;
+
+    dst.updateContinuityFlag();
 }
 
 void CUDAImage::MoveToGpuMatAsync(cv::cuda::GpuMat& dst, void* cudaStream)
 {
+    if (!dst.empty())
+    {
+        auto status = cudaFreeAsync(dst.data, (cudaStream_t)cudaStream);
 
+        if(status != cudaError_t::cudaSuccess)
+        {
+            LOG_ERROR() << "Failed to release cv::cuda::GpuMat data asynchronously. CUDA error "
+            << static_cast<int>(status) << " - " << cudaGetErrorName(status) << ": " << cudaGetErrorString(status);
+            throw std::runtime_error("CUDA error.");
+        }
+    }
+    auto cvType = ConvertCUDAImageElementTypeAndChannelsToCvType(elementType_, channels_);
+    dst.cols = static_cast<int>(width_);
+    dst.rows = static_cast<int>(height_);
+    dst.step = pitch_;
+    dst.flags = cv::Mat::MAGIC_VAL + (cvType & cv::Mat::TYPE_MASK);
+    dst.data = gpuData_;
+    dst.datastart = gpuData_;
+    dst.dataend = gpuData_;
+
+    size_t minstep = width_ * GetTypeSize(elementType_);
+
+    dst.dataend += pitch_ * (height_ - 1) + minstep;
+
+    width_ = 0;
+    height_ = 0;
+    pitch_ = 0;
+    channels_ = 0;
+    elementType_ = TYPE_UNKNOWN;
+    gpuData_ = nullptr;
+    allocatedBytes_= 0;
+    pitchedAllocation_ = false;
+    dst.updateContinuityFlag();
 }
 
-void CUDAImage::CopyToGpuMat(cv::cuda::GpuMat& dst)
+void CUDAImage::CopyToGpuMat(cv::cuda::GpuMat& dst) const
 {
+    auto cvType = ConvertCUDAImageElementTypeAndChannelsToCvType(elementType_, channels_);
+    if (gpuData_ == dst.data)
+    {
+        return;
+    }
 
+    if(dst.data)
+    {
+        bool needReallocation = dst.step * dst.rows < width_ * height_ * channels_ * GetTypeSize(elementType_);
+        if(needReallocation)
+        {
+            dst = cv::cuda::GpuMat(static_cast<int>(height_), static_cast<int>(width_), cvType);
+        }
+    }
+    else
+    {
+        dst = cv::cuda::GpuMat(static_cast<int>(height_), static_cast<int>(width_), cvType);
+    }
+    auto status = cudaMemcpy2D(dst.data, dst.step, gpuData_, pitch_, width_ * channels_ * GetTypeSize(elementType_),
+                               height_, cudaMemcpyKind::cudaMemcpyDeviceToDevice);
+    if(status != cudaError_t::cudaSuccess)
+    {
+        LOG_ERROR() << "Failed to copy image's data. CUDA error " << static_cast<int>(status) << " - "
+                    << cudaGetErrorName(status) <<": " << cudaGetErrorString(status);
+        throw std::runtime_error("CUDA error.");
+    }
+
+    dst.cols = static_cast<int>(width_);
+    dst.rows = static_cast<int>(height_);
+    dst.flags = cv::Mat::MAGIC_VAL + (cvType & cv::Mat::TYPE_MASK);
+    dst.updateContinuityFlag();
 }
 
-void CUDAImage::CopyToGpuMatAsync(cv::cuda::GpuMat& dst, void* cudaStream)
+void CUDAImage::CopyToGpuMatAsync(cv::cuda::GpuMat& dst, void* cudaStream) const
 {
+    auto cvType = ConvertCUDAImageElementTypeAndChannelsToCvType(elementType_, channels_);
+    if (gpuData_ == dst.data)
+    {
+        return;
+    }
 
+    if(dst.data)
+    {
+        bool needReallocation = dst.step * dst.rows < width_ * height_ * channels_ * GetTypeSize(elementType_);
+        if(needReallocation)
+        {
+            dst = cv::cuda::GpuMat(static_cast<int>(height_), static_cast<int>(width_), cvType);
+        }
+    }
+    else
+    {
+        dst = cv::cuda::GpuMat(static_cast<int>(height_), static_cast<int>(width_), cvType);
+    }
+    auto status = cudaMemcpy2DAsync(dst.data, dst.step, gpuData_, pitch_, width_ * channels_ * GetTypeSize(elementType_),
+                               height_, cudaMemcpyKind::cudaMemcpyDeviceToDevice, (cudaStream_t)cudaStream);
+    if(status != cudaError_t::cudaSuccess)
+    {
+        LOG_ERROR() << "Failed to copy image's data. CUDA error " << static_cast<int>(status) << " - "
+                    << cudaGetErrorName(status) <<": " << cudaGetErrorString(status);
+        throw std::runtime_error("CUDA error.");
+    }
+
+    dst.cols = static_cast<int>(width_);
+    dst.rows = static_cast<int>(height_);
+    dst.flags = cv::Mat::MAGIC_VAL + (cvType & cv::Mat::TYPE_MASK);
+    dst.updateContinuityFlag();
 }
 
 void CUDAImage::MoveToCvMat(cv::Mat& dst)
 {
     auto cvType = ConvertCUDAImageElementTypeAndChannelsToCvType(elementType_, channels_);
-    dst = cv::Mat(height_, width_, cvType);
+    dst = cv::Mat(static_cast<int>(height_), static_cast<int>(width_), cvType);
     auto status = cudaMemcpy2D(dst.data, dst.step, gpuData_, pitch_, width_ * channels_ * GetTypeSize(elementType_),
                                height_, cudaMemcpyKind::cudaMemcpyDeviceToHost);
     if(status != cudaError_t::cudaSuccess)
@@ -1077,7 +1297,7 @@ void CUDAImage::MoveToCvMat(cv::Mat& dst)
 void CUDAImage::MoveToCvMatAsync(cv::Mat& dst, void* cudaStream)
 {
     auto cvType = ConvertCUDAImageElementTypeAndChannelsToCvType(elementType_, channels_);
-    dst = cv::Mat(height_, width_, cvType);
+    dst = cv::Mat(static_cast<int>(height_), static_cast<int>(width_), cvType);
     auto status = cudaMemcpy2DAsync(dst.data, dst.step, gpuData_, pitch_, width_ * channels_ * GetTypeSize(elementType_),
                                height_, cudaMemcpyKind::cudaMemcpyDeviceToHost, (cudaStream_t)cudaStream);
     if(status != cudaError_t::cudaSuccess)
@@ -1092,7 +1312,7 @@ void CUDAImage::MoveToCvMatAsync(cv::Mat& dst, void* cudaStream)
 void CUDAImage::CopyToCvMat(cv::Mat& dst) const
 {
     auto cvType = ConvertCUDAImageElementTypeAndChannelsToCvType(elementType_, channels_);
-    dst = cv::Mat(height_, width_, cvType);
+    dst = cv::Mat(static_cast<int>(height_), static_cast<int>(width_), cvType);
     auto status = cudaMemcpy2D(dst.data, dst.step, gpuData_, pitch_, width_ * channels_ * GetTypeSize(elementType_),
                                     height_, cudaMemcpyKind::cudaMemcpyDeviceToHost);
     if(status != cudaError_t::cudaSuccess)
@@ -1106,7 +1326,7 @@ void CUDAImage::CopyToCvMat(cv::Mat& dst) const
 void CUDAImage::CopyToCvMatAsync(cv::Mat& dst, void* cudaStream) const
 {
     auto cvType = ConvertCUDAImageElementTypeAndChannelsToCvType(elementType_, channels_);
-    dst = cv::Mat(height_, width_, cvType);
+    dst = cv::Mat(static_cast<int>(height_), static_cast<int>(width_), cvType);
     auto status = cudaMemcpy2DAsync(dst.data, dst.step, gpuData_, pitch_, width_ * channels_ * GetTypeSize(elementType_),
                                     height_, cudaMemcpyKind::cudaMemcpyDeviceToHost, (cudaStream_t)cudaStream);
     if(status != cudaError_t::cudaSuccess)

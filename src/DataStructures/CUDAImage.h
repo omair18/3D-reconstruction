@@ -146,22 +146,6 @@ struct CUDAImage final
     /**
      * @brief
      *
-     * @param other
-     * @return
-     */
-    bool operator==(const CUDAImage& other) const;
-
-    /**
-     * @brief
-     *
-     * @param other
-     * @return
-     */
-    bool operator==(const cv::cuda::GpuMat& other) const;
-
-    /**
-     * @brief
-     *
      * @param width
      * @param height
      * @param channels
@@ -278,7 +262,7 @@ struct CUDAImage final
      *
      * @param dst
      */
-    void CopyToGpuMat(cv::cuda::GpuMat& dst);
+    void CopyToGpuMat(cv::cuda::GpuMat& dst) const;
 
     /**
      * @brief
@@ -286,7 +270,7 @@ struct CUDAImage final
      * @param dst
      * @param cudaStream
      */
-    void CopyToGpuMatAsync(cv::cuda::GpuMat& dst, void* cudaStream = nullptr);
+    void CopyToGpuMatAsync(cv::cuda::GpuMat& dst, void* cudaStream = nullptr) const;
 
     /**
      * @brief
@@ -412,11 +396,10 @@ struct CUDAImage final
      *
      * @param dst
      * @param width
-     * @param height
      * @param channels
      * @param type
      */
-    void CopyToRawHostPointer(void* dst, size_t width, size_t height, size_t channels, ELEMENT_TYPE type) const;
+    void CopyToRawHostPointer(void* dst, size_t width, size_t channels, ELEMENT_TYPE type) const;
 
     /**
      * @brief
@@ -428,7 +411,7 @@ struct CUDAImage final
      * @param type
      * @param cudaStream
      */
-    void CopyToRawHostPointerAsync(void* dst, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, void* cudaStream = nullptr) const;
+    void CopyToRawHostPointerAsync(void* dst, size_t width, size_t channels, ELEMENT_TYPE type, void* cudaStream = nullptr) const;
 
     /// Device pointer
 
@@ -462,23 +445,21 @@ struct CUDAImage final
      *
      * @param dst
      * @param width
-     * @param height
      * @param channels
      * @param type
      */
-    void CopyToRawDevicePointer(void* dst, size_t width, size_t height, size_t channels, ELEMENT_TYPE type);
+    void CopyToRawDevicePointer(void* dst, size_t width, size_t channels, ELEMENT_TYPE type) const;
 
     /**
      * @brief
      *
      * @param dst
      * @param width
-     * @param height
      * @param channels
      * @param type
      * @param cudaStream
      */
-    void CopyToRawDevicePointerAsync(void* dst, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, void* cudaStream = nullptr);
+    void CopyToRawDevicePointerAsync(void* dst, size_t width, size_t channels, ELEMENT_TYPE type, void* cudaStream = nullptr) const;
 
     /**
      * @brief
