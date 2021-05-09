@@ -108,7 +108,7 @@ public:
      *
      * @param config
      */
-    AKAZEKeypointDetectionAlgorithm(const std::shared_ptr<Config::JsonConfig>& config);
+    AKAZEKeypointDetectionAlgorithm(const std::shared_ptr<Config::JsonConfig>& config, [[maybe_unused]] const std::unique_ptr<GPU::GpuManager>& gpuManager, [[maybe_unused]] void* cudaStream);
 
     /**
      * @brief
@@ -121,7 +121,7 @@ public:
      * @param processingData
      * @return
      */
-    bool Process(std::shared_ptr<DataStructures::ProcessingData>& processingData) override;
+    bool Process(const std::shared_ptr<DataStructures::ProcessingData>& processingData) override;
 
 
 

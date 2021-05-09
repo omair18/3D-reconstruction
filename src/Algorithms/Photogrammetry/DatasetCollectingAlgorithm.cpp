@@ -12,12 +12,8 @@ expireTimeoutSeconds_(120)
 
 }
 
-bool DatasetCollectingAlgorithm::Process(std::shared_ptr<DataStructures::ProcessingData> &processingData)
+bool DatasetCollectingAlgorithm::Process(const std::shared_ptr<DataStructures::ProcessingData> &processingData)
 {
-    if()
-    {
-
-    }
     return false;
 }
 

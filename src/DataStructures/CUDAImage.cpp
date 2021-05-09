@@ -572,11 +572,6 @@ void CUDAImage::CopyFromCvMat(const cv::Mat& src)
     elementType_ = type;
 }
 
-bool CUDAImage::Empty() const
-{
-    return gpuData_ == nullptr;
-}
-
 void CUDAImage::CopyFromRawHostPointer(void* src, size_t width, size_t height, size_t channels, ELEMENT_TYPE type, bool pitchedAllocation)
 {
     if(gpuData_)
