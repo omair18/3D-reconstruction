@@ -6,6 +6,7 @@
 #include "KafkaIO/KafkaMessageParsingAlgorithm.h"
 #include "Decoding/CpuImageDecodingAlgorithm.h"
 #include "Decoding/CUDAImageDecodingAlgorithm.h"
+#include "Photogrammetry/DatasetCollectingAlgorithm.h"
 #include "KafkaConsumer.h"
 #include "KafkaProducer.h"
 #include "Logger.h"
@@ -21,7 +22,8 @@ AlgorithmFactory::AlgorithmFactory()
         { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::KafkaProducingAlgorithm, GetAlgorithmLambda<KafkaProducingAlgorithm>() },
         { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::KafkaMessageParsingAlgorithm, GetAlgorithmLambda<KafkaMessageParsingAlgorithm>() },
         { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::CpuImageDecodingAlgorithm, GetAlgorithmLambda<CpuImageDecodingAlgorithm>() },
-        { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::CUDAImageDecodingAlgorithm, GetAlgorithmLambda<CUDAImageDecodingAlgorithm>() }
+        { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::CUDAImageDecodingAlgorithm, GetAlgorithmLambda<CUDAImageDecodingAlgorithm>() },
+        { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::DatasetCollectingAlgorithm, GetAlgorithmLambda<DatasetCollectingAlgorithm>() }
     };
 }
 

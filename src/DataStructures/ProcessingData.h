@@ -56,6 +56,11 @@ public:
 
     /**
      * @brief
+     */
+    ~ProcessingData() = default;
+
+    /**
+     * @brief
      *
      * @param other
      * @return

@@ -4,14 +4,16 @@ set(DATA_STRUCTURES_LIB_HEADERS
         CUDAImageDescriptor.h
         ProcessingQueue.h
         ProcessingQueueManager.h
-        ProcessingData.h)
+        ProcessingData.h
+        KeyPoint.h)
 
 set(DATA_STRUCTURES_LIB_CPPS
         ModelDataset.cpp
         CUDAImage.cpp
         CUDAImageDescriptor.cpp
         ProcessingQueueManager.cpp
-        ProcessingData.cpp)
+        ProcessingData.cpp
+        KeyPoint.cpp)
 
 source_group("Header Files" FILES ${DATA_STRUCTURES_LIB_HEADERS})
 source_group("Source Files" FILES ${DATA_STRUCTURES_LIB_CPPS})

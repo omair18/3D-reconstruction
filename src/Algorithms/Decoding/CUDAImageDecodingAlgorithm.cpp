@@ -50,8 +50,8 @@ bool CUDAImageDecodingAlgorithm::Process(const std::shared_ptr<DataStructures::P
 {
     auto& dataset = processingData->GetModelDataset();
     auto& imageDescriptors = dataset->GetImagesDescriptors();
-    const auto& datasetUUID = dataset->GetUUID();
-    const auto datasetTotalFramesAmount = dataset->GetTotalFramesAmount();
+    auto& datasetUUID = dataset->GetUUID();
+    auto totalFramesInDataset = dataset->GetTotalFramesAmount();
 
     if(imageDescriptors.empty())
     {
@@ -62,12 +62,12 @@ bool CUDAImageDecodingAlgorithm::Process(const std::shared_ptr<DataStructures::P
     bool decodingStatus = true;
     for(auto& imageDescriptor : imageDescriptors)
     {
+        auto& image = imageDescriptor.GetCUDAImage();
         if(decodingStatus)
         {
-            LOG_TRACE() << "Decoding image " << imageDescriptor.GetFrameId() << "/" << dataset.GetTotalFramesAmount()
+            LOG_TRACE() << "Decoding image " << imageDescriptor.GetFrameId() << "/" << totalFramesInDataset
             << " of dataset " << datasetUUID << " ...";
             auto& rawImageData = imageDescriptor.GetRawImageData();
-            DataStructures::CUDAImage image;
             decodingStatus = false;
 
             if (rawImageData.empty())
@@ -78,7 +78,7 @@ bool CUDAImageDecodingAlgorithm::Process(const std::shared_ptr<DataStructures::P
 
             for(auto& decoder : decoders_)
             {
-                decodingStatus = decoder->Decode(rawImageData.data(), rawImageData.size(), image);
+                decodingStatus = decoder->Decode(rawImageData.data(), rawImageData.size(), *image);
                 if(decodingStatus)
                 {
                     break;
@@ -87,18 +87,18 @@ bool CUDAImageDecodingAlgorithm::Process(const std::shared_ptr<DataStructures::P
 
             if(decodingStatus)
             {
-                LOG_TRACE() << "Decoding image " << imageDescriptor.GetFrameId() << "/" << dataset.GetTotalFramesAmount()
+                LOG_TRACE() << "Decoding image " << imageDescriptor.GetFrameId() << "/" << totalFramesInDataset
                 << " of dataset " << dataset->GetUUID() << " was successful.";
-                imageDescriptor.Set
                 if(removeSourceData_)
                 {
-                    imageDescriptorModifiable.SetRawImageData({});
+                    auto& modifiableImageDescriptor = const_cast<DataStructures::CUDAImageDescriptor&>(imageDescriptor);
+                    modifiableImageDescriptor.SetRawImageData({});
                 }
             }
             else
             {
                 LOG_TRACE() << "Failed to decode image " << imageDescriptor.GetFrameId() << "/"
-                << dataset.GetTotalFramesAmount() << " of dataset " << dataset.GetUUID() << ".";
+                << totalFramesInDataset << " of dataset " << datasetUUID << ".";
             }
         }
         else
@@ -153,7 +153,10 @@ void CUDAImageDecodingAlgorithm::InitializeInternal(const std::shared_ptr<Config
             if(decoder)
             {
                 decoder->Initialize();
-                decoders_.push_back(std::move(decoder));
+                if(decoder->IsInitialized())
+                {
+                    decoders_.push_back(std::move(decoder));
+                }
             }
             else
             {
@@ -161,6 +164,7 @@ void CUDAImageDecodingAlgorithm::InitializeInternal(const std::shared_ptr<Config
                 throw std::runtime_error("Invalid algorithm configuration.");
             }
         }
+        LOG_TRACE() << "CUDA image decoding algorithm was successfully initialized.";
     }
     else
     {

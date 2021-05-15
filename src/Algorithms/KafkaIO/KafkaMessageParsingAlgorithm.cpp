@@ -62,7 +62,7 @@ bool KafkaMessageParsingAlgorithm::Process(const std::shared_ptr<DataStructures:
         auto frameId = (*key)[Config::ConfigNodes::MessageNodes::FrameID]->ToInt32();
         auto framesTotal = (*key)[Config::ConfigNodes::MessageNodes::FramesTotal]->ToInt32();
 
-        if(framesTotal <= 0)
+        if(framesTotal <= 2)
         {
             LOG_ERROR() << "Failed to parse kafka message. Invalid total frames amount " << framesTotal << ".";
             return false;
@@ -110,10 +110,14 @@ bool KafkaMessageParsingAlgorithm::Process(const std::shared_ptr<DataStructures:
         auto UUID = (*key)[Config::ConfigNodes::MessageNodes::UUID]->ToString();
 
         DataStructures::CUDAImageDescriptor imageDescriptor;
-        DataStructures::ModelDataset dataset;
+        auto dataset = std::make_shared<DataStructures::ModelDataset>();
 
         auto& rawImageData = message->GetData();
-        imageDescriptor.SetRawImageData(std::move(rawImageData));
+
+        // to avoid copy operation
+
+        auto& modifiableRawImageData = const_cast<std::vector<unsigned char>&>(rawImageData);
+        imageDescriptor.SetRawImageData(modifiableRawImageData);
 
         imageDescriptor.SetCameraId(cameraId);
         imageDescriptor.SetTimestamp(timeStamp);
@@ -121,13 +125,13 @@ bool KafkaMessageParsingAlgorithm::Process(const std::shared_ptr<DataStructures:
         imageDescriptor.SetSensorSize(sensorSize);
         imageDescriptor.SetFrameId(frameId);
 
-        dataset.SetUUID(std::move(UUID));
-        dataset.SetTotalFramesAmount(framesTotal);
+        dataset->SetUUID(std::move(UUID));
+        dataset->SetTotalFramesAmount(framesTotal);
 
         std::vector<DataStructures::CUDAImageDescriptor> descriptors;
         descriptors.push_back(std::move(imageDescriptor));
 
-        dataset.SetImagesDescriptors(std::move(descriptors));
+        dataset->SetImagesDescriptors(std::move(descriptors));
 
         processingData->SetModelDataset(std::move(dataset));
 

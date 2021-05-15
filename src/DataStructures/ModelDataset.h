@@ -21,7 +21,7 @@ namespace Config
 /**
  * @namespace DataStructures
  *
- * @brief
+ * @brief Namespace of libdatastructures library.
  */
 namespace DataStructures
 {
@@ -69,7 +69,7 @@ public:
      *
      * @param other
      */
-    ModelDataset(const ModelDataset& other) = default;
+    ModelDataset(const ModelDataset& other);
 
     /**
      * @brief
@@ -81,7 +81,7 @@ public:
     /**
      * @brief
      */
-    ~ModelDataset() = default;
+    ~ModelDataset();
 
     /**
      * @brief
@@ -189,6 +189,13 @@ public:
      * @param totalSize
      */
     void SetTotalSize(int totalSize);
+
+    /**
+     * @brief
+     *
+     * @return
+     */
+    [[nodiscard]] size_t GetCurrentFramesAmount() const;
 
 private:
 

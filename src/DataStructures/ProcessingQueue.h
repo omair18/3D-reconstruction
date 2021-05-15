@@ -16,7 +16,7 @@
 /**
  * @namespace DataStructures
  *
- * @brief
+ * @brief Namespace of libdatastructures library.
  */
 namespace DataStructures
 {

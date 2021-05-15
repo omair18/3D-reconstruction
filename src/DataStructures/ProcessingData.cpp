@@ -70,7 +70,7 @@ void ProcessingData::SetModelDataset(const std::shared_ptr<ModelDataset> &datase
 
 void ProcessingData::SetModelDataset(std::shared_ptr<ModelDataset> &&dataset) noexcept
 {
-
+    modelDataset_ = std::move(dataset);
 }
 
 const std::shared_ptr<Networking::KafkaMessage> &ProcessingData::GetKafkaMessage() const

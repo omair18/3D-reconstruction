@@ -17,7 +17,8 @@ set(ALGORITHMS_LIB_HEADERS
         Photogrammetry/PointCloudDensificationAlgorithm.h
         ImageProcessing/CUDAResizeAlgorithm.h
         ImageProcessing/CUDAConvolutionAlgorithm.h
-        ImageProcessing/CUDAImageBinarizationAlgorithm.h)
+        ImageProcessing/CUDAImageBinarizationAlgorithm.h
+        ImageProcessing/CUDASeparableConvolutionAlgorithm.h)
 
 set(ALGORITHMS_LIB_CPPS
         AlgorithmFactory.cpp
@@ -34,7 +35,8 @@ set(ALGORITHMS_LIB_CPPS
         Photogrammetry/PointCloudDensificationAlgorithm.cpp
         ImageProcessing/CUDAResizeAlgorithm.cpp
         ImageProcessing/CUDAConvolutionAlgorithm.cpp
-        ImageProcessing/CUDAImageBinarizationAlgorithm.cpp)
+        ImageProcessing/CUDAImageBinarizationAlgorithm.cpp
+        ImageProcessing/CUDASeparableConvolutionAlgorithm.cpp)
 
 source_group("Header Files" FILES ${ALGORITHMS_LIB_HEADERS})
 source_group("Source Files" FILES ${ALGORITHMS_LIB_CPPS})

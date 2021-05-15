@@ -1,4 +1,5 @@
 #include "CUDAImageDescriptor.h"
+#include "CUDAImage.h"
 
 namespace DataStructures
 {
@@ -37,14 +38,16 @@ CUDAImageDescriptor::CUDAImageDescriptor(const CUDAImageDescriptor &other)
     rawImageData_ = (other.rawImageData_);
 }
 
+CUDAImageDescriptor::~CUDAImageDescriptor() = default;
+
 bool CUDAImageDescriptor::operator==(const CUDAImageDescriptor &other)
 {
-    return false;
+    return image_ == other.image_;
 }
 
 CUDAImageDescriptor &CUDAImageDescriptor::operator=(CUDAImageDescriptor&& other) noexcept
 {
-    image_ = std::move(other.image_);
+    *image_ = std::move(*other.image_);
     frameId_ = other.frameId_;
     cameraId_ = other.cameraId_;
     timestamp_ = other.timestamp_;
@@ -54,27 +57,39 @@ CUDAImageDescriptor &CUDAImageDescriptor::operator=(CUDAImageDescriptor&& other)
     return *this;
 }
 
+CUDAImageDescriptor& CUDAImageDescriptor::operator=(const CUDAImageDescriptor& other)
+{
+    *image_ = *other.image_;
+    frameId_ = other.frameId_;
+    cameraId_ = other.cameraId_;
+    timestamp_ = other.timestamp_;
+    focalLength_ = other.focalLength_;
+    sensorSize_ = other.sensorSize_;
+    rawImageData_ = other.rawImageData_;
+    return *this;
+}
+
 const std::unique_ptr<CUDAImage>& CUDAImageDescriptor::GetCUDAImage() const
 {
     return image_;
 }
 
-void CUDAImageDescriptor::SetCUDAImage(const CUDAImage &image)
+void CUDAImageDescriptor::SetCUDAImage(const CUDAImage& image)
 {
     *image_ = image;
 }
 
-void CUDAImageDescriptor::SetCUDAImage(CUDAImage &&image) noexcept
+void CUDAImageDescriptor::SetCUDAImage(CUDAImage&& image) noexcept
 {
     *image_ = std::move(image);
 }
 
-void CUDAImageDescriptor::SetCUDAImage(const std::unique_ptr<CUDAImage> &image)
+void CUDAImageDescriptor::SetCUDAImage(const std::unique_ptr<CUDAImage>& image)
 {
-    image_ = std::make_unique<CUDAImage>(*image);
+    *image_ = *image;
 }
 
-void CUDAImageDescriptor::SetCUDAImage(std::unique_ptr<CUDAImage> &&image) noexcept
+void CUDAImageDescriptor::SetCUDAImage(std::unique_ptr<CUDAImage>&& image) noexcept
 {
     image_ = std::move(image);
 }
@@ -129,17 +144,17 @@ void CUDAImageDescriptor::SetSensorSize(float sensorSize)
     sensorSize_ = sensorSize;
 }
 
-const std::vector<unsigned char> &CUDAImageDescriptor::GetRawImageData() const noexcept
+const std::vector<unsigned char>& CUDAImageDescriptor::GetRawImageData() const noexcept
 {
     return rawImageData_;
 }
 
-void CUDAImageDescriptor::SetRawImageData(const std::vector<unsigned char> &rawImageData)
+void CUDAImageDescriptor::SetRawImageData(const std::vector<unsigned char>& rawImageData)
 {
     rawImageData_ = rawImageData;
 }
 
-void CUDAImageDescriptor::SetRawImageData(std::vector<unsigned char> &&rawImageData) noexcept
+void CUDAImageDescriptor::SetRawImageData(std::vector<unsigned char>&& rawImageData) noexcept
 {
     rawImageData_ = std::move(rawImageData);
 }
@@ -147,11 +162,6 @@ void CUDAImageDescriptor::SetRawImageData(std::vector<unsigned char> &&rawImageD
 void CUDAImageDescriptor::ClearRawImageData() noexcept
 {
     rawImageData_.clear();
-}
-
-CUDAImageDescriptor& CUDAImageDescriptor::operator=(const CUDAImageDescriptor& other)
-{
-    return *this;
 }
 
 }

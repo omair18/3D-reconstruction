@@ -48,8 +48,9 @@ decoders_()
 bool CpuImageDecodingAlgorithm::Process(const std::shared_ptr<DataStructures::ProcessingData> &processingData)
 {
     auto& dataset = processingData->GetModelDataset();
-    auto& modifiableDataset = const_cast<DataStructures::ModelDataset&>(dataset);
-    auto& imageDescriptors = modifiableDataset.GetImagesDescriptors();
+    auto& imageDescriptors = dataset->GetImagesDescriptors();
+    auto& datasetUUID = dataset->GetUUID();
+    auto totalFramesInDataset = dataset->GetTotalFramesAmount();
 
     if(imageDescriptors.empty())
     {
@@ -62,12 +63,10 @@ bool CpuImageDecodingAlgorithm::Process(const std::shared_ptr<DataStructures::Pr
     {
         if(decodingStatus)
         {
-            LOG_TRACE() << "Decoding image " << imageDescriptor.GetFrameId() << "/" << dataset.GetTotalFramesAmount()
-            << " of dataset " << modifiableDataset.GetUUID() << " ...";
-            auto& imageDescriptorModifiable = const_cast<DataStructures::CUDAImageDescriptor&>(imageDescriptor);
-            auto& rawImageData = imageDescriptorModifiable.GetRawImageData();
-            auto& CUDAImage = imageDescriptorModifiable.GetCUDAImage();
-            auto& CUDAImageModifiable = const_cast<DataStructures::CUDAImage&>(CUDAImage);
+            LOG_TRACE() << "Decoding image " << imageDescriptor.GetFrameId() << "/" << totalFramesInDataset
+            << " of dataset " << datasetUUID << " ...";
+            auto& rawImageData = imageDescriptor.GetRawImageData();
+            auto& image = imageDescriptor.GetCUDAImage();
             decodingStatus = false;
 
             if (rawImageData.empty())
@@ -78,7 +77,7 @@ bool CpuImageDecodingAlgorithm::Process(const std::shared_ptr<DataStructures::Pr
 
             for(auto& decoder : decoders_)
             {
-                decodingStatus = decoder->Decode(rawImageData.data(), rawImageData.size(), CUDAImageModifiable);
+                decodingStatus = decoder->Decode(rawImageData.data(), rawImageData.size(), *image);
                 if(decodingStatus)
                 {
                     break;
@@ -87,17 +86,18 @@ bool CpuImageDecodingAlgorithm::Process(const std::shared_ptr<DataStructures::Pr
 
             if(decodingStatus)
             {
-                LOG_TRACE() << "Decoding image " << imageDescriptor.GetFrameId() << "/" << dataset.GetTotalFramesAmount()
-                << " of dataset " << modifiableDataset.GetUUID() << " was successful.";
+                LOG_TRACE() << "Decoding image " << imageDescriptor.GetFrameId() << "/" << totalFramesInDataset
+                << " of dataset " << datasetUUID << " was successful.";
                 if(removeSourceData_)
                 {
-                    imageDescriptorModifiable.SetRawImageData({});
+                    auto& modifiableImageDescriptor = const_cast<DataStructures::CUDAImageDescriptor&>(imageDescriptor);
+                    modifiableImageDescriptor.SetRawImageData({});
                 }
             }
             else
             {
                 LOG_TRACE() << "Failed to decode image " << imageDescriptor.GetFrameId() << "/"
-                << dataset.GetTotalFramesAmount() << " of dataset " << modifiableDataset.GetUUID() << ".";
+                << totalFramesInDataset << " of dataset " << datasetUUID << ".";
             }
         }
         else
@@ -152,7 +152,10 @@ void CpuImageDecodingAlgorithm::InitializeInternal(const std::shared_ptr<Config:
             if(decoder)
             {
                 decoder->Initialize();
-                decoders_.push_back(std::move(decoder));
+                if (decoder->IsInitialized())
+                {
+                    decoders_.push_back(std::move(decoder));
+                }
             }
             else
             {
@@ -160,6 +163,7 @@ void CpuImageDecodingAlgorithm::InitializeInternal(const std::shared_ptr<Config:
                 throw std::runtime_error("Invalid algorithm configuration.");
             }
         }
+        LOG_TRACE() << "CPU image decoding algorithm was successfully initialized.";
     }
     else
     {

@@ -24,6 +24,8 @@ imagesDescriptors_()
 
 }
 
+ModelDataset::ModelDataset(const ModelDataset &other) = default;
+
 ModelDataset::ModelDataset(ModelDataset &&other) noexcept :
 status_(other.status_),
 totalSize_(other.totalSize_),
@@ -33,6 +35,8 @@ UUID_(std::move(other.UUID_))
 {
 
 }
+
+ModelDataset::~ModelDataset() = default;
 
 void DataStructures::ModelDataset::SetUUID(const std::string &UUID)
 {
@@ -107,6 +111,11 @@ int ModelDataset::GetTotalSize() const noexcept
 void ModelDataset::SetTotalSize(int totalSize)
 {
     totalSize_ = totalSize;
+}
+
+size_t ModelDataset::GetCurrentFramesAmount() const
+{
+    return imagesDescriptors_.size();
 }
 
 }

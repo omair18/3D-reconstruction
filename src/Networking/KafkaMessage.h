@@ -100,21 +100,21 @@ public:
      *
      * @return
      */
-    bool Empty() const;
+    [[nodiscard]] bool Empty() const;
 
     /**
      * @brief
      *
      * @return
      */
-    const std::vector<unsigned char>& GetData() const;
+    [[nodiscard]] const std::vector<unsigned char>& GetData() const;
 
     /**
      * @brief
      *
      * @return
      */
-    const std::shared_ptr<Config::JsonConfig>& GetKey() const;
+    [[nodiscard]] const std::shared_ptr<Config::JsonConfig>& GetKey() const;
 
     /**
      * @brief

@@ -69,6 +69,13 @@ private:
     /**
      * @brief
      *
+     * @param currentTimestamp
+     */
+    void UpdateExpired(unsigned long currentTimestamp);
+
+    /**
+     * @brief
+     *
      * @param config
      */
     static void ValidateConfig(const std::shared_ptr<Config::JsonConfig>& config);
