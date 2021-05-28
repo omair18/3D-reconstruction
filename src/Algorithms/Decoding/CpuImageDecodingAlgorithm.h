@@ -42,9 +42,7 @@ public:
      * @param gpuManager
      * @param cudaStream
      */
-    CpuImageDecodingAlgorithm(const std::shared_ptr<Config::JsonConfig>& config,
-                              [[maybe_unused]] const std::unique_ptr<GPU::GpuManager>& gpuManager,
-                              [[maybe_unused]] void* cudaStream);
+    CpuImageDecodingAlgorithm(const std::shared_ptr<Config::JsonConfig>& config, [[maybe_unused]] const std::unique_ptr<GPU::GpuManager>& gpuManager, [[maybe_unused]] void* cudaStream);
 
     /**
      * @brief
@@ -57,7 +55,7 @@ public:
      * @param processingData
      * @return
      */
-    bool Process(const std::shared_ptr<DataStructures::ProcessingData> &processingData) override;
+    bool Process(const std::shared_ptr<DataStructures::ProcessingData>& processingData) override;
 
     /**
      * @brief

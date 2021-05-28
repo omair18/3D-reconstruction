@@ -42,9 +42,6 @@ enum DIFFUSIVITY_TYPE
 
 struct Params
 {
-    int iNbOctave = 4; ///< Octave to process
-    int iNbSlicePerOctave = 4; ///< Levels per octave
-    float fSigma0 = 1.6f; ///< Initial sigma offset (used to suppress low level noise)
     float fThreshold = 0.0008f;  ///< Hessian determinant threshold
     float fDesc_factor = 1.f;   ///< Magnifier used to describe an interest point
 };
@@ -223,6 +220,8 @@ int fed_tau_by_process_time(const float T, const int M, const float tau_max, con
 }
 */
 
+
+
 void checkCudaErrors(cudaError_t&& error)
 {
     if(error != cudaError_t::cudaSuccess)
@@ -239,6 +238,302 @@ void checkNppErrors(NppStatus&& error)
     {
         std::clog << "NPPI error " << static_cast<int>(error) << std::endl;
         throw std::runtime_error("CUDA NPPI RTE.");
+    }
+}
+
+/**
+* Compute if a number is prime of not
+* @param i Input number to test
+* @retval true if number is prime
+* @retval false if number is not prime
+*/
+inline bool IsPrime( const int i )
+{
+    if (i == 1)
+    {
+        return false;
+    }
+    if (i == 2 || i == 3)
+    {
+        return true;
+    }
+    if (i % 2 == 0)
+    {
+        return false;
+    }
+
+    const size_t i_root = static_cast<int>( sqrt( static_cast<double>( i + 1 ) ) );
+
+    for (size_t cur = 3; cur <= i_root; cur += 2)
+    {
+        if (i % cur == 0)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
+* @brief Get the next prime number greater or equal to input
+* @param i Input number
+* @return next prime greater or equal to input
+*/
+inline int NextPrimeGreaterOrEqualTo( const int i )
+{
+    if (IsPrime( i ))
+    {
+        return i;
+    }
+    else
+    {
+        int cur = i + 1;
+
+        while (!IsPrime( cur ))
+        {
+            ++cur;
+        }
+        return cur;
+    }
+}
+
+/**
+ ** Compute FED cycle timings using total time
+ ** @param T total time
+ ** @param Tmax cycle stability limit (max : 0.25)
+ ** @param tau vector of FED cycle timings
+ ** @return number of cycle timings
+ **/
+int FEDCycleTimings(const float T, const float Tmax, std::vector<float>& tau)
+{
+    // Number of timings
+    const int n = ceilf( sqrtf( (3.0f * T) / Tmax + 0.25f ) - 0.5f - 1.0e-8f) + 0.5f;
+
+    // Scaling factor
+    const float scale = 3.0f * T / ( Tmax * static_cast<float>( n * (n + 1)) );
+
+    // only constants
+    const float cos_fact = 1.0f / ( static_cast<float>( 4 * n ) + 2.0f );
+    const float glo_fact = scale * Tmax / 2.0f;
+
+    // Compute cycle timings
+    tau.resize( n );
+    for (int j = 0; j < n; ++j)
+    {
+        const float cos_j = cosf( M_PI * ( static_cast<float>( 2 * j + 1 ) ) * cos_fact );
+        tau[ j ] = glo_fact / ( cos_j * cos_j );
+    }
+
+    // Compute Kappa reordering using kappa = n / 2
+    const int kappa = n / 2;
+
+    const int p = NextPrimeGreaterOrEqualTo( n + 1 );
+
+    // Store new positions
+    std::vector<float> tmp( n );
+    for (int i = 0 , k = 0; i < n; ++i , ++k)
+    {
+        // Search new index
+        int index = n;
+        while (( index = ( ( k + 1 ) * kappa ) % p - 1 ) >= n)
+        {
+            ++k;
+        }
+
+        tmp[ i ] = tau[ index ];
+    }
+
+    // Get new vector
+    std::swap( tmp , tau );
+    return n;
+}
+
+/**
+** Apply Fast Explicit Diffusion to an Image (on central part)
+** @param src input image
+** @param diff diffusion coefficient image
+** @param half_t Half diffusion time
+** @param out Output image
+** @param row_start Row range beginning (range is [row_start; row_end [ )
+** @param row_end Row range end (range is [row_start; row_end [ )
+**/
+void ImageFEDCentral( const DataStructures::CUDAImage& src , const DataStructures::CUDAImage& diff , const float half_t , DataStructures::CUDAImage& out ,
+                      const int row_start , const int row_end )
+{
+    const int width = src.Width();
+    float n_diff[4];
+    float n_src[4];
+    // Compute FED step on general range
+    for (int i = row_start; i < row_end; ++i)
+    {
+        for (int j = 1; j < width - 1; ++j)
+        {
+            // Retrieve neighbors : TODO check if we need a cache efficient version ?
+            n_diff[0] = diff( i , j + 1 );
+            n_diff[1] = diff( i - 1 , j );
+            n_diff[2] = diff( i , j - 1 );
+            n_diff[3] = diff( i + 1 , j );
+            n_src[0] = src( i , j + 1 );
+            n_src[1] = src( i - 1 , j );
+            n_src[2] = src( i , j - 1 );
+            n_src[3] = src( i + 1 , j );
+
+            // Compute diffusion factor for given pixel
+            const float cur_src = src( i , j );
+            const float cur_diff = diff( i , j );
+            const float a = ( cur_diff + n_diff[0] ) * ( n_src[0] - cur_src );
+            const float b = ( cur_diff + n_diff[1] ) * ( cur_src - n_src[1] );
+            const float c = ( cur_diff + n_diff[2] ) * ( cur_src - n_src[2] );
+            const float d = ( cur_diff + n_diff[3] ) * ( n_src[3] - cur_src );
+            const float value = half_t * ( a - c + d - b );
+            out( i , j ) = value;
+        }
+    }
+}
+
+/**
+** Apply Fast Explicit Diffusion to an Image (on central part)
+** @param src input image
+** @param diff diffusion coefficient image
+** @param half_t Half diffusion time
+** @param out Output image
+**/
+void ImageFEDCentralCPPThread(const DataStructures::CUDAImage& src , const DataStructures::CUDAImage& diff , const float half_t , DataStructures::CUDAImage & out )
+{
+    const int nb_thread = omp_get_max_threads();
+
+    // Compute ranges
+    std::vector<int > range;
+    SplitRange( 1 , ( int ) ( src.rows() - 1 ) , nb_thread , range );
+
+#pragma omp parallel for schedule(dynamic)
+    for (int i = 1; i < static_cast<int>( range.size() ); ++i)
+    {
+        ImageFEDCentral( src, diff, half_t, out, range[i - 1] , range[i] );
+    }
+}
+
+/**
+** Apply Fast Explicit Diffusion of an Image
+** @param src input image
+** @param diff diffusion coefficient image
+** @param t diffusion time
+** @param out output image
+**/
+void ImageFED(const DataStructures::CUDAImage& src, const DataStructures::CUDAImage& diff, const float tt, DataStructures::CUDAImage& out )
+{
+    const int width = src.Width();
+    const int height = src.Height();
+    const float half_t = t * 0.5f ;
+    if (out.Width() != width || out.Height() != height)
+    {
+        out.resize( width , height );
+    }
+    float n_diff[4];
+    float n_src[4];
+
+    // Take care of the central part
+    ImageFEDCentralCPPThread( src , diff , half_t , out );
+
+    // Take care of the border
+    // - first/last row
+    // - first/last col
+
+    // Compute FED step on first row
+    for (int j = 1; j < width - 1; ++j)
+    {
+        n_diff[0] = diff( 0 , j + 1 );
+        n_diff[2] = diff( 0 , j - 1 );
+        n_diff[3] = diff( 1 , j );
+        n_src[0] = src( 0 , j + 1 );
+        n_src[2] = src( 0 , j - 1 );
+        n_src[3] = src( 1 , j );
+
+        // Compute diffusion factor for given pixel
+        const float cur_src = src( 0 , j );
+        const float cur_diff = diff( 0 , j );
+        const float a = ( cur_diff + n_diff[0] ) * ( n_src[0] - cur_src );
+        const float c = ( cur_diff + n_diff[2] ) * ( cur_src - n_src[2] );
+        const float d = ( cur_diff + n_diff[3] ) * ( n_src[3] - cur_src );
+        const float value = half_t * ( a - c + d );
+        out( 0 , j ) = value;
+    }
+
+    // Compute FED step on last row
+    for (int j = 1; j < width - 1; ++j)
+    {
+        n_diff[0] = diff( height - 1 , j + 1 );
+        n_diff[1] = diff( height - 2 , j );
+        n_diff[2] = diff( height - 1 , j - 1 );
+        n_src[0] = src( height - 1 , j + 1 );
+        n_src[1] = src( height - 2 , j );
+        n_src[2] = src( height - 1 , j - 1 );
+
+        // Compute diffusion factor for given pixel
+        const float cur_src = src( height - 1 , j );
+        const float cur_diff = diff( height - 1 , j );
+        const float a = ( cur_diff + n_diff[0] ) * ( n_src[0] - cur_src );
+        const float b = ( cur_diff + n_diff[1] ) * ( cur_src - n_src[1] );
+        const float c = ( cur_diff + n_diff[2] ) * ( cur_src - n_src[2] );
+        const float value = half_t * ( a - c - b );
+        out( height - 1 , j ) = value;
+    }
+
+    // Compute FED step on first col
+    for (int i = 1; i < height - 1; ++i)
+    {
+        n_diff[0] = diff( i , 1 );
+        n_diff[1] = diff( i - 1 , 0 );
+        n_diff[3] = diff( i + 1 , 0 );
+        n_src[0] = src( i , 1 );
+        n_src[1] = src( i - 1 , 0 );
+        n_src[3] = src( i + 1 , 0 );
+
+        // Compute diffusion factor for given pixel
+        const float cur_src = src( i , 0 );
+        const float cur_diff = diff( i , 0 );
+        const float a = ( cur_diff + n_diff[0] ) * ( n_src[0] - cur_src );
+        const float b = ( cur_diff + n_diff[1] ) * ( cur_src - n_src[1] );
+        const float d = ( cur_diff + n_diff[3] ) * ( n_src[3] - cur_src );
+        const float value = half_t * ( a + d - b );
+        out( i , 0 ) = value;
+    }
+
+    // Compute FED step on last col
+    for (int i = 1; i < height - 1; ++i)
+    {
+        n_diff[1] = diff( i - 1 , width - 1 );
+        n_diff[2] = diff( i , width - 2 );
+        n_diff[3] = diff( i + 1 , width - 1 );
+        n_src[1] = src( i - 1 , width - 1 );
+        n_src[2] = src( i , width - 2 );
+        n_src[3] = src( i + 1 , width - 1 );
+
+        // Compute diffusion factor for given pixel
+        const float cur_src = src( i , width - 1 );
+        const float cur_diff = diff( i , width - 1 );
+        const float b = ( cur_diff + n_diff[1] ) * ( cur_src - n_src[1] );
+        const float c = ( cur_diff + n_diff[2] ) * ( cur_src - n_src[2] );
+        const float d = ( cur_diff + n_diff[3] ) * ( n_src[3] - cur_src );
+        const float value = half_t * ( - c + d - b );
+        out( i , width - 1 ) = value;
+    }
+}
+
+/**
+ ** Compute Fast Explicit Diffusion cycle
+ ** @param self input/output image
+ ** @param diff diffusion coefficient
+ ** @param tau cycle timing vector
+ **/
+void ImageFEDCycle(DataStructures::CUDAImage& in, const DataStructures::CUDAImage& diff, DataStructures::CUDAImage& temp, const std::vector<float>& tau )
+{
+    for (int i = 0; i < tau.size(); ++i)
+    {
+        fast_explicit_diffusion_api((float*)in.gpuData_, (float*)diff.gpuData_, (float*)temp.gpuData_,
+                                    in.width_, in.height_, in.pitch_, diff.pitch_, temp.pitch_);
+        ImageFED( self , diff , tau[i] , temp );
+        self.array() += tmp.array();
     }
 }
 
@@ -383,7 +678,8 @@ void PeronaMalikG1Diffusion(DataStructures::CUDAImage& Lx, DataStructures::CUDAI
 
 void PeronaMalikG2Diffusion(DataStructures::CUDAImage& Lx, DataStructures::CUDAImage& Ly, float contrastFactor, DataStructures::CUDAImage& out)
 {
-
+    perona_malik_g2_diffusion_api((float*)Lx.gpuData_, Lx.pitch_, (float*)Ly.gpuData_, Ly.pitch_, contrastFactor, (float*)out.gpuData_,
+                                  out.width_, out.height_, out.pitch_);
 }
 
 void WeickertDiffusion(DataStructures::CUDAImage& Lx, DataStructures::CUDAImage& Ly, float contrastFactor, DataStructures::CUDAImage& out)
@@ -392,6 +688,11 @@ void WeickertDiffusion(DataStructures::CUDAImage& Lx, DataStructures::CUDAImage&
 }
 
 void CharbonnierDiffusion(DataStructures::CUDAImage& Lx, DataStructures::CUDAImage& Ly, float contrastFactor, DataStructures::CUDAImage& out)
+{
+
+}
+
+void ComputeHessian()
 {
 
 }
@@ -544,6 +845,105 @@ void ImageScharrYDerivative(const DataStructures::CUDAImage& input, DataStructur
     ImageSeparableConvolution(input, output, temp, scharrYHorizontalKernel, scharrYVerticalKernel);
 }
 
+/**
+ ** Compute X-derivative using scaled Scharr filter
+ ** @param img Input image
+ ** @param out Output image
+ ** @param scale scale of filter (1 -> 3x3 filter; 2 -> 5x5, ...)
+ ** @param bNormalize true if kernel must be normalized
+ **/
+void ImageScaledScharrXDerivative( const DataStructures::CUDAImage& img, DataStructures::CUDAImage& out, DataStructures::CUDAImage& temp, const int scale , const bool bNormalize = true )
+{
+    const int kernel_size = 3 + 2 * ( scale - 1 );
+
+    std::vector<float> kernel_vert;
+    std::vector<float> kernel_horiz;
+
+    kernel_vert.resize(kernel_size);
+    kernel_horiz.resize(kernel_size);
+
+
+    /*
+    General X-derivative function
+                                | -1   0   1 |
+    D = 1 / ( 2 h * ( w + 2 ) ) | -w   0   w |
+                                | -1   0   1 |
+    */
+
+    std::fill(kernel_horiz.begin(), kernel_horiz.end(), 0);
+    kernel_horiz[0] = -1.0;
+    // kernel_horiz( kernel_size / 2 ) = 0.0;
+    kernel_horiz[kernel_size - 1] = 1.0;
+
+    // Scharr parameter for derivative
+    const float w = 10.0f / 3.0f;
+
+    std::fill(kernel_vert.begin(), kernel_vert.end(), 0);
+    kernel_vert[0] = 1.0;
+    kernel_vert[kernel_size / 2] = w;
+    kernel_vert[kernel_size - 1] = 1.0;
+
+    if (bNormalize)
+    {
+        for (auto& number : kernel_vert)
+        {
+            number *= (1.0f / (2.0f * static_cast<float>(scale) * (w + 2.0f)));
+        }
+    }
+
+    ImageSeparableConvolution(img, out, temp, kernel_horiz , kernel_vert);
+}
+
+
+
+/**
+ ** Compute Y-derivative using scaled Scharr filter
+ ** @param img Input image
+ ** @param out Output image
+ ** @param scale scale of filter (1 -> 3x3 filter; 2 -> 5x5, ...)
+ ** @param bNormalize true if kernel must be normalized
+ **/
+void ImageScaledScharrYDerivative( const DataStructures::CUDAImage& img, DataStructures::CUDAImage& out, DataStructures::CUDAImage& temp, const int scale , const bool bNormalize = true )
+{
+    /*
+    General Y-derivative function
+                                | -1  -w  -1 |
+    D = 1 / ( 2 h * ( w + 2 ) ) |  0   0   0 |
+                                |  1   w   1 |
+    */
+    const int kernel_size = 3 + 2 * ( scale - 1 );
+
+    std::vector<float> kernel_vert;
+    std::vector<float> kernel_horiz;
+
+    kernel_vert.resize(kernel_size);
+    kernel_horiz.resize(kernel_size);
+
+    // Scharr parameter for derivative
+    const float w = 10.0f / 3.0f;
+
+
+    std::fill(kernel_horiz.begin(), kernel_horiz.end(), 0);
+    kernel_horiz[0] = 1.0;
+    kernel_horiz[kernel_size / 2] = w;
+    kernel_horiz[kernel_size - 1] = 1.0;
+
+    if (bNormalize )
+    {
+        for (auto& number : kernel_horiz)
+        {
+            number *= (1.0f / (2.0f * static_cast<float>(scale) * (w + 2.0f)));
+        }
+    }
+
+    std::fill(kernel_vert.begin(), kernel_vert.end(), 0);
+    kernel_vert[0] = - 1.0;
+    // kernel_vert( kernel_size / 2 ) = 0.0;
+    kernel_vert[kernel_size - 1] = 1.0;
+
+    ImageSeparableConvolution(img, out, temp, kernel_horiz, kernel_vert);
+}
+
 void ComputeAKAZESlice(const DataStructures::CUDAImage& src,
                        DataStructures::CUDAImage& temp,
                        const int p,
@@ -589,12 +989,12 @@ void ComputeAKAZESlice(const DataStructures::CUDAImage& src,
         // Compute first derivatives (Scharr scale 1, non normalized) for diffusion coef
         ImageGaussianFilter(in , 1.f , smoothed, temp, 0, 0 );
 
-        ImageScharrXDerivative(smoothed , Lx , false );
-        ImageScharrYDerivative(smoothed , Ly , false );
+        ImageScharrXDerivative(smoothed , Lx , temp, false );
+        ImageScharrYDerivative(smoothed , Ly , temp, false );
 
         // Compute diffusion coefficient
         DataStructures::CUDAImage& diff = smoothed; // diffusivity image (reuse existing memory)
-        ImagePeronaMalikG2DiffusionCoef( Lx , Ly , contrast_factor , diff );
+        PeronaMalikG2Diffusion(Lx, Ly, contrast_factor, diff);
 
         // Compute FED cycles
         std::vector<float> tau;
@@ -611,12 +1011,12 @@ void ComputeAKAZESlice(const DataStructures::CUDAImage& src,
     else
     {
         // Add a little smooth to image (for robustness of Scharr derivatives)
-        ImageGaussianFilter( Li , 1.f , smoothed, 0, 0 );
+        ImageGaussianFilter( Li , 1.f , smoothed, temp, 0, 0 );
     }
 
     // Compute true first derivatives
-    ImageScaledScharrXDerivative( smoothed , Lx , sigma_scale );
-    ImageScaledScharrYDerivative( smoothed , Ly , sigma_scale );
+    ImageScaledScharrXDerivative(smoothed, Lx, temp, sigma_scale );
+    ImageScaledScharrYDerivative(smoothed, Ly, temp, sigma_scale );
 
     // Second order spatial derivatives
     Image<float> Lxx, Lyy, Lxy;
@@ -629,7 +1029,8 @@ void ComputeAKAZESlice(const DataStructures::CUDAImage& src,
 
     // Compute Determinant of the Hessian
     Lhess.resize(Li.Width(), Li.Height());
-    const float sigma_size_quad = Square(sigma_scale) * Square(sigma_scale);
+    const float sigma_size_square = sigma_scale * sigma_scale;
+    const float sigma_size_quad = sigma_size_square * sigma_size_square;
     Lhess.array() = (Lxx.array()*Lyy.array()-Lxy.array().square())*sigma_size_quad;
 }
 
@@ -666,8 +1067,6 @@ int main()
     NormalizeImage(grayFloatImage, grayFloatNormalizedImage);
 
     /// Compute contrast factor
-
-    Params params;
 
     float contrastFactor = 0;
 
@@ -724,6 +1123,7 @@ int main()
     {
         levels.push_back(i);
     }
+
     DataStructures::CUDAImage histogramGpu;
     DataStructures::CUDAImage levelsGpu;
     histogramGpu.Allocate(nbins + 1, 1, 1, DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_32S, false);
@@ -733,7 +1133,7 @@ int main()
     checkNppErrors(nppiHistogramRangeGetBufferSize_32f_C1R(maxGradientRoi, nbins + 1, &scratchBufferSize));
     scratchBuffer.Allocate(scratchBufferSize, 1, 1, DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_8U, false);
     checkNppErrors(nppiHistogramRange_32f_C1R((float*)tempImage.gpuData_, tempImage.pitch_, maxGradientRoi, (Npp32s*)histogramGpu.gpuData_, (float*)levelsGpu.gpuData_, nbins + 1, scratchBuffer.gpuData_));
-    histogramGpu.CopyToRawHostPointer(histogram.data(), nbins + 1, 1, 1, DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_32S);
+    histogramGpu.CopyToRawHostPointer(histogram.data(), nbins + 1, 1, DataStructures::CUDAImage::ELEMENT_TYPE::TYPE_32S);
 
     unsigned int amountOfPoints = sourceImage.width_ * sourceImage.height_;
     const float percentile = 0.7;

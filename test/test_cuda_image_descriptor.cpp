@@ -1,9 +1,9 @@
-#include "CUDAImageDescriptor.h"
+#include "ImageDescriptor.h"
 #include <vector>
 
 int main()
 {
-    DataStructures::CUDAImageDescriptor d;
-    std::vector<DataStructures::CUDAImageDescriptor> v;
+    DataStructures::ImageDescriptor d;
+    std::vector<DataStructures::ImageDescriptor> v;
     return 0;
 }

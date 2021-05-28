@@ -7,7 +7,7 @@
 #ifndef MESH_TEXTURING_ALGORITHM_H
 #define MESH_TEXTURING_ALGORITHM_H
 
-#include "IGPUAlgorithm.h"
+#include "ICPUAlgorithm.h"
 
 /**
  * @namespace Algorithms
@@ -22,7 +22,7 @@ namespace Algorithms
  *
  * @brief
  */
-class MeshTexturingAlgorithm : public IGPUAlgorithm
+class MeshTexturingAlgorithm : public ICPUAlgorithm
 {
 
 public:

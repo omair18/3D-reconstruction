@@ -21,6 +21,7 @@ int main(int argc, char** argv)
     int frameStep;
     std::string kafkaBroker;
     std::string topic;
+    int distortionFunctionId;
     int cameraId;
     int jpegQuality;
     float focalLength;
@@ -39,6 +40,7 @@ int main(int argc, char** argv)
     ("jpeg-quality,j", boost::program_options::value<int>(&jpegQuality)->default_value(40), "JPEG quality.")
     ("focal-length,l", boost::program_options::value<float>(&focalLength)->default_value(40.0), "Focal length of the camera in millimeters.")
     ("sensor-size,s", boost::program_options::value<float>(&sensorSize)->default_value(33.3), "Camera sensor size in millimeters.")
+    ("distortion-function,d", boost::program_options::value<int>(&distortionFunctionId)->default_value(0), "Camera's distortion function number. Possible values: [0..5].")
     ("timeout,o", boost::program_options::value<int>(&timeout)->default_value(10000), "Kafka producer flush timeout in milliseconds");
 
     boost::program_options::store(boost::program_options::parse_command_line(argc, argv, options), paramsMap);
@@ -60,6 +62,12 @@ int main(int argc, char** argv)
     if(frameStep <= 0)
     {
         std::clog << "Frame step must be positive!" << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    if (distortionFunctionId < 0 || distortionFunctionId > 5)
+    {
+        std::clog << "Distortion function id must be in [0..5]!" << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -191,6 +199,7 @@ int main(int argc, char** argv)
         jsonKey.as_object().emplace("framesTotal", encodedImagesTotal);
         jsonKey.as_object().emplace("focalLength", focalLength);
         jsonKey.as_object().emplace("sensorSize", sensorSize);
+        jsonKey.as_object().emplace("distortionFunctionID", distortionFunctionId);
         auto jsonKeyString = boost::json::serialize(jsonKey);
         std::cout << jsonKeyString << std::endl;
 

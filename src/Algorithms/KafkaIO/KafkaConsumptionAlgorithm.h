@@ -52,7 +52,7 @@ public:
      * @param processingData
      * @return
      */
-    bool Process(const std::shared_ptr<DataStructures::ProcessingData> &processingData) override;
+    bool Process(const std::shared_ptr<DataStructures::ProcessingData>& processingData) override;
 
     /**
      * @brief

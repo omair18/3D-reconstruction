@@ -37,7 +37,7 @@ static Decoding::DecoderType ConvertDecoderNameToDecodingType(const std::string&
 namespace Algorithms
 {
 
-CUDAImageDecodingAlgorithm::CUDAImageDecodingAlgorithm(const std::shared_ptr<Config::JsonConfig> &config, const std::unique_ptr<GPU::GpuManager> &gpuManager, void *cudaStream) :
+CUDAImageDecodingAlgorithm::CUDAImageDecodingAlgorithm(const std::shared_ptr<Config::JsonConfig>& config, const std::unique_ptr<GPU::GpuManager>& gpuManager, void* cudaStream) :
 IGPUAlgorithm(),
 removeSourceData_(false),
 decoders_(),
@@ -46,7 +46,7 @@ cudaStream_(cudaStream)
     InitializeInternal(config);
 }
 
-bool CUDAImageDecodingAlgorithm::Process(const std::shared_ptr<DataStructures::ProcessingData> &processingData)
+bool CUDAImageDecodingAlgorithm::Process(const std::shared_ptr<DataStructures::ProcessingData>& processingData)
 {
     auto& dataset = processingData->GetModelDataset();
     auto& imageDescriptors = dataset->GetImagesDescriptors();
@@ -89,10 +89,11 @@ bool CUDAImageDecodingAlgorithm::Process(const std::shared_ptr<DataStructures::P
             {
                 LOG_TRACE() << "Decoding image " << imageDescriptor.GetFrameId() << "/" << totalFramesInDataset
                 << " of dataset " << dataset->GetUUID() << " was successful.";
+                auto& modifiableImageDescriptor = const_cast<DataStructures::ImageDescriptor&>(imageDescriptor);
+                modifiableImageDescriptor.SetDataLocation(DataStructures::ImageDescriptor::LOCATION::DEVICE);
                 if(removeSourceData_)
                 {
-                    auto& modifiableImageDescriptor = const_cast<DataStructures::CUDAImageDescriptor&>(imageDescriptor);
-                    modifiableImageDescriptor.SetRawImageData({});
+                    modifiableImageDescriptor.ClearRawImageData();
                 }
             }
             else
@@ -111,12 +112,12 @@ bool CUDAImageDecodingAlgorithm::Process(const std::shared_ptr<DataStructures::P
     return decodingStatus;
 }
 
-void CUDAImageDecodingAlgorithm::Initialize(const std::shared_ptr<Config::JsonConfig> &config)
+void CUDAImageDecodingAlgorithm::Initialize(const std::shared_ptr<Config::JsonConfig>& config)
 {
     InitializeInternal(config);
 }
 
-void CUDAImageDecodingAlgorithm::ValidateConfig(const std::shared_ptr<Config::JsonConfig> &config)
+void CUDAImageDecodingAlgorithm::ValidateConfig(const std::shared_ptr<Config::JsonConfig>& config)
 {
     if(!config->Contains(Config::ConfigNodes::AlgorithmsConfig::CUDAImageDecodingAlgorithmConfig::Decoders))
     {
@@ -134,7 +135,7 @@ void CUDAImageDecodingAlgorithm::ValidateConfig(const std::shared_ptr<Config::Js
     }
 }
 
-void CUDAImageDecodingAlgorithm::InitializeInternal(const std::shared_ptr<Config::JsonConfig> &config)
+void CUDAImageDecodingAlgorithm::InitializeInternal(const std::shared_ptr<Config::JsonConfig>& config)
 {
     if(decoders_.empty())
     {

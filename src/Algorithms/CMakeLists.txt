@@ -10,15 +10,32 @@ set(ALGORITHMS_LIB_HEADERS
         Decoding/CUDAImageDecodingAlgorithm.h
         Decoding/CpuImageDecodingAlgorithm.h
         Photogrammetry/DatasetCollectingAlgorithm.h
+        Photogrammetry/CUDAAKAZEKeypointDetectionAlgorithm.h
         Photogrammetry/AKAZEKeypointDetectionAlgorithm.h
-        Photogrammetry/MeshReconstructionAlgorithm.h
-        Photogrammetry/MeshRefinementAlgorithm.h
-        Photogrammetry/MeshTexturingAlgorithm.h
+        Photogrammetry/CUDAKeyPointMatchingAlgorithm.h
+        Photogrammetry/KeyPointMatchingAlgorithm.h
+        Photogrammetry/CUDAKeyPointFilteringAlgorithm.h
+        Photogrammetry/KeyPointFilteringAlgorithm.h
+        Photogrammetry/CUDABundleAdjustmentAlgorithm.h
+        Photogrammetry/BundleAdjustmentAlgorithm.h
+        Photogrammetry/CUDAPointCloudDensificationAlgorithm.h
         Photogrammetry/PointCloudDensificationAlgorithm.h
-        ImageProcessing/CUDAResizeAlgorithm.h
-        ImageProcessing/CUDAConvolutionAlgorithm.h
+        Photogrammetry/CUDAMeshReconstructionAlgorithm.h
+        Photogrammetry/MeshReconstructionAlgorithm.h
+        Photogrammetry/CUDAMeshRefinementAlgorithm.h
+        Photogrammetry/MeshRefinementAlgorithm.h
+        Photogrammetry/CUDAMeshTexturingAlgorithm.h
+        Photogrammetry/MeshTexturingAlgorithm.h
+        ImageProcessing/CUDAImageResizeAlgorithm.h
+        ImageProcessing/ImageResizeAlgorithm.h
+        ImageProcessing/CUDAImageConvolutionAlgorithm.h
+        ImageProcessing/ImageConvolutionAlgorithm.h
         ImageProcessing/CUDAImageBinarizationAlgorithm.h
-        ImageProcessing/CUDASeparableConvolutionAlgorithm.h)
+        ImageProcessing/ImageBinarizationAlgorithm.h
+        ImageProcessing/CUDAImageSeparableConvolutionAlgorithm.h
+        ImageProcessing/ImageSeparableConvolutionAlgorithm.h
+        DataTransferring/DeviceToHostTransferringAlgorithm.h
+        DataTransferring/HostToDeviceTransferringAlgorithm.h)
 
 set(ALGORITHMS_LIB_CPPS
         AlgorithmFactory.cpp
@@ -28,15 +45,32 @@ set(ALGORITHMS_LIB_CPPS
         Decoding/CUDAImageDecodingAlgorithm.cpp
         Decoding/CpuImageDecodingAlgorithm.cpp
         Photogrammetry/DatasetCollectingAlgorithm.cpp
+        Photogrammetry/CUDAAKAZEKeypointDetectionAlgorithm.cpp
         Photogrammetry/AKAZEKeypointDetectionAlgorithm.cpp
-        Photogrammetry/MeshReconstructionAlgorithm.cpp
-        Photogrammetry/MeshRefinementAlgorithm.cpp
-        Photogrammetry/MeshTexturingAlgorithm.cpp
+        Photogrammetry/CUDAKeyPointMatchingAlgorithm.cpp
+        Photogrammetry/KeyPointMatchingAlgorithm.cpp
+        Photogrammetry/CUDAKeyPointFilteringAlgorithm.cpp
+        Photogrammetry/KeyPointFilteringAlgorithm.cpp
+        Photogrammetry/CUDABundleAdjustmentAlgorithm.cpp
+        Photogrammetry/BundleAdjustmentAlgorithm.cpp
+        Photogrammetry/CUDAPointCloudDensificationAlgorithm.cpp
         Photogrammetry/PointCloudDensificationAlgorithm.cpp
-        ImageProcessing/CUDAResizeAlgorithm.cpp
-        ImageProcessing/CUDAConvolutionAlgorithm.cpp
+        Photogrammetry/CUDAMeshReconstructionAlgorithm.cpp
+        Photogrammetry/MeshReconstructionAlgorithm.cpp
+        Photogrammetry/CUDAMeshRefinementAlgorithm.cpp
+        Photogrammetry/MeshRefinementAlgorithm.cpp
+        Photogrammetry/CUDAMeshTexturingAlgorithm.cpp
+        Photogrammetry/MeshTexturingAlgorithm.cpp
+        ImageProcessing/CUDAImageResizeAlgorithm.cpp
+        ImageProcessing/ImageResizeAlgorithm.cpp
+        ImageProcessing/CUDAImageConvolutionAlgorithm.cpp
+        ImageProcessing/ImageConvolutionAlgorithm.cpp
         ImageProcessing/CUDAImageBinarizationAlgorithm.cpp
-        ImageProcessing/CUDASeparableConvolutionAlgorithm.cpp)
+        ImageProcessing/ImageBinarizationAlgorithm.cpp
+        ImageProcessing/CUDAImageSeparableConvolutionAlgorithm.cpp
+        ImageProcessing/ImageSeparableConvolutionAlgorithm.cpp
+        DataTransferring/DeviceToHostTransferringAlgorithm.cpp
+        DataTransferring/HostToDeviceTransferringAlgorithm.cpp Photogrammetry/BundleAdjustmentAlgorithm.cpp Photogrammetry/BundleAdjustmentAlgorithm.h)
 
 source_group("Header Files" FILES ${ALGORITHMS_LIB_HEADERS})
 source_group("Source Files" FILES ${ALGORITHMS_LIB_CPPS})

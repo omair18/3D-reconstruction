@@ -14,3 +14,5 @@ void perona_malik_g2_diffusion_api(float* Lx_data, size_t Lx_pitch, float* Ly_da
 void weickert_diffusion_api(float* Lx_data, size_t Lx_pitch, float* Ly_data, size_t Ly_pitch, float contrastFactor, float* out_data, size_t out_width, size_t out_height, size_t out_pitch);
 
 void charbonier_diffusion_api(float* Lx_data, size_t Lx_pitch, float* Ly_data, size_t Ly_pitch, float contrastFactor, float* out_data, size_t out_width, size_t out_height, size_t out_pitch);
+
+void fast_explicit_diffusion_api(float* src, float* diff, float* temp, size_t width, size_t height, size_t srcPitch, size_t diffPitch, size_t tempPitch, );

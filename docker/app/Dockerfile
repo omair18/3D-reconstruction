@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.2.2-devel-ubuntu20.04
+FROM nvidia/cuda:11.3.0-devel-ubuntu20.04
 
 ENV TZ=Europe/Minsk
 ENV NVIDIA_DRIVER_CAPABILITIES=all
@@ -94,14 +94,16 @@ RUN cd /opt \
     && make install -j`nproc` \
     && rm -rf /opt/cmake-3.19.7
     
+    
 RUN cd /opt \
     && mkdir NvCodecHeaders \
     && cd NvCodecHeaders \
-    && git clone --branch=n11.0.10.0 https://github.com/FFmpeg/nv-codec-headers.git \
+    && git clone --branch=n11.0.10.1 https://github.com/FFmpeg/nv-codec-headers.git \
     && cd nv-codec-headers \
     && make -j`nproc` \
     && make install \
     && rm -rf /opt/NvCodecHeaders
+    
     
 RUN cd /opt \
     && mkdir FFmpeg \
@@ -142,62 +144,9 @@ RUN cd /opt \
     && make install \
     && rm -r /opt/FFmpeg
     
-RUN cd /opt \
-    && git clone https://github.com/gflags/gflags.git --branch=v2.2.2 \
-    && cd gflags \
-    && git submodule init \
-    && git submodule update \
-    && mkdir build \
-    && cd build \
-    && cmake \
-        -DCMAKE_CXX_STANDARD=17 \
-        -DCMAKE_CXX_STANDARD_REQUIRED=ON \
-        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_C_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_BUILD_TYPE=RELEASE \
-        -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/gflags \
-        -DBUILD_SHARED_LIBS=ON \
-        -DBUILD_STATIC_LIBS=OFF \
-        -DBUILD_TESTING=OFF \
-        -DBUILD_gflags_LIB=ON \
-        -DBUILD_gflags_nothreads_LIB=OFF \
-        .. \
-    && make -j`nproc` \
-    && make install \
-    && rm -rf /opt/gflags
-
-RUN cd /opt \
-    && git clone https://github.com/google/glog.git --branch=v0.4.0 \
-    && cd glog \
-    && git submodule init \
-    && git submodule update \
-    && sed -i -e 's/2.2.0/2.2.0 PATHS \/var\/3DReconstructionEnv\/gflags\/lib\/cmake\/gflags NO_DEFAULT_PATH/' CMakeLists.txt \
-    && mkdir build \
-    && cd build \
-    && cmake \
-        -DCMAKE_CXX_STANDARD=17 \
-        -DCMAKE_CXX_STANDARD_REQUIRED=ON \
-        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-        -DBUILD_TESTING=OFF \
-        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_C_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_BUILD_TYPE=RELEASE \
-        -DBUILD_SHARED_LIBS=ON \
-        -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/glog \
-        -DWITH_GFLAGS=ON \
-        -DWITH_THREADS=ON \
-        .. \
-    && make -j`nproc` \
-    && make install \
-    && rm -rf /opt/glog
     
 RUN cd /opt \
-    && git clone https://github.com/edenhill/librdkafka.git --branch=v1.5.3 \
+    && git clone https://github.com/edenhill/librdkafka.git --branch=v1.7.0 \
     && cd librdkafka \
     && git submodule init \
     && git submodule update \
@@ -210,9 +159,7 @@ RUN cd /opt \
         -DBUILD_SHARED_LIBS=ON \
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
         -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
         -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_C_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
         -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/librdkafka \
         -DRDKAFKA_BUILD_EXAMPLES=OFF \
         -DRDKAFKA_BUILD_TESTS=OFF \
@@ -221,14 +168,15 @@ RUN cd /opt \
     && make install \
     && rm -r /opt/librdkafka
 
+
 RUN cd /opt \
     && mkdir boost_lib \
     && mkdir -p /var/3DReconstructionEnv/boost \
     && cd boost_lib \
-    && wget https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.gz \
-    && tar -xzvf boost_1_75_0.tar.gz \
-    && rm boost_1_75_0.tar.gz \
-    && cd boost_1_75_0 \
+    && wget https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.gz \
+    && tar -xzvf boost_1_76_0.tar.gz \
+    && rm boost_1_76_0.tar.gz \
+    && cd boost_1_76_0 \
     && ./bootstrap.sh --prefix=/var/3DReconstructionEnv/boost \
     && ./b2 install cxxflags="-fPIC -Ofast -march=native -mtune=native -std=gnu++17 -fopenmp -fopenmp-simd -DNDEBUG" \
     && rm -r /opt/boost_lib
@@ -252,9 +200,7 @@ RUN cd /opt \
         -DBOOST_LIBRARYDIR=/var/3DReconstructionEnv/boost/lib \
         -DCMAKE_CXX_STANDARD_REQUIRED=ON \
         -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
         -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_C_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
         -DEIGEN_CUDA_COMPUTE_ARCH=86 \
         -DCUDA_NVCC_FLAGS="-gencode arch=compute_86,code=[sm_86,compute_86]" \
         -DBUILD_TESTING=OFF \
@@ -268,34 +214,6 @@ RUN cd /opt \
     && make install \
     && rm -rf /opt/eigen
         
-RUN cd /opt \
-    && git clone https://ceres-solver.googlesource.com/ceres-solver --branch=2.0.0 \
-    && cd ceres-solver \
-    && git submodule init \
-    && git submodule update \
-    && mkdir build \
-    && cd build \
-    && cmake \
-        -DCMAKE_BUILD_TYPE=RELEASE \
-        -DCMAKE_CXX_STANDARD=17 \
-        -DCMAKE_CXX_STANDARD_REQUIRED=ON \
-        -DEigen3_DIR=/var/3DReconstructionEnv/eigen/share/eigen3/cmake \
-        -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/ceres \
-        -DBUILD_SHARED_LIBS=ON \
-        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-        -DBUILD_TESTING=OFF \
-        -DBUILD_EXAMPLES=OFF \
-        -DBUILD_BENCHMARKS=OFF \
-        -Dgflags_DIR=/var/3DReconstructionEnv/gflags/lib/cmake/gflags \
-        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -fPIC -std=gnu++17 -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -std=gnu++17 -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_C_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -Dglog_DIR=/var/3DReconstructionEnv/glog \
-        .. \
-    && make -j`nproc` \
-    && make install \
-    && rm -rf /opt/ceres-solver
      
 RUN cd /opt \
     && mkdir opencv_lib \
@@ -335,6 +253,7 @@ RUN cd /opt \
         -DBUILD_opencv_python_bindings_generator=OFF \
         -DBUILD_opencv_optflow=OFF \
         -DBUILD_opencv_aruco=OFF \
+        -DBUILD_opencv_sfm=OFF \
         -DBUILD_opencv_dnn=OFF \
         -DBUILD_opencv_apps=OFF \
         -DWITH_OPENMP=ON \
@@ -355,16 +274,11 @@ RUN cd /opt \
         -DCUDA_ARCH_PTX=8.6 \
         -DENABLE_PRECOMPILED_HEADERS=OFF \
         -DEigen3_DIR=/var/3DReconstructionEnv/eigen/share/eigen3/cmake \
-        -DGLOG_DIR=/var/3DReconstructionEnv/glog \
-        -DGLOG_INCLUDE_DIR=/var/3DReconstructionEnv/glog/include \
-        -DGLOG_LIBRARY=/var/3DReconstructionEnv/glog/lib/libglog.so \
-        -DGlog_LIBS=/var/3DReconstructionEnv/glog/lib/libglog.so \
-        -Dgflags_DIR=/var/3DReconstructionEnv/gflags/lib/cmake/gflags \
-        -DCeres_DIR=/var/3DReconstructionEnv/ceres/lib/cmake/Ceres \
         .. \
     && make -j`nproc` \
     && make install \
     && rm -rf /opt/opencv_lib
+    
     
 RUN cd /opt \
     && git clone https://github.com/openMVG/openMVG.git --branch=v1.6 \
@@ -376,9 +290,7 @@ RUN cd /opt \
     && cmake \
         -DCMAKE_BUILD_TYPE=RELEASE \
         -DCMAKE_CXX_FLAGS="-Ofast -fopenmp -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -fopenmp -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp-simd -DNDEBUG" \
         -DCMAKE_C_FLAGS="-Ofast -fopenmp -march=native -mtune=native -fPIC -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_C_FLAGS_RELEASE="-Ofast -fopenmp -march=native -mtune=native -fPIC -fopenmp-simd -DNDEBUG" \
         -DOpenMVG_BUILD_DOC=OFF \
         -DOpenMVG_BUILD_EXAMPLES=OFF \
         -DOpenMVG_BUILD_GUI_SOFTWARES=OFF \
@@ -392,6 +304,7 @@ RUN cd /opt \
     && make -j`nproc` \
     && make install \
     && rm -rf /opt/openMVG
+    
     
 RUN cd /opt \
     && git clone https://github.com/CGAL/cgal.git --branch=v5.2 \
@@ -409,9 +322,7 @@ RUN cd /opt \
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
         -DOpenMVG_BUILD_SHARED=ON \
         -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
         -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_C_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
         -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/CGAL \
         -DEigen3_DIR=/var/3DReconstructionEnv/eigen/share/eigen3/cmake \
         .. \
@@ -421,6 +332,7 @@ RUN cd /opt \
     
 RUN cd /var/3DReconstructionEnv \
     && git clone https://github.com/cdcseacave/VCG.git --branch=v1.0.1 vcglib
+    
     
 RUN cd /opt \
     && git clone https://github.com/cdcseacave/openMVS.git --branch=v1.1.1 \
@@ -444,9 +356,7 @@ RUN cd /opt \
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
         -DOpenMVS_USE_CUDA=ON \
         -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
         -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_C_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
         -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/openMVS \
         -DCGAL_ROOT=/var/3DReconstructionEnv/CGAL/lib/cmake/CGAL \
         -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs \
@@ -455,34 +365,39 @@ RUN cd /opt \
     && make install \
     && rm -rf /opt/openMVS
 
-RUN cd /opt \
-    && git clone --branch=1.8.161 https://github.com/aws/aws-sdk-cpp.git \
-    && cd aws-sdk-cpp \
-    && mkdir build \
-    && cd build \
-    && cmake \
-        -DCMAKE_CXX_STANDARD=17 \
-        -DCMAKE_CXX_STANDARD_REQUIRED=ON \
-        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_C_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_BUILD_TYPE=RELEASE \
-        -DBUILD_SHARED_LIBS=ON \
-        -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/aws \
-        -DENABLE_UNITY_BUILD=OFF \
-        -DENABLE_TESTING=OFF \
-        -DAUTORUN_UNIT_TESTS=OFF \
-        -DANDROID_BUILD_CURL=OFF \
-        -DANDROID_BUILD_OPENSSL=OFF \
-        -DANDROID_BUILD_ZLIB=OFF \
-        .. \
-    && make -j`nproc` \
-    && make install \
-    && rm -rf /opt/aws-sdk-cpp
+
+#RUN cd /opt \
+#    && git clone https://github.com/aws/aws-sdk-cpp.git --branch=1.8.161 \
+#    && cd aws-sdk-cpp \
+#    && git submodule init \
+#    && git submodule update \
+#    && mkdir build \
+#    && cd build \
+#    && cmake \
+#        -DCMAKE_CXX_STANDARD=17 \
+#        -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+#        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+#        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+#        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+#        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+#        -DCMAKE_C_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
+#        -DCMAKE_BUILD_TYPE=RELEASE \
+#        -DBUILD_SHARED_LIBS=ON \
+#        -DCMAKE_INSTALL_PREFIX=/var/3DReconstructionEnv/aws \
+#        -DENABLE_UNITY_BUILD=OFF \
+#        -DENABLE_TESTING=OFF \
+#        -DAUTORUN_UNIT_TESTS=OFF \
+#        -DANDROID_BUILD_CURL=OFF \
+#        -DANDROID_BUILD_OPENSSL=OFF \
+#        -DANDROID_BUILD_ZLIB=OFF \
+#        .. \
+#    && make -j`nproc` \
+#    && make install \
+#    && rm -rf /opt/aws-sdk-cpp
+
 
 COPY 3D-reconstruction /opt/3D-reconstruction
+
 
 RUN cd /opt/3D-reconstruction \
     && mkdir build \
@@ -493,10 +408,6 @@ RUN cd /opt/3D-reconstruction \
         -DCMAKE_BUILD_TYPE=RELEASE \
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
         -DBUILD_SHARED_LIBS=ON \
-        -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_CXX_FLAGS_RELEASE="-Ofast -march=native -mtune=native -std=gnu++17 -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
-        -DCMAKE_C_FLAGS_RELEASE="-Ofast -march=native -mtune=native -fPIC -fopenmp -fopenmp-simd -DNDEBUG" \
         .. \
     && make -j`nproc` \
 

@@ -40,9 +40,7 @@ public:
      * @param gpuManager
      * @param cudaStream
      */
-    KafkaProducingAlgorithm(const std::shared_ptr<Config::JsonConfig>& config,
-                            [[maybe_unused]] const std::unique_ptr<GPU::GpuManager>& gpuManager,
-                            [[maybe_unused]] void* cudaStream);
+    KafkaProducingAlgorithm(const std::shared_ptr<Config::JsonConfig>& config, [[maybe_unused]] const std::unique_ptr<GPU::GpuManager>& gpuManager, [[maybe_unused]] void* cudaStream);
 
     /**
      * @brief

@@ -13,7 +13,7 @@ OpenCVImageDecoder::~OpenCVImageDecoder() noexcept(false)
 
 }
 
-bool OpenCVImageDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::Mat &decodedData)
+bool OpenCVImageDecoder::Decode(const unsigned char* data, unsigned long long int size, cv::Mat& decodedData)
 {
     LOG_TRACE() << "Decoding image with OpenCV decoder";
     std::vector<char> buffer(data, data  + size);
@@ -30,7 +30,7 @@ bool OpenCVImageDecoder::Decode(const unsigned char *data, unsigned long long in
     }
 }
 
-bool OpenCVImageDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::cuda::GpuMat &decodedImage)
+bool OpenCVImageDecoder::Decode(const unsigned char* data, unsigned long long int size, cv::cuda::GpuMat& decodedImage)
 {
     cv::Mat decodedFrame;
     if(Decode(data, size, decodedFrame))
@@ -45,7 +45,7 @@ bool OpenCVImageDecoder::Decode(const unsigned char *data, unsigned long long in
 
 }
 
-bool OpenCVImageDecoder::Decode(const unsigned char *data, unsigned long long int size, DataStructures::CUDAImage &decodedImage)
+bool OpenCVImageDecoder::Decode(const unsigned char* data, unsigned long long int size, DataStructures::CUDAImage& decodedImage)
 {
     cv::cuda::GpuMat gpuImage;
     if(Decode(data, size, gpuImage))

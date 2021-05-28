@@ -1,6 +1,7 @@
 #include <unordered_map>
 
 #include "ModelDataset.h"
+#include "ReconstructionParams.h"
 
 namespace DataStructures
 {
@@ -19,12 +20,30 @@ status_(ProcessingStatus::RECEIVED),
 totalSize_(0),
 totalFramesAmount_(0),
 UUID_(),
-imagesDescriptors_()
+imagesDescriptors_(),
+reconstructionParams_(std::make_unique<ReconstructionParams>())
 {
 
 }
 
-ModelDataset::ModelDataset(const ModelDataset &other) = default;
+ModelDataset::ModelDataset(const ModelDataset &other)
+{
+    imagesDescriptors_ = other.imagesDescriptors_;
+    UUID_ = other.UUID_;
+    totalSize_ = other.totalSize_;
+    status_ = other.status_;
+    imagesDescriptors_ = other.imagesDescriptors_;
+    totalFramesAmount_ = other.totalFramesAmount_;
+    if(other.reconstructionParams_)
+    {
+        reconstructionParams_ = std::make_unique<ReconstructionParams>(*other.reconstructionParams_);
+    }
+    else
+    {
+        reconstructionParams_ = std::make_unique<ReconstructionParams>();
+    }
+
+};
 
 ModelDataset::ModelDataset(ModelDataset &&other) noexcept :
 status_(other.status_),
@@ -58,7 +77,7 @@ DataStructures::ModelDataset::ProcessingStatus DataStructures::ModelDataset::Get
     return status_;
 }
 
-const std::vector<CUDAImageDescriptor> &ModelDataset::GetImagesDescriptors() const noexcept
+const std::vector<ImageDescriptor> &ModelDataset::GetImagesDescriptors() const noexcept
 {
     return imagesDescriptors_;
 }
@@ -83,12 +102,12 @@ void ModelDataset::SetProcessingStatus(ModelDataset::ProcessingStatus status) no
     status_ = status;
 }
 
-void ModelDataset::SetImagesDescriptors(const std::vector<CUDAImageDescriptor>& imagesDescriptors)
+void ModelDataset::SetImagesDescriptors(const std::vector<ImageDescriptor>& imagesDescriptors)
 {
     imagesDescriptors_ = imagesDescriptors;
 }
 
-void ModelDataset::SetImagesDescriptors(std::vector<CUDAImageDescriptor> &&imagesDescriptors) noexcept
+void ModelDataset::SetImagesDescriptors(std::vector<ImageDescriptor> &&imagesDescriptors) noexcept
 {
     imagesDescriptors_ = std::move(imagesDescriptors);
 }

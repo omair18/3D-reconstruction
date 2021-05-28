@@ -137,19 +137,50 @@ namespace Config
                 const inline static std::string KafkaProducingAlgorithm = "kafkaProducingAlgorithm";
                 const inline static std::string KafkaMessageParsingAlgorithm = "kafkaMessageParsingAlgorithm";
 
+                // Data transferring
+                const inline static std::string DeviceToHostTransferringAlgorithm = "deviceToHostTransferringAlgorithm";
+                const inline static std::string HostToDeviceTransferringAlgorithm = "hostToDeviceTransferringAlgorithm";
+
                 // Decoding
                 const inline static std::string CpuImageDecodingAlgorithm = "cpuImageDecodingAlgorithm";
                 const inline static std::string CUDAImageDecodingAlgorithm = "CUDAImageDecodingAlgorithm";
 
                 // Image processing
-                const inline static std::string CUDAConvolutionAlgorithm = "CUDAConvolutionAlgorithm";
-                const inline static std::string CUDAResizeAlgorithm = "CUDAResizeAlgorithm";
+                const inline static std::string CUDAImageConvolutionAlgorithm = "CUDAImageConvolutionAlgorithm";
+                const inline static std::string ImageConvolutionAlgorithm = "imageConvolutionAlgorithm";
+                const inline static std::string CUDAImageResizeAlgorithm = "CUDAImageResizeAlgorithm";
+                const inline static std::string ImageResizeAlgorithm = "imageResizeAlgorithm";
+                const inline static std::string CUDAImageBinarizationAlgorithm = "CUDAImageBinarizationAlgorithm";
+                const inline static std::string ImageBinarizationAlgorithm = "imageBinarizationAlgorithm";
+                const inline static std::string CUDAImageSeparableConvolutionAlgorithm = "CUDAImageSeparableConvolutionAlgorithm";
+                const inline static std::string ImageSeparableConvolutionAlgorithm = "imageSeparableConvolutionAlgorithm";
+
 
                 // Photogrammetry
                 const inline static std::string DatasetCollectingAlgorithm = "datasetCollectingAlgorithm";
 
+                const inline static std::string CUDAAKAZEKeyPointDetectionAlgorithm = "CUDAAKAZEKeyPointDetectionAlgorithm";
+                const inline static std::string AKAZEKeyPointDetectionAlgorithm = "AKAZEKeyPointDetectionAlgorithm";
+
+                const inline static std::string CUDAKeyPointMatchingAlgorithm = "CUDAKeyPointMatchingAlgorithm";
+                const inline static std::string KeyPointMatchingAlgorithm = "keyPointMatchingAlgorithm";
+
+                const inline static std::string CUDAKeyPointFilteringAlgorithm = "CUDAKeyPointFilteringAlgorithm";
+                const inline static std::string KeyPointFilteringAlgorithm = "keyPointFilteringAlgorithm";
+
+                const inline static std::string CUDABundleAdjustmentAlgorithm = "CUDABundleAdjustmentAlgorithm";
+                const inline static std::string BundleAdjustmentAlgorithm = "bundleAdjustmentAlgorithm";
+
+                const inline static std::string CUDAPointCloudDensificationAlgorithm = "CUDAPointCloudDensificationAlgorithm";
+                const inline static std::string PointCloudDensificationAlgorithm = "pointCloudDensificationAlgorithm";
+
+                const inline static std::string CUDAMeshReconstructionAlgorithm = "CUDAMeshReconstructionAlgorithm";
                 const inline static std::string MeshReconstructionAlgorithm = "meshReconstructionAlgorithm";
+
+                const inline static std::string CUDAMeshRefinementAlgorithm = "CUDAMeshRefinementAlgorithm";
                 const inline static std::string MeshRefinementAlgorithm = "meshRefinementAlgorithm";
+
+                const inline static std::string CUDAMeshTexturingAlgorithm = "CUDAMeshTexturingAlgorithm";
                 const inline static std::string MeshTexturingAlgorithm = "meshTexturingAlgorithm";
             }
 
@@ -169,6 +200,21 @@ namespace Config
                 const inline static std::string& Timeout = NetworkingConfig::KafkaProducerConfig::Timeout;
             }
 
+            namespace KafkaMessageParsingAlgorithm
+            {
+
+            }
+
+            namespace DeviceToHostTransferringAlgorithm
+            {
+
+            }
+
+            namespace HostToDeviceTransferringAlgorithm
+            {
+
+            }
+
             namespace CpuImageDecodingAlgorithmConfig
             {
                 const inline static std::string Decoders = "decoders";
@@ -181,12 +227,42 @@ namespace Config
                 const inline static std::string& RemoveSourceData = CpuImageDecodingAlgorithmConfig::RemoveSourceData;
             }
 
-            namespace CUDAConvolutionAlgorithmConfig
+            namespace CUDAImageConvolutionAlgorithmConfig
             {
 
             }
 
-            namespace CUDAResizeAlgorithmConfig
+            namespace ImageConvolutionAlgorithmConfig
+            {
+
+            }
+
+            namespace CUDAImageResizeAlgorithmConfig
+            {
+
+            }
+
+            namespace ImageResizeAlgorithmConfig
+            {
+
+            }
+
+            namespace CUDAImageBinarizationAlgorithm
+            {
+
+            }
+
+            namespace ImageBinarizationAlgorithm
+            {
+
+            }
+
+            namespace CUDAImageSeparableConvolutionAlgorithm
+            {
+
+            }
+
+            namespace ImageSeparableConvolutionAlgorithm
             {
 
             }
@@ -196,6 +272,85 @@ namespace Config
                 const inline static std::string ExpireTimeout = "expireTimeout";
             }
 
+            namespace CUDAAKAZEKeyPointDetectionAlgorithm
+            {
+
+            }
+
+            namespace AKAZEKeyPointDetectionAlgorithm
+            {
+
+            }
+
+            namespace CUDAKeyPointMatchingAlgorithm
+            {
+
+            }
+
+            namespace KeyPointMatchingAlgorithm
+            {
+
+            }
+
+            namespace CUDAKeyPointFilteringAlgorithm
+            {
+
+            }
+
+            namespace KeyPointFilteringAlgorithm
+            {
+
+            }
+
+            namespace CUDABundleAdjustmentAlgorithm
+            {
+
+            }
+
+            namespace BundleAdjustmentAlgorithm
+            {
+
+            }
+
+            namespace CUDAPointCloudDensificationAlgorithm
+            {
+
+            }
+
+            namespace PointCloudDensificationAlgorithm
+            {
+
+            }
+
+            namespace CUDAMeshReconstructionAlgorithm
+            {
+
+            }
+
+            namespace MeshReconstructionAlgorithm
+            {
+
+            }
+
+            namespace CUDAMeshRefinementAlgorithm
+            {
+
+            }
+
+            namespace MeshRefinementAlgorithm
+            {
+
+            }
+
+            namespace CUDAMeshTexturingAlgorithm
+            {
+
+            }
+
+            namespace MeshTexturingAlgorithm
+            {
+
+            }
 
         }
 
@@ -208,6 +363,7 @@ namespace Config
             const inline static std::string FramesTotal = "framesTotal";
             const inline static std::string FocalLength = "focalLength";
             const inline static std::string SensorSize = "sensorSize";
+            const inline static std::string DistortionFunctionID = "distortionFunctionID";
         }
     }
 }

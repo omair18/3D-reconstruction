@@ -10,7 +10,7 @@
 #include <vector>
 #include <string>
 
-#include "CUDAImageDescriptor.h"
+#include "ImageDescriptor.h"
 
 // forward declaration for Config::JsonConfig
 namespace Config
@@ -25,6 +25,9 @@ namespace Config
  */
 namespace DataStructures
 {
+
+// forward declaration for DataStructures::ReconstructionParams
+struct ReconstructionParams;
 
 /**
  * @class
@@ -146,21 +149,21 @@ public:
      *
      * @return
      */
-    [[nodiscard]] const std::vector<CUDAImageDescriptor>& GetImagesDescriptors() const noexcept;
+    [[nodiscard]] const std::vector<ImageDescriptor>& GetImagesDescriptors() const noexcept;
 
     /**
      * @brief
      *
      * @param imagesDescriptors
      */
-    void SetImagesDescriptors(const std::vector<CUDAImageDescriptor>& imagesDescriptors);
+    void SetImagesDescriptors(const std::vector<ImageDescriptor>& imagesDescriptors);
 
     /**
      * @brief
      *
      * @param imagesDescriptors
      */
-    void SetImagesDescriptors(std::vector<CUDAImageDescriptor>&& imagesDescriptors) noexcept;
+    void SetImagesDescriptors(std::vector<ImageDescriptor>&& imagesDescriptors) noexcept;
 
     /**
      * @brief
@@ -200,7 +203,7 @@ public:
 private:
 
     ///
-    std::vector<CUDAImageDescriptor> imagesDescriptors_;
+    std::vector<ImageDescriptor> imagesDescriptors_;
 
     ///
     std::string UUID_;
@@ -213,6 +216,9 @@ private:
 
     ///
     ProcessingStatus status_;
+
+    ///
+    std::unique_ptr<ReconstructionParams> reconstructionParams_;
 };
 
 }

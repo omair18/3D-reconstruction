@@ -6,6 +6,8 @@
 #include "KafkaIO/KafkaMessageParsingAlgorithm.h"
 #include "Decoding/CpuImageDecodingAlgorithm.h"
 #include "Decoding/CUDAImageDecodingAlgorithm.h"
+#include "DataTransferring/HostToDeviceTransferringAlgorithm.h"
+#include "DataTransferring/DeviceToHostTransferringAlgorithm.h"
 #include "Photogrammetry/DatasetCollectingAlgorithm.h"
 #include "KafkaConsumer.h"
 #include "KafkaProducer.h"
@@ -21,9 +23,17 @@ AlgorithmFactory::AlgorithmFactory()
         { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::KafkaConsumptionAlgorithm, GetAlgorithmLambda<KafkaConsumptionAlgorithm>() },
         { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::KafkaProducingAlgorithm, GetAlgorithmLambda<KafkaProducingAlgorithm>() },
         { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::KafkaMessageParsingAlgorithm, GetAlgorithmLambda<KafkaMessageParsingAlgorithm>() },
+
         { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::CpuImageDecodingAlgorithm, GetAlgorithmLambda<CpuImageDecodingAlgorithm>() },
         { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::CUDAImageDecodingAlgorithm, GetAlgorithmLambda<CUDAImageDecodingAlgorithm>() },
+
+        { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::HostToDeviceTransferringAlgorithm, GetAlgorithmLambda<HostToDeviceTransferringAlgorithm>() },
+        { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::DeviceToHostTransferringAlgorithm, GetAlgorithmLambda<DeviceToHostTransferringAlgorithm>() },
+
         { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::DatasetCollectingAlgorithm, GetAlgorithmLambda<DatasetCollectingAlgorithm>() }
+
+
+
     };
 }
 

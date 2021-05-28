@@ -46,7 +46,6 @@ find_package(OpenCV COMPONENTS
         opencv_videoio
         opencv_cudaimgproc
         opencv_cudawarping
-        opencv_sfm
         opencv_rgbd
         opencv_cudafeatures2d
         opencv_features2d
@@ -57,9 +56,14 @@ find_package(OpenCV COMPONENTS
         PATHS ${LIBRARIES_PATH}/opencv
         NO_DEFAULT_PATH)
 
-set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "${LIBRARIES_PATH}/aws")
+#set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "${LIBRARIES_PATH}/aws")
 set(BUILD_SHARED_LIBS ON)
-find_package(AWSSDK COMPONENTS s3 REQUIRED PATHS ${LIBRARIES_PATH}/aws NO_DEFAULT_PATH)
+#find_package(AWSSDK COMPONENTS s3 REQUIRED PATHS ${LIBRARIES_PATH}/aws NO_DEFAULT_PATH)
+
+find_package(Eigen3 REQUIRED PATHS /var/3DReconstructionEnv/eigen NO_DEFAULT_PATH)
+
+find_package(OpenMVG REQUIRED PATHS /var/3DReconstructionEnv/openMVG NO_DEFAULT_PATH)
+find_package(OpenMVS REQUIRED PATHS /var/3DReconstructionEnv/openMVS/lib/CMake NO_DEFAULT_PATH)
 
 find_library(NVJPEG_LIBRARY nvjpeg ${CUDA_TOOLKIT_ROOT_DIR}/lib64)
 
@@ -76,6 +80,6 @@ add_subdirectory(src)
 add_subdirectory(test)
 
 file(COPY web DESTINATION ${PROJECT_BINARY_DIR}/bin)
-file(COPY python/kafka_dataset_sender.py DESTINATION ${PROJECT_BINARY_DIR}/bin)
+file(COPY python/kafka_jpeg_dataset_sender.py DESTINATION ${PROJECT_BINARY_DIR}/bin)
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/bin/models)
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/bin/Logs)

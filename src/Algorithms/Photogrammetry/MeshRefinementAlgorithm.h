@@ -7,7 +7,7 @@
 #ifndef MESH_REFINEMENT_ALGORITHM_H
 #define MESH_REFINEMENT_ALGORITHM_H
 
-#include "IGPUAlgorithm.h"
+#include "ICPUAlgorithm.h"
 
 /**
  * @namespace Algorithms
@@ -22,7 +22,7 @@ namespace Algorithms
  *
  * @brief
  */
-class MeshRefinementAlgorithm : public IGPUAlgorithm
+class MeshRefinementAlgorithm : public ICPUAlgorithm
 {
 
 public:

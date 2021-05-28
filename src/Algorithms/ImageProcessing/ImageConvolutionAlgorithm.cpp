@@ -1,0 +1,1 @@
+#include "ImageConvolutionAlgorithm.h"

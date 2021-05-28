@@ -1,4 +1,4 @@
-include_directories(${LIBRARIES_PATH}/aws/include)
+#include_directories(${LIBRARIES_PATH}/aws/include)
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${CUDA_INCLUDE_DIRS})
 
@@ -6,7 +6,7 @@ add_executable(http_server_test http_server_test.cpp test_cuda_image_descriptor.
 target_link_libraries(http_server_test Boost::system pthread ssl crypto)
 
 add_executable(test test.cpp)
-target_link_libraries(test Boost::json opencv_cudaarithm opencv_cudawarping opencv_core opencv_imgcodecs decoding datastructures log stdc++fs processing)
+target_link_libraries(test Boost::json opencv_cudaarithm opencv_cudawarping opencv_core opencv_imgcodecs stdc++fs OpenMVG::openMVG_sfm)
 
 add_executable(test_json test_json.cpp)
 target_link_libraries(test_json Boost::json)
@@ -35,8 +35,8 @@ target_link_libraries(test_npp_convolution
         ${CUDA_nppig_LIBRARY}
         ${CUDA_LIBRARIES})
 
-add_executable(test_aws_bucket test_aws_bucket.cpp)
-target_link_libraries(test_aws_bucket ${AWSSDK_LINK_LIBRARIES})
+#add_executable(test_aws_bucket test_aws_bucket.cpp)
+#target_link_libraries(test_aws_bucket ${AWSSDK_LINK_LIBRARIES})
 
 add_executable(test_scharr_filter test_scharr_filter.cpp)
 target_link_libraries(test_scharr_filter

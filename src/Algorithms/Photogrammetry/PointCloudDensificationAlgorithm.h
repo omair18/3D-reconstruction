@@ -7,7 +7,7 @@
 #ifndef POINT_CLOUD_DENSIFICATION_ALGORITHM_H
 #define POINT_CLOUD_DENSIFICATION_ALGORITHM_H
 
-#include "IGPUAlgorithm.h"
+#include "ICPUAlgorithm.h"
 
 /**
  * @namespace Algorithms
@@ -22,7 +22,7 @@ namespace Algorithms
  *
  * @brief
  */
-class PointCloudDensificationAlgorithm : public IGPUAlgorithm
+class PointCloudDensificationAlgorithm : public ICPUAlgorithm
 {
 
 public:

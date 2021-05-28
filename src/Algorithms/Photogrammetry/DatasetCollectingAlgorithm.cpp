@@ -20,7 +20,7 @@ bool DatasetCollectingAlgorithm::Process(const std::shared_ptr<DataStructures::P
     auto& dataset = processingData->GetModelDataset();
     auto& datasetUUID = dataset->GetUUID();
 
-    auto& receivedImageDescriptors = const_cast<std::vector<DataStructures::CUDAImageDescriptor>&>(dataset->GetImagesDescriptors());
+    auto& receivedImageDescriptors = const_cast<std::vector<DataStructures::ImageDescriptor>&>(dataset->GetImagesDescriptors());
     unsigned long currentTimestamp = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 
     auto existingDataset = datasets_.find(datasetUUID);
@@ -38,7 +38,7 @@ bool DatasetCollectingAlgorithm::Process(const std::shared_ptr<DataStructures::P
         auto& collectedDatasetAndTimestamp = existingDataset->second;
         auto& collectedDataset = collectedDatasetAndTimestamp.second->GetModelDataset();
         auto& collectedDatasetLastUpdateTime = collectedDatasetAndTimestamp.first;
-        auto& collectedDatasetImageDescriptors = const_cast<std::vector<DataStructures::CUDAImageDescriptor>&>(collectedDataset->GetImagesDescriptors());
+        auto& collectedDatasetImageDescriptors = const_cast<std::vector<DataStructures::ImageDescriptor>&>(collectedDataset->GetImagesDescriptors());
 
         for (auto& receivedImageDescriptor : receivedImageDescriptors)
         {

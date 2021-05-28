@@ -1,7 +1,7 @@
 #include "KafkaMessageParsingAlgorithm.h"
 #include "KafkaMessage.h"
 #include "ProcessingData.h"
-#include "CUDAImageDescriptor.h"
+#include "ImageDescriptor.h"
 #include "JsonConfig.h"
 #include "ConfigNodes.h"
 #include "Logger.h"
@@ -9,19 +9,19 @@
 namespace Algorithms
 {
 
-KafkaMessageParsingAlgorithm::KafkaMessageParsingAlgorithm([[maybe_unused]] const std::shared_ptr<Config::JsonConfig> &config, [[maybe_unused]] const std::unique_ptr<GPU::GpuManager> &gpuManager, [[maybe_unused]] void *cudaStream) :
+KafkaMessageParsingAlgorithm::KafkaMessageParsingAlgorithm([[maybe_unused]] const std::shared_ptr<Config::JsonConfig>& config, [[maybe_unused]] const std::unique_ptr<GPU::GpuManager>& gpuManager, [[maybe_unused]] void* cudaStream) :
 ICPUAlgorithm(),
 isInitialized_(false)
 {
     InitializeInternal();
 }
 
-void KafkaMessageParsingAlgorithm::Initialize(const std::shared_ptr<Config::JsonConfig> &config)
+void KafkaMessageParsingAlgorithm::Initialize(const std::shared_ptr<Config::JsonConfig>& config)
 {
     InitializeInternal();
 }
 
-bool KafkaMessageParsingAlgorithm::Process(const std::shared_ptr<DataStructures::ProcessingData> &processingData)
+bool KafkaMessageParsingAlgorithm::Process(const std::shared_ptr<DataStructures::ProcessingData>& processingData)
 {
     auto& message = processingData->GetKafkaMessage();
     if(!message)
@@ -76,6 +76,7 @@ bool KafkaMessageParsingAlgorithm::Process(const std::shared_ptr<DataStructures:
 
         float focalLength;
         float sensorSize;
+        int distortionFunctionId;
 
         if(key->Contains(Config::ConfigNodes::MessageNodes::FocalLength))
         {
@@ -88,8 +89,8 @@ bool KafkaMessageParsingAlgorithm::Process(const std::shared_ptr<DataStructures:
         }
         else
         {
-            LOG_WARNING() << "Focal length of image's camera was not set. Setting it to 40mm.";
             focalLength = 40;
+            LOG_WARNING() << "Focal length of image's camera was not set. Setting it to " << focalLength << "mm.";
         }
 
         if(key->Contains(Config::ConfigNodes::MessageNodes::SensorSize))
@@ -103,13 +104,28 @@ bool KafkaMessageParsingAlgorithm::Process(const std::shared_ptr<DataStructures:
         }
         else
         {
-            LOG_WARNING() << "Sensor size of image's camera was not set. Setting it to 33.3mm.";
-            sensorSize = 33.3;
+            sensorSize = 33.3f;
+            LOG_WARNING() << "Sensor size of image's camera was not set. Setting it to " << sensorSize << "mm.";
+        }
+
+        if (key->Contains(Config::ConfigNodes::MessageNodes::DistortionFunctionID))
+        {
+            distortionFunctionId = (*key)[Config::ConfigNodes::MessageNodes::DistortionFunctionID]->ToInt32();
+            if (distortionFunctionId < 0 || distortionFunctionId > 5)
+            {
+                LOG_ERROR() << "Failed to parse kafka message. Invalid camera's distortion function id " << focalLength  << ".";
+                return false;
+            }
+        }
+        else
+        {
+            distortionFunctionId = 0;
+            LOG_WARNING() << "Camera's distortion function id was not set. Setting it to " << distortionFunctionId << ".";
         }
 
         auto UUID = (*key)[Config::ConfigNodes::MessageNodes::UUID]->ToString();
 
-        DataStructures::CUDAImageDescriptor imageDescriptor;
+        DataStructures::ImageDescriptor imageDescriptor;
         auto dataset = std::make_shared<DataStructures::ModelDataset>();
 
         auto& rawImageData = message->GetData();
@@ -124,11 +140,12 @@ bool KafkaMessageParsingAlgorithm::Process(const std::shared_ptr<DataStructures:
         imageDescriptor.SetFocalLength(focalLength);
         imageDescriptor.SetSensorSize(sensorSize);
         imageDescriptor.SetFrameId(frameId);
+        imageDescriptor.SetCameraDistortionFunctionId(distortionFunctionId);
 
         dataset->SetUUID(std::move(UUID));
         dataset->SetTotalFramesAmount(framesTotal);
 
-        std::vector<DataStructures::CUDAImageDescriptor> descriptors;
+        std::vector<DataStructures::ImageDescriptor> descriptors;
         descriptors.push_back(std::move(imageDescriptor));
 
         dataset->SetImagesDescriptors(std::move(descriptors));

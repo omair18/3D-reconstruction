@@ -8,13 +8,13 @@
 namespace Algorithms
 {
 
-KafkaProducingAlgorithm::KafkaProducingAlgorithm(const std::shared_ptr<Config::JsonConfig> &config, [[maybe_unused]] const std::unique_ptr<GPU::GpuManager> &gpuManager, [[maybe_unused]] void *cudaStream) :
+KafkaProducingAlgorithm::KafkaProducingAlgorithm(const std::shared_ptr<Config::JsonConfig>& config, [[maybe_unused]] const std::unique_ptr<GPU::GpuManager>& gpuManager, [[maybe_unused]] void* cudaStream) :
 ICPUAlgorithm()
 {
     Initialize(config);
 }
 
-bool KafkaProducingAlgorithm::Process(const std::shared_ptr<DataStructures::ProcessingData> &processingData)
+bool KafkaProducingAlgorithm::Process(const std::shared_ptr<DataStructures::ProcessingData>& processingData)
 {
     auto& message = processingData->GetKafkaMessage();
     if(message->Empty())
@@ -26,7 +26,7 @@ bool KafkaProducingAlgorithm::Process(const std::shared_ptr<DataStructures::Proc
     return true;
 }
 
-void KafkaProducingAlgorithm::Initialize(const std::shared_ptr<Config::JsonConfig> &config)
+void KafkaProducingAlgorithm::Initialize(const std::shared_ptr<Config::JsonConfig>& config)
 {
     LOG_TRACE() << "Initializing " << Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::KafkaProducingAlgorithm
                 << " ...";

@@ -1,15 +1,21 @@
 /**
- * @file CUDAImageDescriptor.h.
+ * @file ImageDescriptor.h.
  *
- * @brief Declares the class for containing CUDA image and its metadata.
+ * @brief Declares the class for containing image and its metadata.
  */
 
 
-#ifndef CUDA_IMAGE_DESCRIPTOR_H
-#define CUDA_IMAGE_DESCRIPTOR_H
+#ifndef IMAGE_DESCRIPTOR_H
+#define IMAGE_DESCRIPTOR_H
 
 #include <vector>
 #include <memory>
+
+// forward declaration for cv::Mat
+namespace cv
+{
+    class Mat;
+}
 
 /**
  * @namespace DataStructures
@@ -23,46 +29,54 @@ namespace DataStructures
 class CUDAImage;
 
 /**
- * @class CUDAImageDescriptor
+ * @class ImageDescriptor
  *
- * @brief This is a class for containing CUDA image and its metadata.
+ * @brief This is a class for containing image and its metadata.
  */
-class CUDAImageDescriptor final
+class ImageDescriptor final
 {
 public:
 
     /**
+     * @enum LOCATION
+     *
+     * @brief Possible variants of descriptor's data location.
+     */
+    enum LOCATION
+    {
+        /// Descriptor's data is located on host memory
+        HOST = 0,
+
+        /// Descriptor's data is located on device memory
+        DEVICE,
+
+        /// Descriptor's data location is undefined
+        UNDEFINED
+    };
+
+    /**
      * @brief Default constructor.
      */
-    CUDAImageDescriptor();
+    ImageDescriptor();
 
     /**
      * @brief Copy constructor.
      *
      * @param other - CUDA image descriptor to copy
      */
-    CUDAImageDescriptor(const CUDAImageDescriptor& other);
+    ImageDescriptor(const ImageDescriptor& other);
 
     /**
      * @brief Move constructor.
      *
      * @param other - CUDA image desctiptor to move
      */
-    CUDAImageDescriptor(CUDAImageDescriptor&& other) noexcept;
+    ImageDescriptor(ImageDescriptor&& other) noexcept;
 
     /**
      * @brief Default destructor.
      */
-    ~CUDAImageDescriptor();
-
-    /**
-     * @brief Checks weather current image descriptor and other-param image descriptor have same pointers on CUDA
-     * images.
-     *
-     * @param other - Descriptor to compare with
-     * @return True if pointers are initialized with same address. Otherwise returns false.
-     */
-    bool operator==(const CUDAImageDescriptor& other);
+    ~ImageDescriptor();
 
     /**
      * @brief Equation operator. Copies data from other-param CUDA image descriptor to current image descriptor.
@@ -70,7 +84,7 @@ public:
      * @param other - Image descriptor to copy data from
      * @return L-value reference to current CUDA image descriptor.
      */
-    CUDAImageDescriptor& operator=(const CUDAImageDescriptor& other);
+    ImageDescriptor& operator=(const ImageDescriptor& other);
 
     /**
      * @brief Equation operator. Moves data from other-param CUDA image descriptor to current image descriptor.
@@ -78,42 +92,89 @@ public:
      * @param other - Image descriptor to move data from
      * @return L-value reference to current CUDA image descriptor.
      */
-    CUDAImageDescriptor& operator=(CUDAImageDescriptor&& other) noexcept;
+    ImageDescriptor& operator=(ImageDescriptor&& other) noexcept;
 
     /**
-     * @brief Provides access to image_-member.
+     * @brief Provides access to CUDAImage_-member.
      *
      * @return Pointer to current descriptor's CUDA image
      */
     [[nodiscard]] const std::unique_ptr<CUDAImage>& GetCUDAImage() const;
 
     /**
-     * @brief Copies data of image-param CUDA image to the image pointed by image_-member.
+     * @brief Copies data of image-param CUDA image to the image pointed by CUDAImage_-member.
      *
      * @param image - CUDA image for being copied
      */
     void SetCUDAImage(const CUDAImage& image);
 
     /**
-     * @brief Moves data of image-param CUDA image to the image pointed by image_-member.
+     * @brief Moves data of image-param CUDA image to the image pointed by CUDAImage_-member.
      *
      * @param image - CUDA image for being moved
      */
     void SetCUDAImage(CUDAImage&& image) noexcept;
 
     /**
-     * @brief Copies data from CUDA image pointed by image-param to CUDA image pointed by image_-member.
+     * @brief Copies data from CUDA image pointed by image-param to CUDA image pointed by CUDAImage_-member.
      *
      * @param image - Pointer to CUDA image to be copied
      */
     void SetCUDAImage(const std::unique_ptr<CUDAImage>& image);
 
     /**
-     * @brief Moves image-param pointer to image_member.
+     * @brief Moves image-param pointer to CUDAImage_-member.
      *
-     * @param image - Pointer to CUDA image.
+     * @param image - Pointer to CUDA image
      */
     void SetCUDAImage(std::unique_ptr<CUDAImage>&& image) noexcept;
+
+    /**
+     * @brief Copies data of image-param host image to the image pointed by hostImage_-member.
+     *
+     * @param image - Host image for being copied
+     */
+    void SetHostImage(const cv::Mat& image);
+
+    /**
+     * @brief Moves data of image-param host image to the image pointed by hostImage_-member.
+     *
+     * @param image - Host image for being moved
+     */
+    void SetHostImage(cv::Mat&& image);
+
+    /**
+     * @brief Copies data from host image pointed by image-param to host image pointed by hostImage_-member.
+     *
+     * @param image - Pointer to host image to be copied
+     */
+    void SetHostImage(const std::unique_ptr<cv::Mat>& image);
+
+    /**
+     * @brief Moves image-param pointer to hostImage_-member.
+     *
+     * @param image - Pointer to host image
+     */
+    void SetHostImage(std::unique_ptr<cv::Mat>&& image);
+
+    /**
+     * @brief Provides access to hostImage_-member.
+     *
+     * @return L-value reference to a hostImage_-member
+     */
+    [[nodiscard]] const std::unique_ptr<cv::Mat>& GetHostImage() const noexcept;
+
+    /**
+     * @brief Sets location_-member flag to a location-param value.
+     *
+     * @param location - New value of location_-member flag.
+     */
+    void SetDataLocation(LOCATION location);
+
+    /**
+     * @brief Provides access to location_-member.
+     */
+    [[nodiscard]] LOCATION GetDataLocation() const noexcept;
 
     /**
      * @brief Provides access to frameId_-member.
@@ -211,16 +272,39 @@ public:
      */
     void ClearRawImageData() noexcept;
 
+    /**
+     * @brief Sets value of distortionFunctionId_-member to id-param value.
+     *
+     * @param id - New value of distortionFunctionId_-member
+     */
+    void SetCameraDistortionFunctionId(int id);
+
+    /**
+     * @brief Provides access to distortionFunctionId_-member.
+     *
+     * @return Value of distortionFunctionId_-member
+     */
+    [[nodiscard]] int GetCameraDistortionFunctionId() const noexcept;
+
 private:
 
     /// Pointer to CUDA image.
-    std::unique_ptr<CUDAImage> image_;
+    std::unique_ptr<CUDAImage> CUDAImage_;
+
+    /// Pointer to host image.
+    std::unique_ptr<cv::Mat> hostImage_;
+
+    /// Data location flag.
+    LOCATION location_;
 
     /// ID of frame in dataset.
     int frameId_;
 
     /// ID of dataset's camera.
     int cameraId_;
+
+    /// ID of camera's distortion function.
+    int distortionFunctionId_;
 
     /// Timestamp of receiving image's data.
     unsigned long timestamp_;
@@ -237,4 +321,4 @@ private:
 
 }
 
-#endif // CUDA_IMAGE_DESCRIPTOR_H
+#endif // IMAGE_DESCRIPTOR_H
