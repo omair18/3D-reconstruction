@@ -58,17 +58,17 @@ void ProcessingData::SetModelDataset(const ModelDataset &dataset)
     modelDataset_ = std::make_shared<ModelDataset>(dataset);
 }
 
-void ProcessingData::SetModelDataset(ModelDataset &&dataset) noexcept
+void ProcessingData::SetModelDataset(ModelDataset&& dataset) noexcept
 {
     *modelDataset_ = std::move(dataset);
 }
 
-void ProcessingData::SetModelDataset(const std::shared_ptr<ModelDataset> &dataset)
+void ProcessingData::SetModelDataset(const std::shared_ptr<ModelDataset>& dataset)
 {
 
 }
 
-void ProcessingData::SetModelDataset(std::shared_ptr<ModelDataset> &&dataset) noexcept
+void ProcessingData::SetModelDataset(std::shared_ptr<ModelDataset>&& dataset) noexcept
 {
     modelDataset_ = std::move(dataset);
 }
@@ -78,12 +78,12 @@ const std::shared_ptr<Networking::KafkaMessage> &ProcessingData::GetKafkaMessage
     return kafkaMessage_;
 }
 
-void ProcessingData::SetKafkaMessage(const std::shared_ptr<Networking::KafkaMessage> &message)
+void ProcessingData::SetKafkaMessage(const std::shared_ptr<Networking::KafkaMessage>& message)
 {
     kafkaMessage_ = message;
 }
 
-void ProcessingData::SetKafkaMessage(std::shared_ptr<Networking::KafkaMessage> &&message) noexcept
+void ProcessingData::SetKafkaMessage(std::shared_ptr<Networking::KafkaMessage>&& message) noexcept
 {
     kafkaMessage_ = std::move(message);
 }

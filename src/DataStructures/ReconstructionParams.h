@@ -1,8 +1,25 @@
+/**
+ * @file ReconstructionParams.h
+ *
+ * @brief
+ */
+
 #ifndef RECONSTRUCTION_PARAMS_H
 #define RECONSTRUCTION_PARAMS_H
 
-#include <openMVG/cameras/cameras.hpp>
-#include <openMVG/sfm/sfm.hpp>
+#include <memory>
+
+namespace openMVG
+{
+    namespace sfm
+    {
+        struct SfM_Data;
+        struct Features_Provider;
+        struct Matches_Provider;
+    }
+}
+
+class RegionsProvider;
 
 /**
  * @namespace DataStructures
@@ -12,10 +29,22 @@
 namespace DataStructures
 {
 
-struct ReconstructionParams
+class ReconstructionParams
 {
-    openMVG::cameras::EINTRINSIC distortionFunction_;
-    openMVG::sfm::SfM_Data sfMData_;
+public:
+
+    ReconstructionParams();
+
+    ~ReconstructionParams();
+
+    std::shared_ptr<openMVG::sfm::SfM_Data> sfMData_;
+
+    std::shared_ptr<openMVG::sfm::Features_Provider> featuresProvider_;
+
+    std::shared_ptr<openMVG::sfm::Matches_Provider> matchesProvider_;
+
+    std::shared_ptr<RegionsProvider> regionsProvider_;
+
 };
 
 }

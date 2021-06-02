@@ -66,7 +66,7 @@ NvJPEGHardwareImageDecoder::~NvJPEGHardwareImageDecoder() noexcept(false)
         }
 
         cudaError_t cudaStatus;
-        for (auto &channel : imageBuffer_.channel)
+        for (auto& channel : imageBuffer_.channel)
         {
             if (channel)
             {
@@ -118,17 +118,17 @@ bool NvJPEGHardwareImageDecoder::InitDecoder()
     return true;
 }
 
-bool NvJPEGHardwareImageDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::Mat &decodedData)
+bool NvJPEGHardwareImageDecoder::Decode(const unsigned char* data, unsigned long long int size, cv::Mat& decodedData)
 {
     return NvJPEGImageDecoder::Decode(data, size, decodedData);
 }
 
-bool NvJPEGHardwareImageDecoder::Decode(const unsigned char *data, unsigned long long int size, cv::cuda::GpuMat &decodedData)
+bool NvJPEGHardwareImageDecoder::Decode(const unsigned char* data, unsigned long long int size, cv::cuda::GpuMat& decodedData)
 {
     return NvJPEGImageDecoder::Decode(data, size, decodedData);
 }
 
-bool NvJPEGHardwareImageDecoder::Decode(const unsigned char *data, unsigned long long int size, DataStructures::CUDAImage &decodedImage)
+bool NvJPEGHardwareImageDecoder::Decode(const unsigned char* data, unsigned long long int size, DataStructures::CUDAImage& decodedImage)
 {
     return NvJPEGImageDecoder::Decode(data, size, decodedImage);
 }

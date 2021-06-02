@@ -43,27 +43,21 @@ ImageDescriptor::ImageDescriptor(ImageDescriptor&& other) noexcept
     other.distortionFunctionId_ = 0;
 }
 
-ImageDescriptor::ImageDescriptor(const ImageDescriptor &other)
+ImageDescriptor::ImageDescriptor(const ImageDescriptor& other)
 {
     location_ = other.location_;
     switch (location_)
     {
         case LOCATION::HOST:
         {
-            if (other.hostImage_)
-            {
-                hostImage_ = std::make_unique<cv::Mat>(*other.hostImage_);
-                CUDAImage_ = nullptr;
-            }
+            hostImage_ = std::make_unique<cv::Mat>(*other.hostImage_);
+            CUDAImage_ = nullptr;
         } break;
 
         case LOCATION::DEVICE:
         {
-            if (other.CUDAImage_)
-            {
-                CUDAImage_ = std::make_unique<CUDAImage>(*other.CUDAImage_);
-                hostImage_ = nullptr;
-            }
+            CUDAImage_ = std::make_unique<CUDAImage>(*other.CUDAImage_);
+            hostImage_ = nullptr;
         } break;
 
         default: break;
@@ -288,7 +282,7 @@ void ImageDescriptor::ClearRawImageData() noexcept
     rawImageData_.clear();
 }
 
-void ImageDescriptor::SetHostImage(const cv::Mat &image)
+void ImageDescriptor::SetHostImage(const cv::Mat& image)
 {
     if (hostImage_)
     {
@@ -300,7 +294,7 @@ void ImageDescriptor::SetHostImage(const cv::Mat &image)
     }
 }
 
-void ImageDescriptor::SetHostImage(cv::Mat &&image)
+void ImageDescriptor::SetHostImage(cv::Mat&& image)
 {
     if (hostImage_)
     {
@@ -331,7 +325,7 @@ void ImageDescriptor::SetHostImage(const std::unique_ptr<cv::Mat> &image)
     }
 }
 
-void ImageDescriptor::SetHostImage(std::unique_ptr<cv::Mat> &&image)
+void ImageDescriptor::SetHostImage(std::unique_ptr<cv::Mat>&& image)
 {
     if (image)
     {
@@ -373,6 +367,69 @@ void ImageDescriptor::SetCameraDistortionFunctionId(int id)
 int ImageDescriptor::GetCameraDistortionFunctionId() const noexcept
 {
     return distortionFunctionId_;
+}
+
+size_t ImageDescriptor::GetImageWidth() const
+{
+    switch (location_)
+    {
+        case ImageDescriptor::LOCATION::HOST:
+        {
+            return hostImage_->cols;
+        }
+
+        case ImageDescriptor::LOCATION::DEVICE:
+        {
+            return CUDAImage_->width_;
+        }
+
+        default:
+        {
+            return 0;
+        }
+    }
+}
+
+size_t ImageDescriptor::GetImageHeight() const
+{
+    switch (location_)
+    {
+        case ImageDescriptor::LOCATION::HOST:
+        {
+            return hostImage_->rows;
+        }
+
+        case ImageDescriptor::LOCATION::DEVICE:
+        {
+            return CUDAImage_->height_;
+        }
+
+        default:
+        {
+            return 0;
+        }
+    }
+}
+
+size_t ImageDescriptor::GetImageChannelsAmount() const
+{
+    switch (location_)
+    {
+        case ImageDescriptor::LOCATION::HOST:
+        {
+            return hostImage_->channels();
+        }
+
+        case ImageDescriptor::LOCATION::DEVICE:
+        {
+            return CUDAImage_->channels_;
+        }
+
+        default:
+        {
+            return 0;
+        }
+    }
 }
 
 }

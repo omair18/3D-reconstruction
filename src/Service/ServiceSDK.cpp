@@ -9,7 +9,10 @@
 #include "GpuManager.h"
 #include "ConfigNodes.h"
 #include "PathUtils.h"
-#include "WebServerManager.h"
+
+/// TODO: Add web server implementation
+//#include "WebServerManager.h"
+
 #include "ProcessingQueueManager.h"
 #include "ProcessorManager.h"
 
@@ -19,7 +22,8 @@ namespace Service
 ServiceSDK::ServiceSDK(int argc, char** argv) :
 configManager_(std::make_unique<Config::JsonConfigManager>()),
 gpuManager_(std::make_unique<GPU::GpuManager>()),
-webServerManager_(std::make_unique<Networking::WebServerManager>()),
+/// TODO: Add web server implementation
+//webServerManager_(std::make_unique<Networking::WebServerManager>()),
 queueManager_(std::make_unique<DataStructures::ProcessingQueueManager>()),
 processorManager_(std::make_unique<Processing::ProcessorManager>())
 {
@@ -44,7 +48,8 @@ void ServiceSDK::Initialize()
 
     ValidateServiceConfiguration(serviceConfig);
 
-    InitializeWebServer(serviceConfig);
+    /// TODO: Add web server implementation
+    //InitializeWebServer(serviceConfig);
 
     InitializeGpuManager();
 
@@ -134,10 +139,13 @@ void ServiceSDK::InitializeServiceGPU(const std::shared_ptr<Config::JsonConfig>&
     gpuManager_->SetDevice(matchingGpu);
 }
 
-void ServiceSDK::InitializeWebServer(const std::shared_ptr<Config::JsonConfig> &serviceConfig)
+/// TODO: Add web server implementation
+/*
+void ServiceSDK::InitializeWebServer(const std::shared_ptr<Config::JsonConfig>& serviceConfig)
 {
     webServerManager_->CreateWebServer(serviceConfig);
 }
+*/
 
 void ServiceSDK::Start()
 {
@@ -157,14 +165,18 @@ void ServiceSDK::InitializeProcessors(const std::shared_ptr<Config::JsonConfig>&
     processorManager_->Initialize(serviceConfig, configManager_, gpuManager_, queueManager_);
 }
 
-void ServiceSDK::ValidateServiceConfiguration(const std::shared_ptr<Config::JsonConfig> &serviceConfig)
+void ServiceSDK::ValidateServiceConfiguration(const std::shared_ptr<Config::JsonConfig>& serviceConfig)
 {
+    /// TODO: Add web server implementation
+
+    /*
     if(!serviceConfig->Contains(Config::ConfigNodes::ServiceConfig::WebServer))
     {
         LOG_ERROR() << "Invalid service configuration. There is no node "
                     << Config::ConfigNodes::ServiceConfig::WebServer << " in service configuration.";
         throw std::runtime_error("Invalid service configuration");
     }
+    */
 
     if(!serviceConfig->Contains(Config::ConfigNodes::ServiceConfig::Gpu))
     {

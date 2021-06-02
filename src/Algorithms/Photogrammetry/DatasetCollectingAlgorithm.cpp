@@ -9,13 +9,13 @@
 namespace Algorithms
 {
 
-DatasetCollectingAlgorithm::DatasetCollectingAlgorithm(const std::shared_ptr<Config::JsonConfig> &config, [[maybe_unused]] const std::unique_ptr<GPU::GpuManager> &gpuManager, [[maybe_unused]] void *cudaStream) :
+DatasetCollectingAlgorithm::DatasetCollectingAlgorithm(const std::shared_ptr<Config::JsonConfig>& config, [[maybe_unused]] const std::unique_ptr<GPU::GpuManager>& gpuManager, [[maybe_unused]] void* cudaStream) :
 expireTimeoutSeconds_(120)
 {
     InitializeInternal(config);
 }
 
-bool DatasetCollectingAlgorithm::Process(const std::shared_ptr<DataStructures::ProcessingData> &processingData)
+bool DatasetCollectingAlgorithm::Process(const std::shared_ptr<DataStructures::ProcessingData>& processingData)
 {
     auto& dataset = processingData->GetModelDataset();
     auto& datasetUUID = dataset->GetUUID();
@@ -28,6 +28,7 @@ bool DatasetCollectingAlgorithm::Process(const std::shared_ptr<DataStructures::P
     {
         LOG_TRACE() << "Started collecting of dataset with UUID " << datasetUUID << ".";
         auto datasetPair = std::make_pair(datasetUUID, std::make_pair(currentTimestamp, processingData));
+        processingData->GetModelDataset()->SetProcessingStatus(DataStructures::ModelDataset::ProcessingStatus::COLLECTING);
         datasets_.insert(std::move(datasetPair));
         receivedImageDescriptors.reserve(dataset->GetTotalFramesAmount());
         UpdateExpired(currentTimestamp);
@@ -52,6 +53,7 @@ bool DatasetCollectingAlgorithm::Process(const std::shared_ptr<DataStructures::P
         {
             LOG_TRACE() << "Dataset with UUID " << datasetUUID << " was successfully collected.";
             *processingData = std::move(*collectedDatasetAndTimestamp.second);
+            processingData->GetModelDataset()->SetProcessingStatus(DataStructures::ModelDataset::ProcessingStatus::COLLECTED);
             datasets_.erase(datasetUUID);
             return true;
         }
@@ -59,12 +61,12 @@ bool DatasetCollectingAlgorithm::Process(const std::shared_ptr<DataStructures::P
     return false;
 }
 
-void DatasetCollectingAlgorithm::Initialize(const std::shared_ptr<Config::JsonConfig> &config)
+void DatasetCollectingAlgorithm::Initialize(const std::shared_ptr<Config::JsonConfig>& config)
 {
     InitializeInternal(config);
 }
 
-void DatasetCollectingAlgorithm::ValidateConfig(const std::shared_ptr<Config::JsonConfig> &config)
+void DatasetCollectingAlgorithm::ValidateConfig(const std::shared_ptr<Config::JsonConfig>& config)
 {
     if(!config->Contains(Config::ConfigNodes::AlgorithmsConfig::DatasetCollectingAlgorithm::ExpireTimeout))
     {
@@ -74,7 +76,7 @@ void DatasetCollectingAlgorithm::ValidateConfig(const std::shared_ptr<Config::Js
     }
 }
 
-void DatasetCollectingAlgorithm::InitializeInternal(const std::shared_ptr<Config::JsonConfig> &config)
+void DatasetCollectingAlgorithm::InitializeInternal(const std::shared_ptr<Config::JsonConfig>& config)
 {
     LOG_TRACE() << "Initializing " << Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::DatasetCollectingAlgorithm
                 << " ...";

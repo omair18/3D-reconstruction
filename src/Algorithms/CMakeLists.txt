@@ -22,18 +22,19 @@ set(ALGORITHMS_LIB_HEADERS
         Photogrammetry/PointCloudDensificationAlgorithm.h
         Photogrammetry/CUDAMeshReconstructionAlgorithm.h
         Photogrammetry/MeshReconstructionAlgorithm.h
-        Photogrammetry/CUDAMeshRefinementAlgorithm.h
-        Photogrammetry/MeshRefinementAlgorithm.h
+        #Photogrammetry/CUDAMeshRefinementAlgorithm.h
+        #Photogrammetry/MeshRefinementAlgorithm.h
         Photogrammetry/CUDAMeshTexturingAlgorithm.h
         Photogrammetry/MeshTexturingAlgorithm.h
-        ImageProcessing/CUDAImageResizeAlgorithm.h
-        ImageProcessing/ImageResizeAlgorithm.h
-        ImageProcessing/CUDAImageConvolutionAlgorithm.h
-        ImageProcessing/ImageConvolutionAlgorithm.h
-        ImageProcessing/CUDAImageBinarizationAlgorithm.h
-        ImageProcessing/ImageBinarizationAlgorithm.h
-        ImageProcessing/CUDAImageSeparableConvolutionAlgorithm.h
-        ImageProcessing/ImageSeparableConvolutionAlgorithm.h
+# TODO: Implement image processing algorithms
+#        ImageProcessing/CUDAImageResizeAlgorithm.h
+#        ImageProcessing/ImageResizeAlgorithm.h
+#        ImageProcessing/CUDAImageConvolutionAlgorithm.h
+#        ImageProcessing/ImageConvolutionAlgorithm.h
+#        ImageProcessing/CUDAImageBinarizationAlgorithm.h
+#        ImageProcessing/ImageBinarizationAlgorithm.h
+#        ImageProcessing/CUDAImageSeparableConvolutionAlgorithm.h
+#        ImageProcessing/ImageSeparableConvolutionAlgorithm.h
         DataTransferring/DeviceToHostTransferringAlgorithm.h
         DataTransferring/HostToDeviceTransferringAlgorithm.h)
 
@@ -57,23 +58,26 @@ set(ALGORITHMS_LIB_CPPS
         Photogrammetry/PointCloudDensificationAlgorithm.cpp
         Photogrammetry/CUDAMeshReconstructionAlgorithm.cpp
         Photogrammetry/MeshReconstructionAlgorithm.cpp
-        Photogrammetry/CUDAMeshRefinementAlgorithm.cpp
-        Photogrammetry/MeshRefinementAlgorithm.cpp
+        #Photogrammetry/CUDAMeshRefinementAlgorithm.cpp
+        #Photogrammetry/MeshRefinementAlgorithm.cpp
         Photogrammetry/CUDAMeshTexturingAlgorithm.cpp
         Photogrammetry/MeshTexturingAlgorithm.cpp
-        ImageProcessing/CUDAImageResizeAlgorithm.cpp
-        ImageProcessing/ImageResizeAlgorithm.cpp
-        ImageProcessing/CUDAImageConvolutionAlgorithm.cpp
-        ImageProcessing/ImageConvolutionAlgorithm.cpp
-        ImageProcessing/CUDAImageBinarizationAlgorithm.cpp
-        ImageProcessing/ImageBinarizationAlgorithm.cpp
-        ImageProcessing/CUDAImageSeparableConvolutionAlgorithm.cpp
-        ImageProcessing/ImageSeparableConvolutionAlgorithm.cpp
+# TODO: Implement image processing algorithms
+#        ImageProcessing/CUDAImageResizeAlgorithm.cpp
+#        ImageProcessing/ImageResizeAlgorithm.cpp
+#        ImageProcessing/CUDAImageConvolutionAlgorithm.cpp
+#        ImageProcessing/ImageConvolutionAlgorithm.cpp
+#        ImageProcessing/CUDAImageBinarizationAlgorithm.cpp
+#        ImageProcessing/ImageBinarizationAlgorithm.cpp
+#        ImageProcessing/CUDAImageSeparableConvolutionAlgorithm.cpp
+#        ImageProcessing/ImageSeparableConvolutionAlgorithm.cpp
         DataTransferring/DeviceToHostTransferringAlgorithm.cpp
-        DataTransferring/HostToDeviceTransferringAlgorithm.cpp Photogrammetry/BundleAdjustmentAlgorithm.cpp Photogrammetry/BundleAdjustmentAlgorithm.h)
+        DataTransferring/HostToDeviceTransferringAlgorithm.cpp Photogrammetry/DatasetInitializationAlgorithm.cpp Photogrammetry/DatasetInitializationAlgorithm.h)
 
 source_group("Header Files" FILES ${ALGORITHMS_LIB_HEADERS})
 source_group("Source Files" FILES ${ALGORITHMS_LIB_CPPS})
+
+include_directories(${CUDA_INCLUDE_DIRS})
 
 add_library(algorithms SHARED ${ALGORITHMS_LIB_HEADERS} ${ALGORITHMS_LIB_CPPS})
 
@@ -86,7 +90,18 @@ target_link_libraries(algorithms
         config
         networking
         datastructures
+        gpu
         log
-        opencv_core)
+        opencv_core
+        ${CUDA_nppc_LIBRARY}
+        ${CUDA_nppig_LIBRARY}
+        ${CUDA_nppif_LIBRARY}
+        ${CUDA_nppicc_LIBRARY}
+        ${CUDA_nppist_LIBRARY}
+        ${CUDA_nppidei_LIBRARY}
+        ${CUDA_nppial_LIBRARY}
+        OpenMVG::openMVG_sfm
+        OpenMVG::openMVG_camera
+        opencv_features2d)
 
 target_include_directories(algorithms PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

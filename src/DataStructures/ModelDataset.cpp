@@ -11,6 +11,7 @@ const static std::unordered_map<ModelDataset::ProcessingStatus, const std::strin
                 { ModelDataset::ProcessingStatus::RECEIVED, "RECEIVED"},
                 { ModelDataset::ProcessingStatus::FAILED, "FAILED" },
                 { ModelDataset::ProcessingStatus::COLLECTING, "COLLECTING" },
+                { ModelDataset::ProcessingStatus::COLLECTED, "COLLECTED" },
                 { ModelDataset::ProcessingStatus::PROCESSING, "PROCESSING" },
                 {ModelDataset::ProcessingStatus::READY, "READY" }
         };
@@ -57,12 +58,17 @@ UUID_(std::move(other.UUID_))
 
 ModelDataset::~ModelDataset() = default;
 
+ModelDataset& ModelDataset::operator=(const ModelDataset& other)
+{
+    return *this;
+}
+
 void DataStructures::ModelDataset::SetUUID(const std::string &UUID)
 {
     UUID_ = UUID;
 }
 
-const std::string &DataStructures::ModelDataset::GetUUID() const noexcept
+const std::string& DataStructures::ModelDataset::GetUUID() const noexcept
 {
     return UUID_;
 }
@@ -77,14 +83,15 @@ DataStructures::ModelDataset::ProcessingStatus DataStructures::ModelDataset::Get
     return status_;
 }
 
-const std::vector<ImageDescriptor> &ModelDataset::GetImagesDescriptors() const noexcept
+const std::vector<ImageDescriptor>& ModelDataset::GetImagesDescriptors() const noexcept
 {
     return imagesDescriptors_;
 }
 
-ModelDataset &ModelDataset::operator=(ModelDataset &&other) noexcept
+ModelDataset& ModelDataset::operator=(ModelDataset &&other) noexcept
 {
     imagesDescriptors_ = std::move(other.imagesDescriptors_);
+    reconstructionParams_ = std::move(other.reconstructionParams_);
     UUID_ = std::move(other.UUID_);
     totalFramesAmount_ = other.totalFramesAmount_;
     totalSize_ = other.totalSize_;
@@ -135,6 +142,11 @@ void ModelDataset::SetTotalSize(int totalSize)
 size_t ModelDataset::GetCurrentFramesAmount() const
 {
     return imagesDescriptors_.size();
+}
+
+const std::unique_ptr<ReconstructionParams>& ModelDataset::GetReconstructionParams() const
+{
+    return reconstructionParams_;
 }
 
 }

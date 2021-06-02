@@ -40,7 +40,7 @@ int main(int argc, char** argv)
     ("jpeg-quality,j", boost::program_options::value<int>(&jpegQuality)->default_value(40), "JPEG quality.")
     ("focal-length,l", boost::program_options::value<float>(&focalLength)->default_value(40.0), "Focal length of the camera in millimeters.")
     ("sensor-size,s", boost::program_options::value<float>(&sensorSize)->default_value(33.3), "Camera sensor size in millimeters.")
-    ("distortion-function,d", boost::program_options::value<int>(&distortionFunctionId)->default_value(0), "Camera's distortion function number. Possible values: [0..5].")
+    ("distortion-function,d", boost::program_options::value<int>(&distortionFunctionId)->default_value(0), "Camera's distortion function number. Possible values: [0..4].")
     ("timeout,o", boost::program_options::value<int>(&timeout)->default_value(10000), "Kafka producer flush timeout in milliseconds");
 
     boost::program_options::store(boost::program_options::parse_command_line(argc, argv, options), paramsMap);
@@ -65,9 +65,9 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    if (distortionFunctionId < 0 || distortionFunctionId > 5)
+    if (distortionFunctionId < 0 || distortionFunctionId > 4)
     {
-        std::clog << "Distortion function id must be in [0..5]!" << std::endl;
+        std::clog << "Distortion function id must be in [0..4]!" << std::endl;
         return EXIT_FAILURE;
     }
 

@@ -27,12 +27,9 @@ namespace std
 }
 
 // forward declaration for boost::json::value
-namespace boost
+namespace boost::json
 {
-    namespace json
-    {
-        class value;
-    }
+    class value;
 }
 
 /**
@@ -97,7 +94,7 @@ public:
      * @param key - Key value
      * @param value - Value of boolean to add
      */
-    void AddNodeBool(const std::string &key, bool value);
+    void AddNodeBool(const std::string& key, bool value);
 
     /**
      * @brief Adds float value-param with key key-param. If current JsonConfig is no an object,
@@ -124,7 +121,7 @@ public:
      * @param key - Key value
      * @param value - Value of string to add
      */
-    void AddNodeString(const std::string& key, const std::string &value);
+    void AddNodeString(const std::string& key, const std::string& value);
 
     /**
      * @brief Adds vector&lt;float&gt; value-param with key key-param. If current JsonConfig is no an object,

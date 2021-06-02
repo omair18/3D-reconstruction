@@ -27,7 +27,7 @@ namespace DataStructures
 {
 
 // forward declaration for DataStructures::ReconstructionParams
-struct ReconstructionParams;
+class ReconstructionParams;
 
 /**
  * @class
@@ -51,6 +51,9 @@ public:
 
         ///
         COLLECTING,
+
+        ///
+        COLLECTED,
 
         ///
         PROCESSING,
@@ -92,7 +95,7 @@ public:
      * @param other
      * @return
      */
-    ModelDataset& operator=(const ModelDataset& other) = default;
+    ModelDataset& operator=(const ModelDataset& other);
 
     /**
      * @brief
@@ -199,6 +202,13 @@ public:
      * @return
      */
     [[nodiscard]] size_t GetCurrentFramesAmount() const;
+
+    /**
+     * @brief
+     *
+     * @return
+     */
+    [[nodiscard]] const std::unique_ptr<ReconstructionParams>& GetReconstructionParams() const;
 
 private:
 

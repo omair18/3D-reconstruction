@@ -1,24 +1,24 @@
 set(NETWORKING_LIB_HEADERS
-        WebServer.h
-        WebServerManager.h
-        HttpsSession.h
-        HttpSession.h
+#        WebServer.h
+#        WebServerManager.h
+#        HttpsSession.h
+#        HttpSession.h
         KafkaConsumer.h
         KafkaProducer.h
-        KafkaMessage.h
-        EndpointListener.h
-        AmazonBucketAPI.h)
+        KafkaMessage.h)
+#        EndpointListener.h)
+        #AmazonBucketAPI.h)
 
 set(NETWORKING_LIB_CPPS
-        WebServer.cpp
-        WebServerManager.cpp
-        HttpsSession.cpp
-        HttpSession.cpp
+#        WebServer.cpp
+#        WebServerManager.cpp
+#        HttpsSession.cpp
+#        HttpSession.cpp
         KafkaConsumer.cpp
         KafkaProducer.cpp
-        KafkaMessage.cpp
-        EndpointListener.cpp
-        AmazonBucketAPI.cpp)
+        KafkaMessage.cpp)
+#        EndpointListener.cpp)
+        #AmazonBucketAPI.cpp)
 
 source_group("Header Files" FILES ${NETWORKING_LIB_HEADERS})
 source_group("Source Files" FILES ${NETWORKING_LIB_CPPS})

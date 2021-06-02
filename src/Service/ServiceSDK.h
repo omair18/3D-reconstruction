@@ -106,12 +106,13 @@ private:
      */
     void InitializeServiceGPU(const std::shared_ptr<Config::JsonConfig>& serviceConfig);
 
+    /// TODO: Add web server implementation
     /**
      * @brief
      *
      * @param serviceConfig
      */
-    void InitializeWebServer(const std::shared_ptr<Config::JsonConfig>& serviceConfig);
+    //void InitializeWebServer(const std::shared_ptr<Config::JsonConfig>& serviceConfig);
 
     /**
      * @brief
@@ -156,8 +157,9 @@ private:
     ///
     std::unique_ptr<GPU::GpuManager> gpuManager_;
 
+    /// TODO: Add web server implementation
     ///
-    std::unique_ptr<Networking::WebServerManager> webServerManager_;
+    //std::unique_ptr<Networking::WebServerManager> webServerManager_;
 
     ///
     std::unique_ptr<DataStructures::ProcessingQueueManager> queueManager_;

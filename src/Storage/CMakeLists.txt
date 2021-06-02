@@ -1,10 +1,10 @@
 set(STORAGE_LIB_HEADERS
-        AmazonBucketStorage.h
+#        AmazonBucketStorage.h
         FilesystemStorage.h
         IO/PLYModel.h)
 
 set(STORAGE_LIB_CPPS
-        AmazonBucketStorage.cpp
+#        AmazonBucketStorage.cpp
         FilesystemStorage.cpp
         IO/PLYModel.cpp)
 

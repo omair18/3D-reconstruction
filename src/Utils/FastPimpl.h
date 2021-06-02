@@ -40,7 +40,7 @@ public:
      * @param args - Arguments of T-class constructor
      */
     template<class...Args>
-    explicit FastPimpl(Args &&...args)
+    explicit FastPimpl(Args&& ...args)
     {
         new (Ptr()) T(std::forward<Args>(args)...);
     }
@@ -51,7 +51,7 @@ public:
      * @param fastPimpl - R-value reference for other FastPimpl object
      * @return L-value reference to current FastPimpl object.
      */
-    FastPimpl &operator=(FastPimpl&& fastPimpl) noexcept
+    FastPimpl& operator=(FastPimpl&& fastPimpl) noexcept
     {
         *Ptr() = std::move(*fastPimpl);
         return *this;
@@ -63,7 +63,7 @@ public:
      * @param fastPimpl - L-value reference for other FastPimpl object
      * @return L-value reference to current FastPimpl object.
      */
-    FastPimpl &operator=(const FastPimpl &fastPimpl)
+    FastPimpl& operator=(const FastPimpl& fastPimpl)
     {
         Ptr()->~T();
         new (Ptr()) T(fastPimpl);

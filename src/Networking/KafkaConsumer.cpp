@@ -7,7 +7,7 @@
 #include "Logger.h"
 #include "ConfigNodes.h"
 
-Networking::KafkaConsumer::KafkaConsumer(const std::shared_ptr<Config::JsonConfig> &kafkaConfig) :
+Networking::KafkaConsumer::KafkaConsumer(const std::shared_ptr<Config::JsonConfig>& kafkaConfig) :
 timeoutMs_(-1),
 consumer_(nullptr)
 {
@@ -95,7 +95,7 @@ Networking::KafkaConsumer::~KafkaConsumer()
     }
 }
 
-bool Networking::KafkaConsumer::Initialize(const std::shared_ptr<Config::JsonConfig> &kafkaConfig)
+bool Networking::KafkaConsumer::Initialize(const std::shared_ptr<Config::JsonConfig>& kafkaConfig)
 {
     ValidateConfig(kafkaConfig);
 
@@ -196,7 +196,7 @@ bool Networking::KafkaConsumer::Initialize(const std::shared_ptr<Config::JsonCon
     return true;
 }
 
-void Networking::KafkaConsumer::ValidateConfig(const std::shared_ptr<Config::JsonConfig> &kafkaConfig)
+void Networking::KafkaConsumer::ValidateConfig(const std::shared_ptr<Config::JsonConfig>& kafkaConfig)
 {
     if(!kafkaConfig->Contains(Config::ConfigNodes::NetworkingConfig::KafkaConsumerConfig::Topics))
     {

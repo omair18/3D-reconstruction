@@ -7,7 +7,7 @@
 #include "ConfigNodes.h"
 #include "Logger.h"
 
-Networking::KafkaProducer::KafkaProducer(const std::shared_ptr<Config::JsonConfig> &kafkaConfig) :
+Networking::KafkaProducer::KafkaProducer(const std::shared_ptr<Config::JsonConfig>& kafkaConfig) :
 producer_(nullptr)
 {
     LOG_TRACE() << "Initializing kafka producer ...";

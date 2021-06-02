@@ -12,13 +12,18 @@ std::shared_ptr<JsonConfig> DefaultJsonConfigGenerator::GenerateServiceDefaultCo
 {
     /// Creating nodes for service configuration
     auto config = std::make_shared<JsonConfig>();
-    auto webServerConfig = std::make_shared<JsonConfig>();
+
+    /// TODO: Add web server implementation
+    //auto webServerConfig = std::make_shared<JsonConfig>();
+
     auto gpuConfig = std::make_shared<JsonConfig>();
     auto pipelineConfig = std::make_shared<JsonConfig>();
     auto queuesConfig = std::make_shared<JsonConfig>();
     auto resultStorageConfig = std::make_shared<JsonConfig>();
 
+    /// TODO: Add web server implementation
     /// web server node
+    /*
     {
         std::filesystem::path defaultWebDirectoryPath = Utils::PathUtils::GetExecutableFolderPath();
         defaultWebDirectoryPath /= "web";
@@ -33,6 +38,7 @@ std::shared_ptr<JsonConfig> DefaultJsonConfigGenerator::GenerateServiceDefaultCo
                                        defaultWebDirectoryPath.string());
         webServerConfig->AddNodeBool(ConfigNodes::NetworkingConfig::WebServerConfig::UseDhParams, true);
     }
+    */
 
     /// GPU node
     {
@@ -64,7 +70,8 @@ std::shared_ptr<JsonConfig> DefaultJsonConfigGenerator::GenerateServiceDefaultCo
                                            defaultModelsDirectoryPath.string());
     }
 
-    config->SetNode(ConfigNodes::ServiceConfig::WebServer, webServerConfig);
+    //config->SetNode(ConfigNodes::ServiceConfig::WebServer, webServerConfig);
+
     config->SetNode(ConfigNodes::ServiceConfig::Gpu, gpuConfig);
     config->SetNode(ConfigNodes::ServiceConfig::Pipeline, pipelineConfig);
     config->SetNode(ConfigNodes::ServiceConfig::Queues, queuesConfig);
@@ -77,7 +84,7 @@ std::shared_ptr<JsonConfig> DefaultJsonConfigGenerator::GenerateQueueConfig(cons
 {
     auto queueConfig = std::make_shared<Config::JsonConfig>();
     queueConfig->AddNodeString(ConfigNodes::ServiceConfig::QueueConfig::Name, name);
-    queueConfig->AddNodeInt(ConfigNodes::ServiceConfig::QueueConfig::Size, size);
+    queueConfig->AddNodeInt(ConfigNodes::ServiceConfig::QueueConfig::Size, static_cast<int>(size));
     return queueConfig;
 }
 

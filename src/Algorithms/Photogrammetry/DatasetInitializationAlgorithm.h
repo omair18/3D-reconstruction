@@ -1,13 +1,12 @@
 /**
- * @file HostToDeviceTransferringAlgorithm.h
+ * @file DatasetInitializationAlgorithm.h
  *
  * @brief
  */
+#ifndef DATASET_INITIALIZATION_ALGORITHM_H
+#define DATASET_INITIALIZATION_ALGORITHM_H
 
-#ifndef HOST_TO_DEVICE_TRANSFERRING_ALGORITHM_H
-#define HOST_TO_DEVICE_TRANSFERRING_ALGORITHM_H
-
-#include "IGPUAlgorithm.h"
+#include "ICPUAlgorithm.h"
 
 /**
  * @namespace Algorithms
@@ -18,11 +17,11 @@ namespace Algorithms
 {
 
 /**
- * @class HostToDeviceTransferringAlgorithm
+ * @class DatasetInitializationAlgorithm
  *
  * @brief
  */
-class HostToDeviceTransferringAlgorithm : public IGPUAlgorithm
+class DatasetInitializationAlgorithm : public ICPUAlgorithm
 {
 
 public:
@@ -34,12 +33,12 @@ public:
      * @param gpuManager
      * @param cudaStream
      */
-    HostToDeviceTransferringAlgorithm(const std::shared_ptr<Config::JsonConfig>& config, const std::unique_ptr<GPU::GpuManager>& gpuManager, void* cudaStream);
+    DatasetInitializationAlgorithm(const std::shared_ptr<Config::JsonConfig>& config, [[maybe_unused]] const std::unique_ptr<GPU::GpuManager>& gpuManager, [[maybe_unused]] void* cudaStream);
 
     /**
      * @brief
      */
-    ~HostToDeviceTransferringAlgorithm() override = default;
+    ~DatasetInitializationAlgorithm() override = default;
 
     /**
      * @brief
@@ -66,11 +65,9 @@ private:
     ///
     bool isInitialized_;
 
-    ///
-    void* cudaStream_;
-
 };
+
 
 }
 
-#endif // HOST_TO_DEVICE_TRANSFERRING_ALGORITHM_H
+#endif // DATASET_INITIALIZATION_ALGORITHM_H

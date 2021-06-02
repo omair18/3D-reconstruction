@@ -63,7 +63,7 @@ private:
     template<typename T>
     auto GetAlgorithmLambda()
     {
-        return [](const auto & config, const auto & gpuManager, void* cudaStream) -> std::unique_ptr<IAlgorithm>
+        return [](const auto& config, const auto& gpuManager, void* cudaStream) -> std::unique_ptr<IAlgorithm>
         {
             return std::make_unique<T>(config, gpuManager, cudaStream);
         };

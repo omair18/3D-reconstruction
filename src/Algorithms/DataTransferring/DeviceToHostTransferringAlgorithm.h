@@ -58,6 +58,16 @@ public:
 
 private:
 
+    /**
+     * @brief
+     */
+    void InitializeInternal();
+
+    ///
+    bool isInitialized_;
+
+    ///
+    void* cudaStream_;
 
 };
 

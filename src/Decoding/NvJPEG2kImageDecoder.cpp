@@ -70,7 +70,7 @@ void NvJPEG2kImageDecoder::AllocateBuffer(int width, int height, int channels, s
     size_t imageChannelSize = width * height;
     cudaError_t cudaStatus;
 
-    for(int i = 0; i < channels; i++)
+    for(int i = 0; i < channels; ++i)
     {
         if(i == bufferChannels_.size())
         {

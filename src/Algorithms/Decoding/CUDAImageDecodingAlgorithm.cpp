@@ -126,10 +126,10 @@ void CUDAImageDecodingAlgorithm::ValidateConfig(const std::shared_ptr<Config::Js
         throw std::runtime_error("Invalid algorithm configuration.");
     }
 
-    if(!config->Contains(Config::ConfigNodes::AlgorithmsConfig::CpuImageDecodingAlgorithmConfig::RemoveSourceData))
+    if(!config->Contains(Config::ConfigNodes::AlgorithmsConfig::CUDAImageDecodingAlgorithmConfig::RemoveSourceData))
     {
         LOG_ERROR() << "Invalid CUDA image decoder algorithm configuration. There must be "
-        << Config::ConfigNodes::AlgorithmsConfig::CpuImageDecodingAlgorithmConfig::RemoveSourceData
+        << Config::ConfigNodes::AlgorithmsConfig::CUDAImageDecodingAlgorithmConfig::RemoveSourceData
         << " node in algorithm configuration.";
         throw std::runtime_error("Invalid algorithm configuration.");
     }

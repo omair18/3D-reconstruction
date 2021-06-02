@@ -111,7 +111,7 @@ bool KafkaMessageParsingAlgorithm::Process(const std::shared_ptr<DataStructures:
         if (key->Contains(Config::ConfigNodes::MessageNodes::DistortionFunctionID))
         {
             distortionFunctionId = (*key)[Config::ConfigNodes::MessageNodes::DistortionFunctionID]->ToInt32();
-            if (distortionFunctionId < 0 || distortionFunctionId > 5)
+            if (distortionFunctionId < 0 || distortionFunctionId > 4)
             {
                 LOG_ERROR() << "Failed to parse kafka message. Invalid camera's distortion function id " << focalLength  << ".";
                 return false;
@@ -144,6 +144,7 @@ bool KafkaMessageParsingAlgorithm::Process(const std::shared_ptr<DataStructures:
 
         dataset->SetUUID(std::move(UUID));
         dataset->SetTotalFramesAmount(framesTotal);
+        dataset->SetProcessingStatus(DataStructures::ModelDataset::ProcessingStatus::RECEIVED);
 
         std::vector<DataStructures::ImageDescriptor> descriptors;
         descriptors.push_back(std::move(imageDescriptor));

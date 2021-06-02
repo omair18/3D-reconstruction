@@ -8,7 +8,7 @@
 namespace Processing
 {
 
-IProcessor::IProcessor(const std::shared_ptr<Config::JsonConfig> &config, const std::unique_ptr<DataStructures::ProcessingQueueManager> &queueManager)
+IProcessor::IProcessor(const std::shared_ptr<Config::JsonConfig>& config, const std::unique_ptr<DataStructures::ProcessingQueueManager>& queueManager)
 {
     auto name = (*config)[Config::ConfigNodes::ServiceConfig::PipelineConfig::Name]->ToString();
     std::string inputQueueName;

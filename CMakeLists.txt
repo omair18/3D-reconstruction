@@ -56,6 +56,7 @@ find_package(OpenCV COMPONENTS
         PATHS ${LIBRARIES_PATH}/opencv
         NO_DEFAULT_PATH)
 
+# TODO: Add AWS storage
 #set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "${LIBRARIES_PATH}/aws")
 set(BUILD_SHARED_LIBS ON)
 #find_package(AWSSDK COMPONENTS s3 REQUIRED PATHS ${LIBRARIES_PATH}/aws NO_DEFAULT_PATH)
@@ -77,9 +78,11 @@ message("-- Found NvJPEG: " ${NVJPEG_LIBRARY})
 message("-- Found NvJPEG2000: " ${NVJPEG2K_LIBRARY})
 
 add_subdirectory(src)
-add_subdirectory(test)
+#add_subdirectory(test)
 
-file(COPY web DESTINATION ${PROJECT_BINARY_DIR}/bin)
+# TODO: Add web server implementation
+#file(COPY web DESTINATION ${PROJECT_BINARY_DIR}/bin)
+
 file(COPY python/kafka_jpeg_dataset_sender.py DESTINATION ${PROJECT_BINARY_DIR}/bin)
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/bin/models)
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/bin/Logs)

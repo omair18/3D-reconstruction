@@ -177,7 +177,7 @@ GPU& GpuManager::SelectMatchingGPU(const std::shared_ptr<Config::JsonConfig>& se
     throw std::runtime_error("Failed to select matching GPU.");
 }
 
-const std::shared_ptr<GPU> &GpuManager::GetCurrentGPU()
+const std::shared_ptr<GPU>& GpuManager::GetCurrentGPU()
 {
     return selectedGPU_;
 }

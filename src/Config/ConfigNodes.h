@@ -249,7 +249,8 @@ namespace Config
 
             namespace CUDAImageBinarizationAlgorithm
             {
-
+                const inline static std::string AllowUnconfiguredChannels = "allowUnconfiguredChannels";
+                const inline static std::string BinarizationCoefficients = "binarizationCoefficients";
             }
 
             namespace ImageBinarizationAlgorithm
@@ -279,7 +280,14 @@ namespace Config
 
             namespace AKAZEKeyPointDetectionAlgorithm
             {
-
+                const inline static std::string Octaves = "octaves";
+                const inline static std::string SublayersPerOctave = "sublayersPerOctave";
+                const inline static std::string Threshold = "threshold";
+                const inline static std::string AnisotropicDiffusionFunction = "anisotropicDiffusionFunction";
+                const inline static std::string PeronaMalikG1DiffusionFunction = "PERONAMALIKG1DIFFUSIONFUNCTION";
+                const inline static std::string PeronaMalikG2DiffusionFunction = "PERONAMALIKG2DIFFUSIONFUNCTION";
+                const inline static std::string WeickertDiffusionFunction = "WEICKERTDIFFUSIONFUNCTION";
+                const inline static std::string CharbonnierDiffusionFunction = "CHARBONNIERDIFFUSIONFUNCTION";
             }
 
             namespace CUDAKeyPointMatchingAlgorithm

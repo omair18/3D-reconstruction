@@ -31,13 +31,15 @@ public:
      * @brief
      *
      * @param config
+     * @param gpuManager
+     * @param cudaStream
      */
-    CUDAAKAZEKeypointDetectionAlgorithm(const std::shared_ptr<Config::JsonConfig>& config, [[maybe_unused]] const std::unique_ptr<GPU::GpuManager>& gpuManager, [[maybe_unused]] void* cudaStream);
+    CUDAAKAZEKeypointDetectionAlgorithm(const std::shared_ptr<Config::JsonConfig>& config, const std::unique_ptr<GPU::GpuManager>& gpuManager, void* cudaStream);
 
     /**
      * @brief
      */
-    ~CUDAAKAZEKeypointDetectionAlgorithm() override;
+    ~CUDAAKAZEKeypointDetectionAlgorithm() override = default;
 
     /**
      * @brief
@@ -47,10 +49,46 @@ public:
      */
     bool Process(const std::shared_ptr<DataStructures::ProcessingData>& processingData) override;
 
-
+    /**
+     * @brief
+     *
+     * @param config
+     */
+    void Initialize(const std::shared_ptr<Config::JsonConfig>& config) override;
 
 private:
 
+    /**
+     * @brief
+     *
+     * @param config
+     */
+    static void ValidateConfig(const std::shared_ptr<Config::JsonConfig>& config);
+
+    /**
+     * @brief
+     *
+     * @param config
+     */
+    void InitializeInternal(const std::shared_ptr<Config::JsonConfig>& config);
+
+    ///
+    int octaves_;
+
+    ///
+    int sublayersPerOctave_;
+
+    ///
+    std::string anisotropicDiffusionFunction_;
+
+    ///
+    float threshold_;
+
+    ///
+    void* cudaStream_;
+
+    ///
+    std::shared_ptr<GPU::GPU> currentGPU_;
 
 };
 

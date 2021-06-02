@@ -286,6 +286,27 @@ public:
      */
     [[nodiscard]] int GetCameraDistortionFunctionId() const noexcept;
 
+    /**
+     * @brief
+     *
+     * @return
+     */
+    [[nodiscard]] size_t GetImageWidth() const;
+
+    /**
+     * @brief
+     *
+     * @return
+     */
+    [[nodiscard]] size_t GetImageHeight() const;
+
+    /**
+     * @brief
+     *
+     * @return
+     */
+    [[nodiscard]] size_t GetImageChannelsAmount() const;
+
 private:
 
     /// Pointer to CUDA image.

@@ -5,8 +5,11 @@ set(DATA_STRUCTURES_LIB_HEADERS
         ProcessingQueue.h
         ProcessingQueueManager.h
         ProcessingData.h
-        KeyPoint.h
-        ReconstructionParams.h)
+        # TODO: Implement library-independent key point class
+        #KeyPoint.h
+        ReconstructionParams.h
+        # TODO: Remove OpenMVG interface
+        RegionsProvider.h)
 
 set(DATA_STRUCTURES_LIB_CPPS
         ModelDataset.cpp
@@ -14,8 +17,11 @@ set(DATA_STRUCTURES_LIB_CPPS
         ImageDescriptor.cpp
         ProcessingQueueManager.cpp
         ProcessingData.cpp
-        KeyPoint.cpp
-        ReconstructionParams.cpp)
+        # TODO: Implement library-independent key point class
+        #KeyPoint.cpp
+        ReconstructionParams.cpp
+        # TODO: Remove OpenMVG interface
+        RegionsProvider.cpp)
 
 source_group("Header Files" FILES ${DATA_STRUCTURES_LIB_HEADERS})
 source_group("Source Files" FILES ${DATA_STRUCTURES_LIB_CPPS})
@@ -34,8 +40,7 @@ target_link_libraries(datastructures
         config
         networking
         ${CUDA_CUDART_LIBRARY}
-        OpenMVG::openMVG_sfm
-        OpenMVG::openMVG_camera)
+        OpenMVG::openMVG_sfm)
 
 
 target_include_directories(datastructures PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

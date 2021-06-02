@@ -13,7 +13,7 @@
 namespace Processing
 {
 
-GpuProcessor::GpuProcessor(const std::shared_ptr<Config::JsonConfig> &config, const std::unique_ptr<DataStructures::ProcessingQueueManager>& queueManager) :
+GpuProcessor::GpuProcessor(const std::shared_ptr<Config::JsonConfig>& config, const std::unique_ptr<DataStructures::ProcessingQueueManager>& queueManager) :
 IProcessor(config, queueManager)
 {
     cudaError_t status;

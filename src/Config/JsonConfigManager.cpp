@@ -11,13 +11,13 @@
 namespace Config
 {
 
-void JsonConfigManager::ReadSettings(const std::filesystem::path & folderPath)
+void JsonConfigManager::ReadSettings(const std::filesystem::path& folderPath)
 {
     LOG_TRACE() << "Read settings from folder " << folderPath;
     folderPath_ = folderPath.string();
     std::filesystem::directory_iterator fileList(folderPath);
 
-    for (auto const &filename : fileList)
+    for (const auto& filename : fileList)
     {
         try
         {
@@ -79,7 +79,7 @@ std::vector<std::filesystem::path> JsonConfigManager::GetJsonFiles(const std::fi
 {
     std::vector<std::filesystem::path> files;
 
-    for (const auto & file : std::filesystem::directory_iterator(folderName))
+    for (const auto& file : std::filesystem::directory_iterator(folderName))
     {
         if (file.path().extension().string() == jsonExtension)
         {
@@ -117,7 +117,7 @@ void JsonConfigManager::SaveAll()
 void JsonConfigManager::SaveAll(const std::map<std::string, std::shared_ptr<JsonConfig>>& configsMap)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    for (const auto &config : configsMap)
+    for (const auto& config : configsMap)
     {
         std::filesystem::path path(folderPath_);
         path /= (config.first + jsonExtension);
@@ -141,7 +141,7 @@ std::vector<std::string> JsonConfigManager::GetConfigNames()
     return configNames;
 }
 
-bool JsonConfigManager::ConfigExists(const std::string &configName)
+bool JsonConfigManager::ConfigExists(const std::string& configName)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     auto directoryJsonFiles = GetJsonFiles(folderPath_);

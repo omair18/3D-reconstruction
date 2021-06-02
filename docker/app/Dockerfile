@@ -84,7 +84,6 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
         cmake \
     && rm -rf /var/lib/apt/lists/*
     
-
 RUN cd /opt \
     && wget https://cmake.org/files/v3.19/cmake-3.19.7.tar.gz \
     && tar -xzvf cmake-3.19.7.tar.gz \
@@ -94,7 +93,6 @@ RUN cd /opt \
     && make install -j`nproc` \
     && rm -rf /opt/cmake-3.19.7
     
-    
 RUN cd /opt \
     && mkdir NvCodecHeaders \
     && cd NvCodecHeaders \
@@ -103,7 +101,6 @@ RUN cd /opt \
     && make -j`nproc` \
     && make install \
     && rm -rf /opt/NvCodecHeaders
-    
     
 RUN cd /opt \
     && mkdir FFmpeg \
@@ -144,7 +141,6 @@ RUN cd /opt \
     && make install \
     && rm -r /opt/FFmpeg
     
-    
 RUN cd /opt \
     && git clone https://github.com/edenhill/librdkafka.git --branch=v1.7.0 \
     && cd librdkafka \
@@ -168,7 +164,6 @@ RUN cd /opt \
     && make install \
     && rm -r /opt/librdkafka
 
-
 RUN cd /opt \
     && mkdir boost_lib \
     && mkdir -p /var/3DReconstructionEnv/boost \
@@ -181,7 +176,6 @@ RUN cd /opt \
     && ./b2 install cxxflags="-fPIC -Ofast -march=native -mtune=native -std=gnu++17 -fopenmp -fopenmp-simd -DNDEBUG" \
     && rm -r /opt/boost_lib
    
-    
 RUN cd /opt \
     && git clone https://gitlab.com/libeigen/eigen.git --branch=3.3 \
     && cd eigen \
@@ -214,7 +208,6 @@ RUN cd /opt \
     && make install \
     && rm -rf /opt/eigen
         
-     
 RUN cd /opt \
     && mkdir opencv_lib \
     && cd opencv_lib \
@@ -279,7 +272,6 @@ RUN cd /opt \
     && make install \
     && rm -rf /opt/opencv_lib
     
-    
 RUN cd /opt \
     && git clone https://github.com/openMVG/openMVG.git --branch=v1.6 \
     && cd openMVG \
@@ -304,7 +296,6 @@ RUN cd /opt \
     && make -j`nproc` \
     && make install \
     && rm -rf /opt/openMVG
-    
     
 RUN cd /opt \
     && git clone https://github.com/CGAL/cgal.git --branch=v5.2 \
@@ -332,7 +323,6 @@ RUN cd /opt \
     
 RUN cd /var/3DReconstructionEnv \
     && git clone https://github.com/cdcseacave/VCG.git --branch=v1.0.1 vcglib
-    
     
 RUN cd /opt \
     && git clone https://github.com/cdcseacave/openMVS.git --branch=v1.1.1 \
@@ -365,7 +355,6 @@ RUN cd /opt \
     && make install \
     && rm -rf /opt/openMVS
 
-
 #RUN cd /opt \
 #    && git clone https://github.com/aws/aws-sdk-cpp.git --branch=1.8.161 \
 #    && cd aws-sdk-cpp \
@@ -395,9 +384,7 @@ RUN cd /opt \
 #    && make install \
 #    && rm -rf /opt/aws-sdk-cpp
 
-
 COPY 3D-reconstruction /opt/3D-reconstruction
-
 
 RUN cd /opt/3D-reconstruction \
     && mkdir build \
@@ -409,6 +396,6 @@ RUN cd /opt/3D-reconstruction \
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
         -DBUILD_SHARED_LIBS=ON \
         .. \
-    && make -j`nproc` \
+    && make -j`nproc`
 
 WORKDIR /opt/3D-reconstruction/build/bin

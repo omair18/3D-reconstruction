@@ -568,7 +568,7 @@ std::wstring JsonConfig::ToWString()
     }
 }
 
-std::shared_ptr<JsonConfig> JsonConfig::operator[](const std::string &key)
+std::shared_ptr<JsonConfig> JsonConfig::operator[](const std::string& key)
 {
     try
     {
@@ -594,7 +594,7 @@ std::shared_ptr<JsonConfig> JsonConfig::operator[](const std::string& key) const
     }
 }
 
-JsonConfig &JsonConfig::operator=(const JsonConfig &other)
+JsonConfig& JsonConfig::operator=(const JsonConfig& other)
 {
     if(this == &other)
     {
@@ -604,7 +604,7 @@ JsonConfig &JsonConfig::operator=(const JsonConfig &other)
     return *this;
 }
 
-JsonConfig &JsonConfig::operator=(JsonConfig &&other) noexcept
+JsonConfig& JsonConfig::operator=(JsonConfig&& other) noexcept
 {
     if(other.value_ == value_)
     {
@@ -614,7 +614,7 @@ JsonConfig &JsonConfig::operator=(JsonConfig &&other) noexcept
     return *this;
 }
 
-bool JsonConfig::operator==(const JsonConfig &other)
+bool JsonConfig::operator==(const JsonConfig& other)
 {
     if (this == &other)
     {

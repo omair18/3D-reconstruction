@@ -12,7 +12,7 @@ WebServer::~WebServer()
 
 }
 
-bool WebServer::ValidateServerConfiguration(const std::shared_ptr<Config::JsonConfig> &webServerConfig_)
+bool WebServer::ValidateServerConfiguration(const std::shared_ptr<Config::JsonConfig>& webServerConfig_)
 {
     auto& webServerConfig = *webServerConfig_;
 
@@ -60,7 +60,7 @@ bool WebServer::ValidateServerConfiguration(const std::shared_ptr<Config::JsonCo
     return false;
 }
 
-void WebServer::Initialize(const std::shared_ptr<Config::JsonConfig> &serviceConfig)
+void WebServer::Initialize(const std::shared_ptr<Config::JsonConfig>& serviceConfig)
 {
     LOG_TRACE() << "Initializing web server ...";
     auto webServerConfig = (*serviceConfig)[Config::ConfigNodes::ServiceConfig::WebServer];
