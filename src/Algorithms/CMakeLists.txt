@@ -91,6 +91,7 @@ target_link_libraries(algorithms
         networking
         datastructures
         gpu
+        utils
         log
         opencv_core
         ${CUDA_nppc_LIBRARY}
@@ -102,6 +103,8 @@ target_link_libraries(algorithms
         ${CUDA_nppial_LIBRARY}
         OpenMVG::openMVG_sfm
         OpenMVG::openMVG_camera
-        opencv_features2d)
+        OpenMVG::openMVG_matching_image_collection
+        opencv_features2d
+        stdc++fs)
 
 target_include_directories(algorithms PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

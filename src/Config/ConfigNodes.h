@@ -34,6 +34,12 @@ namespace Config
             const inline static std::string ServiceConfigurationFilename = "service_configuration";
         }
 
+        namespace ProjectSubdirectories
+        {
+            const inline static std::string Models = "models";
+            const inline static std::string Web = "web";
+        }
+
         namespace ServiceConfig
         {
             const inline static std::string WebServer = "webServer";
@@ -273,29 +279,29 @@ namespace Config
                 const inline static std::string ExpireTimeout = "expireTimeout";
             }
 
-            namespace CUDAAKAZEKeyPointDetectionAlgorithm
-            {
-
-            }
-
             namespace AKAZEKeyPointDetectionAlgorithm
             {
                 const inline static std::string Octaves = "octaves";
                 const inline static std::string SublayersPerOctave = "sublayersPerOctave";
                 const inline static std::string Threshold = "threshold";
                 const inline static std::string AnisotropicDiffusionFunction = "anisotropicDiffusionFunction";
-                const inline static std::string PeronaMalikG1DiffusionFunction = "PERONAMALIKG1DIFFUSIONFUNCTION";
-                const inline static std::string PeronaMalikG2DiffusionFunction = "PERONAMALIKG2DIFFUSIONFUNCTION";
-                const inline static std::string WeickertDiffusionFunction = "WEICKERTDIFFUSIONFUNCTION";
-                const inline static std::string CharbonnierDiffusionFunction = "CHARBONNIERDIFFUSIONFUNCTION";
+                const inline static std::string PeronaMalikG1DiffusionFunction = "PERONA_MALIK_G1_DIFFUSION_FUNCTION";
+                const inline static std::string PeronaMalikG2DiffusionFunction = "PERONA_MALIK_G2_DIFFUSION_FUNCTION";
+                const inline static std::string WeickertDiffusionFunction = "WEICKERT_DIFFUSION_FUNCTION";
+                const inline static std::string CharbonnierDiffusionFunction = "CHARBONNIER_DIFFUSION_FUNCTION";
             }
 
-            namespace CUDAKeyPointMatchingAlgorithm
+            namespace CUDAAKAZEKeyPointDetectionAlgorithm
             {
 
             }
 
             namespace KeyPointMatchingAlgorithm
+            {
+                const inline static std::string DistanceRatio = "distanceRatio";
+            }
+
+            namespace CUDAKeyPointMatchingAlgorithm
             {
 
             }
@@ -307,7 +313,8 @@ namespace Config
 
             namespace KeyPointFilteringAlgorithm
             {
-
+                const inline static std::string MaxIterations = "maxIterations";
+                const inline static std::string EstimationPrecision = "estimationPrecision";
             }
 
             namespace CUDABundleAdjustmentAlgorithm
@@ -317,7 +324,22 @@ namespace Config
 
             namespace BundleAdjustmentAlgorithm
             {
-
+                const inline static std::string UseMotionPrior = "useMotionPrior";
+                const inline static std::string SaveResult = "saveResult";
+                const inline static std::string UseConstantFocalLength = "useConstantFocalLength";
+                const inline static std::string UseConstantPrincipalPoint = "useConstantPrincipalPoint";
+                const inline static std::string UseConstantDistortionParams = "useConstantDistortionParams";
+                const inline static std::string TriangulationMethod = "triangulationMethod";
+                const inline static std::string DirectLinearTransformTriangulationMethod = "DIRECT_LINEAR_TRANSFORM";
+                const inline static std::string L1AngularTriangulationMethod = "L1_ANGULAR";
+                const inline static std::string LInfinityAngularTriangulationMethod = "LINFINITY_ANGULAR";
+                const inline static std::string InverseDepthWeightedMidpointTriangulationMethod = "INVERSE_DEPTH_WEIGHTED_MIDPOINT";
+                const inline static std::string ResectionMethod = "resectionMethod";
+                const inline static std::string DirectLinearTransform6Points = "DIRECT_LINEAR_TRANSFORM_6_POINTS";
+                const inline static std::string P3P_KE_CVPR17 = "P3P_KE_CVPR17";
+                const inline static std::string P3P_KNEIP_CVPR11 = "P3P_KNEIP_CVPR11";
+                const inline static std::string P3P_NORDBERG_ECCV18 = "P3P_NORDBERG_ECCV18";
+                const inline static std::string UP2P_KUKELOVA_ACCV10 = "UP2P_KUKELOVA_ACCV10";
             }
 
             namespace CUDAPointCloudDensificationAlgorithm
@@ -327,7 +349,46 @@ namespace Config
 
             namespace PointCloudDensificationAlgorithm
             {
-
+                const inline static std::string& SaveResult = BundleAdjustmentAlgorithm::SaveResult;
+                const inline static std::string ResolutionLevel = "resolutionLevel";
+                const inline static std::string MaxResolution = "maxResolution";
+                const inline static std::string MinResolution = "minResolution";
+                const inline static std::string MinViews = "minViews";
+                const inline static std::string MaxViews = "maxViews";
+                const inline static std::string MinViewsFuse = "minViewsFuse";
+                const inline static std::string MinViewsFilter = "minViewsFilter";
+                const inline static std::string MinViewsFilterAdjust = "minViewsFilterAdjust";
+                const inline static std::string MinViewsTrustPoint = "minViewsTrustPoint";
+                const inline static std::string NumbersOfViews = "numbersOfViews";
+                const inline static std::string FilterAdjust = "filterAdjust";
+                const inline static std::string AddCorners = "addCorners";
+                const inline static std::string ViewMinScore = "viewMinScore";
+                const inline static std::string ViewMinScoreRatio = "viewMinScoreRatio";
+                const inline static std::string MinArea = "minArea";
+                const inline static std::string MinAngle = "minAngle";
+                const inline static std::string OptimalAngle = "optimalAngle";
+                const inline static std::string MaxAngle = "maxAngle";
+                const inline static std::string DescriptorMinMagnitudeThreshold = "descriptorMinMagnitudeThreshold";
+                const inline static std::string DepthDiffThreshold = "depthDiffThreshold";
+                const inline static std::string NormalDiffThreshold = "normalDiffThreshold";
+                const inline static std::string PairwiseMul = "pairwiseMul";
+                const inline static std::string OptimizerEps = "optimizerEps";
+                const inline static std::string OptimizerMaxIterations = "optimizerMaxIterations";
+                const inline static std::string SpeckleSize = "speckleSize";
+                const inline static std::string InterpolationGapSize = "interpolationGapSize";
+                const inline static std::string Optimize = "optimize";
+                const inline static std::string EstimateColors = "estimateColors";
+                const inline static std::string EstimateNormals = "estimateNormals";
+                const inline static std::string NCCThresholdKeep = "NCCThresholdKeep";
+                const inline static std::string EstimationIterations = "estimationIterations";
+                const inline static std::string RandomIterations = "randomIterations";
+                const inline static std::string RandomMaxScale = "randomMaxScale";
+                const inline static std::string RandomDepthRatio = "randomDepthRatio";
+                const inline static std::string RandomAngle1Range = "randomAngle1Range";
+                const inline static std::string RandomAngle2Range = "randomAngle2Range";
+                const inline static std::string RandomSmoothDepth = "randomSmoothDepth";
+                const inline static std::string RandomSmoothNormal = "randomSmoothNormal";
+                const inline static std::string RandomSmoothBonus = "randomSmoothBonus";
             }
 
             namespace CUDAMeshReconstructionAlgorithm
@@ -337,7 +398,17 @@ namespace Config
 
             namespace MeshReconstructionAlgorithm
             {
-
+                const inline static std::string& SaveResult = PointCloudDensificationAlgorithm::SaveResult;
+                const inline static std::string DistanceInsert = "distanceInsert";
+                const inline static std::string UseConstantWeight = "useConstantWeight";
+                const inline static std::string UseFreeSpaceSupport = "useFreeSpaceSupport";
+                const inline static std::string ThicknessFactor = "thicknessFactor";
+                const inline static std::string QualityFactor = "qualityFactor";
+                const inline static std::string DecimateMesh = "decimateMesh";
+                const inline static std::string RemoveSpurious = "removeSpurious";
+                const inline static std::string RemoveSpikes = "removeSpikes";
+                const inline static std::string CloseHoles = "closeHoles";
+                const inline static std::string SmoothMesh = "smoothMesh";
             }
 
             namespace CUDAMeshRefinementAlgorithm
@@ -357,9 +428,17 @@ namespace Config
 
             namespace MeshTexturingAlgorithm
             {
-
+                const inline static std::string& SaveResult = PointCloudDensificationAlgorithm::SaveResult;
+                const inline static std::string& ResolutionLevel = PointCloudDensificationAlgorithm::ResolutionLevel;
+                const inline static std::string& MinResolution = PointCloudDensificationAlgorithm::MinResolution;
+                const inline static std::string OutlierThreshold = "outlierThreshold";
+                const inline static std::string RatioDataSmoothness = "ratioDataSmoothness";
+                const inline static std::string GlobalSeamLeveling = "globalSeamLeveling";
+                const inline static std::string LocalSeamLeveling = "localSeamLeveling";
+                const inline static std::string TextureSizeMultiple = "textureSizeMultiple";
+                const inline static std::string RectPackingHeuristic = "rectPackingHeuristic";
+                const inline static std::string ColorEmpty = "colorEmpty";
             }
-
         }
 
         namespace MessageNodes

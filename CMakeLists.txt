@@ -35,6 +35,10 @@ find_package(Boost COMPONENTS
         program_options
         system
         json
+        # for openMVS
+        iostreams
+        serialization
+        wserialization
         REQUIRED
         PATHS ${LIBRARIES_PATH}/boost
         NO_DEFAULT_PATH)
@@ -63,8 +67,22 @@ set(BUILD_SHARED_LIBS ON)
 
 find_package(Eigen3 REQUIRED PATHS /var/3DReconstructionEnv/eigen NO_DEFAULT_PATH)
 
-find_package(OpenMVG REQUIRED PATHS /var/3DReconstructionEnv/openMVG NO_DEFAULT_PATH)
-find_package(OpenMVS REQUIRED PATHS /var/3DReconstructionEnv/openMVS/lib/CMake NO_DEFAULT_PATH)
+find_package(OpenMVG COMPONENTS
+        openMVG_sfm
+        openMVG_matching_image_collection
+
+        REQUIRED PATHS /var/3DReconstructionEnv/openMVG NO_DEFAULT_PATH)
+
+
+find_package(OpenMVS COMPONENTS
+        Common
+        Math
+        IO
+        MVS
+        DensifyPointCloud
+        ReconstructMesh
+        TextureMesh
+        REQUIRED PATHS /var/3DReconstructionEnv/openMVS/lib/CMake NO_DEFAULT_PATH)
 
 find_library(NVJPEG_LIBRARY nvjpeg ${CUDA_TOOLKIT_ROOT_DIR}/lib64)
 

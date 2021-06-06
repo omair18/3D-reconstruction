@@ -17,7 +17,14 @@ namespace openMVG
         struct Features_Provider;
         struct Matches_Provider;
     }
+
+    namespace matching
+    {
+        struct PairWiseMatches;
+    }
 }
+
+class Scene;
 
 class RegionsProvider;
 
@@ -45,6 +52,9 @@ public:
 
     std::shared_ptr<RegionsProvider> regionsProvider_;
 
+    std::shared_ptr<openMVG::matching::PairWiseMatches> matches_;
+
+    std::shared_ptr<Scene> scene_;
 };
 
 }

@@ -54,7 +54,7 @@ bool DatasetInitializationAlgorithm::Process(const std::shared_ptr<DataStructure
 
         auto distortionFunctionID = imageDescriptor.GetCameraDistortionFunctionId();
 
-        views.insert(std::move(std::make_pair(i, std::make_shared<openMVG::sfm::View>("", i, i, i, width, height))));
+        views.insert(std::move(std::make_pair(i, std::make_shared<openMVG::sfm::View>(std::to_string(imageDescriptor.GetFrameId()), i, i, i, width, height))));
 
         switch (distortionFunctionID)
         {
@@ -90,7 +90,6 @@ bool DatasetInitializationAlgorithm::Process(const std::shared_ptr<DataStructure
                 return false;
             }
         }
-
     }
 
     LOG_TRACE() << "Dataset " << datasetUUID << " was successfully prepared for reconstruction ...";

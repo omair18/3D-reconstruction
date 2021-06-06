@@ -27,7 +27,56 @@ class MeshTexturingAlgorithm : public ICPUAlgorithm
 
 public:
 
+    /**
+     * @brief
+     *
+     * @param config
+     * @param gpuManager
+     * @param cudaStream
+     */
+    MeshTexturingAlgorithm(const std::shared_ptr<Config::JsonConfig>& config, [[maybe_unused]] const std::unique_ptr<GPU::GpuManager>& gpuManager, [[maybe_unused]] void* cudaStream);
+
+    /**
+     * @brief
+     */
+    ~MeshTexturingAlgorithm() override = default;
+
+    /**
+     * @brief
+     *
+     * @param processingData
+     * @return
+     */
+    bool Process(const std::shared_ptr<DataStructures::ProcessingData>& processingData) override;
+
+    /**
+     * @brief
+     *
+     * @param config
+     */
+    void Initialize(const std::shared_ptr<Config::JsonConfig>& config) override;
+
 private:
+
+    /**
+     * @brief
+     *
+     * @param config
+     */
+    static void ValidateConfig(const std::shared_ptr<Config::JsonConfig>& config);
+
+    /**
+     * @brief
+     *
+     * @param config
+     */
+    void InitializeInternal(const std::shared_ptr<Config::JsonConfig>& config);
+
+    ///
+    bool isInitialized_;
+
+    ///
+    bool saveResult_;
 
     /// How many times to scale down the images before mesh refinement.
     unsigned int resolutionLevel_ = 0;
@@ -48,13 +97,13 @@ private:
     bool localSeamLeveling_ = true;
 
     /// Texture size should be a multiple of this value (0 - power of two).
-    unsigned textureSizeMultiple_ = 0;
+    unsigned int textureSizeMultiple_ = 0;
 
     /// Specify the heuristic used when deciding where to place a new patch (0 - best fit, 3 - good speed, 100 - best speed).
-    unsigned rectPackingHeuristic_ = 0;
+    unsigned int rectPackingHeuristic_ = 0;
 
     /// Color used for faces not covered by any image.
-    uint32_t colorEmpty_ = 0x00FF7F27;
+    unsigned int colorEmpty_ = 16744231;
 
 };
 

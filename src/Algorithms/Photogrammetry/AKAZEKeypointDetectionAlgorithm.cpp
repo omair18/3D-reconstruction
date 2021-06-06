@@ -44,6 +44,7 @@ AKAZEKeypointDetectionAlgorithm::~AKAZEKeypointDetectionAlgorithm() = default;
 bool AKAZEKeypointDetectionAlgorithm::Process(const std::shared_ptr<DataStructures::ProcessingData>& processingData)
 {
     auto& dataset = processingData->GetModelDataset();
+    auto& datasetUUID = dataset->GetUUID();
     auto& imageDescriptors = dataset->GetImagesDescriptors();
     auto& reconstructionParams = dataset->GetReconstructionParams();
 
@@ -54,8 +55,11 @@ bool AKAZEKeypointDetectionAlgorithm::Process(const std::shared_ptr<DataStructur
     auto& imageRegions = regionsProvider.get_regions_map();
     auto& regionsFeatures = featuresProvider.feats_per_view;
 
+    LOG_TRACE() << "Detecting key points of dataset with ID " << datasetUUID;
+
     for(int i = 0; i < static_cast<int>(imageDescriptors.size()); ++i)
     {
+        LOG_TRACE() << "Detecting key points on image " << i << "/" << imageDescriptors.size() << " ...";
         auto& view = sfmData.views[i];
         std::vector<cv::KeyPoint> keyPoints;
         auto& imageDescriptor = imageDescriptors[i];
@@ -161,25 +165,32 @@ void AKAZEKeypointDetectionAlgorithm::ValidateConfig(const std::shared_ptr<Confi
 
 void AKAZEKeypointDetectionAlgorithm::InitializeInternal(const std::shared_ptr<Config::JsonConfig>& config)
 {
-    LOG_TRACE() << "Initializing AKAZE key point detection algorithm ...";
+    if(!akaze_)
+    {
+        LOG_TRACE() << "Initializing AKAZE key point detection algorithm ...";
 
-    ValidateConfig(config);
+        ValidateConfig(config);
 
-    octaves_ = (*config)[Config::ConfigNodes::AlgorithmsConfig::AKAZEKeyPointDetectionAlgorithm::Octaves]->ToInt32();
-    LOG_TRACE() << "AKAZE image key point detection algorithm's octaves amount was set to " << octaves_;
+        octaves_ = (*config)[Config::ConfigNodes::AlgorithmsConfig::AKAZEKeyPointDetectionAlgorithm::Octaves]->ToInt32();
+        LOG_TRACE() << "AKAZE image key point detection algorithm's octaves amount was set to " << octaves_;
 
-    sublayersPerOctave_ = (*config)[Config::ConfigNodes::AlgorithmsConfig::AKAZEKeyPointDetectionAlgorithm::SublayersPerOctave]->ToInt32();
-    LOG_TRACE() << "AKAZE image key point detection algorithm's amount of sublayers per octave was set to " << sublayersPerOctave_;
+        sublayersPerOctave_ = (*config)[Config::ConfigNodes::AlgorithmsConfig::AKAZEKeyPointDetectionAlgorithm::SublayersPerOctave]->ToInt32();
+        LOG_TRACE() << "AKAZE image key point detection algorithm's amount of sublayers per octave was set to " << sublayersPerOctave_;
 
-    threshold_ = (*config)[Config::ConfigNodes::AlgorithmsConfig::AKAZEKeyPointDetectionAlgorithm::Threshold]->ToFloat();
-    LOG_TRACE() << "AKAZE image key point detection algorithm's amount of sublayers per octave was set to " << sublayersPerOctave_;
+        threshold_ = (*config)[Config::ConfigNodes::AlgorithmsConfig::AKAZEKeyPointDetectionAlgorithm::Threshold]->ToFloat();
+        LOG_TRACE() << "AKAZE image key point detection algorithm's amount of sublayers per octave was set to " << sublayersPerOctave_;
 
-    anisotropicDiffusionFunction_ = (*config)[Config::ConfigNodes::AlgorithmsConfig::AKAZEKeyPointDetectionAlgorithm::AnisotropicDiffusionFunction]->ToString();
-    LOG_TRACE() << "AKAZE image key point detection algorithm's diffusion function was set to " << anisotropicDiffusionFunction_;
-    akaze_ = cv::AKAZE::create(cv::AKAZE::DescriptorType::DESCRIPTOR_KAZE, 0, 1, threshold_, octaves_, sublayersPerOctave_,
-                               diffusionFunctions.at(anisotropicDiffusionFunction_));
+        anisotropicDiffusionFunction_ = (*config)[Config::ConfigNodes::AlgorithmsConfig::AKAZEKeyPointDetectionAlgorithm::AnisotropicDiffusionFunction]->ToString();
+        LOG_TRACE() << "AKAZE image key point detection algorithm's diffusion function was set to " << anisotropicDiffusionFunction_;
+        akaze_ = cv::AKAZE::create(cv::AKAZE::DescriptorType::DESCRIPTOR_KAZE, 0, 1, threshold_, octaves_, sublayersPerOctave_,
+                                   diffusionFunctions.at(anisotropicDiffusionFunction_));
 
-    LOG_TRACE() << "AKAZE image key point detection algorithm was successfully initialized";
+        LOG_TRACE() << "AKAZE image key point detection algorithm was successfully initialized";
+    }
+    else
+    {
+        LOG_WARNING() << "AKAZE key point detection algorithm was already initialized.";
+    }
 
 }
 

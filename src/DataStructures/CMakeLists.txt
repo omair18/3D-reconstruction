@@ -9,7 +9,13 @@ set(DATA_STRUCTURES_LIB_HEADERS
         #KeyPoint.h
         ReconstructionParams.h
         # TODO: Remove OpenMVG interface
-        RegionsProvider.h)
+        RegionsProvider.h
+        FundamentalMatrixRobustModelEstimator.h
+        # TODO: Remove OpenMVS interface
+        Scene.h
+        DepthMapsData.h
+        DenseDepthMapData.h
+        DepthEstimator.h)
 
 set(DATA_STRUCTURES_LIB_CPPS
         ModelDataset.cpp
@@ -21,7 +27,13 @@ set(DATA_STRUCTURES_LIB_CPPS
         #KeyPoint.cpp
         ReconstructionParams.cpp
         # TODO: Remove OpenMVG interface
-        RegionsProvider.cpp)
+        RegionsProvider.cpp
+        FundamentalMatrixRobustModelEstimator.cpp
+        # TODO: Remove OpenMVS interface
+        Scene.cpp
+        DepthMapsData.cpp
+        DenseDepthMapData.cpp
+        DepthEstimator.cpp)
 
 source_group("Header Files" FILES ${DATA_STRUCTURES_LIB_HEADERS})
 source_group("Source Files" FILES ${DATA_STRUCTURES_LIB_CPPS})
@@ -40,7 +52,11 @@ target_link_libraries(datastructures
         config
         networking
         ${CUDA_CUDART_LIBRARY}
-        OpenMVG::openMVG_sfm)
+        OpenMVG::openMVG_sfm
+        Common
+        Math
+        IO
+        MVS)
 
 
 target_include_directories(datastructures PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

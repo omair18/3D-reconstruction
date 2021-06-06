@@ -26,7 +26,7 @@ std::shared_ptr<JsonConfig> DefaultJsonConfigGenerator::GenerateServiceDefaultCo
     /*
     {
         std::filesystem::path defaultWebDirectoryPath = Utils::PathUtils::GetExecutableFolderPath();
-        defaultWebDirectoryPath /= "web";
+        defaultWebDirectoryPath /= ConfigNodes::ProjectSubdirectories::Web;
 
         webServerConfig->AddNodeBool(ConfigNodes::NetworkingConfig::WebServerConfig::Enabled, true);
         webServerConfig->AddNodeString(ConfigNodes::NetworkingConfig::WebServerConfig::IpAddress, "127.0.0.1");
@@ -63,7 +63,7 @@ std::shared_ptr<JsonConfig> DefaultJsonConfigGenerator::GenerateServiceDefaultCo
     /// Storage node
     {
         std::filesystem::path defaultModelsDirectoryPath = Utils::PathUtils::GetExecutableFolderPath();
-        defaultModelsDirectoryPath /= "models";
+        defaultModelsDirectoryPath /= ConfigNodes::ProjectSubdirectories::Models;
         resultStorageConfig->AddNodeString(ConfigNodes::ServiceConfig::StorageConfig::Type,
                                            ConfigNodes::ServiceConfig::StorageConfig::Filesystem);
         resultStorageConfig->AddNodeString(ConfigNodes::ServiceConfig::StorageConfig::Path,

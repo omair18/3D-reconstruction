@@ -23,9 +23,9 @@ target_link_libraries(Service
         log
         gpu)
 
-add_executable(KafkaDatasetSender KafkaDatasetSender.cpp)
+add_executable(KafkaJpegDatasetSender KafkaJpegDatasetSender.cpp)
 
-target_link_libraries(KafkaDatasetSender
+target_link_libraries(KafkaJpegDatasetSender
         PRIVATE
         Boost::program_options
         Boost::json
