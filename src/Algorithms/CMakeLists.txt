@@ -10,21 +10,21 @@ set(ALGORITHMS_LIB_HEADERS
         Decoding/CUDAImageDecodingAlgorithm.h
         Decoding/CpuImageDecodingAlgorithm.h
         Photogrammetry/DatasetCollectingAlgorithm.h
-        Photogrammetry/CUDAAKAZEKeypointDetectionAlgorithm.h
+        #Photogrammetry/CUDAAKAZEKeypointDetectionAlgorithm.h
         Photogrammetry/AKAZEKeypointDetectionAlgorithm.h
-        Photogrammetry/CUDAKeyPointMatchingAlgorithm.h
+        #Photogrammetry/CUDAKeyPointMatchingAlgorithm.h
         Photogrammetry/KeyPointMatchingAlgorithm.h
-        Photogrammetry/CUDAKeyPointFilteringAlgorithm.h
+        #Photogrammetry/CUDAKeyPointFilteringAlgorithm.h
         Photogrammetry/KeyPointFilteringAlgorithm.h
-        Photogrammetry/CUDABundleAdjustmentAlgorithm.h
+        #Photogrammetry/CUDABundleAdjustmentAlgorithm.h
         Photogrammetry/BundleAdjustmentAlgorithm.h
-        Photogrammetry/CUDAPointCloudDensificationAlgorithm.h
+        #Photogrammetry/CUDAPointCloudDensificationAlgorithm.h
         Photogrammetry/PointCloudDensificationAlgorithm.h
-        Photogrammetry/CUDAMeshReconstructionAlgorithm.h
+        #Photogrammetry/CUDAMeshReconstructionAlgorithm.h
         Photogrammetry/MeshReconstructionAlgorithm.h
         #Photogrammetry/CUDAMeshRefinementAlgorithm.h
         #Photogrammetry/MeshRefinementAlgorithm.h
-        Photogrammetry/CUDAMeshTexturingAlgorithm.h
+        #Photogrammetry/CUDAMeshTexturingAlgorithm.h
         Photogrammetry/MeshTexturingAlgorithm.h
 # TODO: Implement image processing algorithms
 #        ImageProcessing/CUDAImageResizeAlgorithm.h
@@ -46,21 +46,21 @@ set(ALGORITHMS_LIB_CPPS
         Decoding/CUDAImageDecodingAlgorithm.cpp
         Decoding/CpuImageDecodingAlgorithm.cpp
         Photogrammetry/DatasetCollectingAlgorithm.cpp
-        Photogrammetry/CUDAAKAZEKeypointDetectionAlgorithm.cpp
+        #Photogrammetry/CUDAAKAZEKeypointDetectionAlgorithm.cpp
         Photogrammetry/AKAZEKeypointDetectionAlgorithm.cpp
-        Photogrammetry/CUDAKeyPointMatchingAlgorithm.cpp
+        #Photogrammetry/CUDAKeyPointMatchingAlgorithm.cpp
         Photogrammetry/KeyPointMatchingAlgorithm.cpp
-        Photogrammetry/CUDAKeyPointFilteringAlgorithm.cpp
+        #Photogrammetry/CUDAKeyPointFilteringAlgorithm.cpp
         Photogrammetry/KeyPointFilteringAlgorithm.cpp
-        Photogrammetry/CUDABundleAdjustmentAlgorithm.cpp
+        #Photogrammetry/CUDABundleAdjustmentAlgorithm.cpp
         Photogrammetry/BundleAdjustmentAlgorithm.cpp
-        Photogrammetry/CUDAPointCloudDensificationAlgorithm.cpp
+        #Photogrammetry/CUDAPointCloudDensificationAlgorithm.cpp
         Photogrammetry/PointCloudDensificationAlgorithm.cpp
-        Photogrammetry/CUDAMeshReconstructionAlgorithm.cpp
+        #Photogrammetry/CUDAMeshReconstructionAlgorithm.cpp
         Photogrammetry/MeshReconstructionAlgorithm.cpp
         #Photogrammetry/CUDAMeshRefinementAlgorithm.cpp
         #Photogrammetry/MeshRefinementAlgorithm.cpp
-        Photogrammetry/CUDAMeshTexturingAlgorithm.cpp
+        #Photogrammetry/CUDAMeshTexturingAlgorithm.cpp
         Photogrammetry/MeshTexturingAlgorithm.cpp
 # TODO: Implement image processing algorithms
 #        ImageProcessing/CUDAImageResizeAlgorithm.cpp

@@ -165,6 +165,8 @@ namespace Config
                 // Photogrammetry
                 const inline static std::string DatasetCollectingAlgorithm = "datasetCollectingAlgorithm";
 
+                const inline static std::string DatasetInitializationAlgorithm = "datasetInitializationAlgorithm";
+
                 const inline static std::string CUDAAKAZEKeyPointDetectionAlgorithm = "CUDAAKAZEKeyPointDetectionAlgorithm";
                 const inline static std::string AKAZEKeyPointDetectionAlgorithm = "AKAZEKeyPointDetectionAlgorithm";
 

@@ -9,6 +9,14 @@
 #include "DataTransferring/HostToDeviceTransferringAlgorithm.h"
 #include "DataTransferring/DeviceToHostTransferringAlgorithm.h"
 #include "Photogrammetry/DatasetCollectingAlgorithm.h"
+#include "Photogrammetry/DatasetInitializationAlgorithm.h"
+#include "Photogrammetry/AKAZEKeypointDetectionAlgorithm.h"
+#include "Photogrammetry/KeyPointMatchingAlgorithm.h"
+#include "Photogrammetry/KeyPointFilteringAlgorithm.h"
+#include "Photogrammetry/BundleAdjustmentAlgorithm.h"
+#include "Photogrammetry/PointCloudDensificationAlgorithm.h"
+#include "Photogrammetry/MeshReconstructionAlgorithm.h"
+#include "Photogrammetry/MeshTexturingAlgorithm.h"
 #include "KafkaConsumer.h"
 #include "KafkaProducer.h"
 #include "Logger.h"
@@ -30,9 +38,15 @@ AlgorithmFactory::AlgorithmFactory()
         { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::HostToDeviceTransferringAlgorithm, GetAlgorithmLambda<HostToDeviceTransferringAlgorithm>() },
         { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::DeviceToHostTransferringAlgorithm, GetAlgorithmLambda<DeviceToHostTransferringAlgorithm>() },
 
-        { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::DatasetCollectingAlgorithm, GetAlgorithmLambda<DatasetCollectingAlgorithm>() }
-
-
+        { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::DatasetCollectingAlgorithm, GetAlgorithmLambda<DatasetCollectingAlgorithm>() },
+        { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::DatasetInitializationAlgorithm, GetAlgorithmLambda<DatasetInitializationAlgorithm>() },
+        { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::AKAZEKeyPointDetectionAlgorithm, GetAlgorithmLambda<AKAZEKeypointDetectionAlgorithm>() },
+        { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::KeyPointMatchingAlgorithm, GetAlgorithmLambda<KeyPointMatchingAlgorithm>() },
+        { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::KeyPointFilteringAlgorithm, GetAlgorithmLambda<KeyPointFilteringAlgorithm>() },
+        { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::BundleAdjustmentAlgorithm, GetAlgorithmLambda<BundleAdjustmentAlgorithm>() },
+        { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::PointCloudDensificationAlgorithm, GetAlgorithmLambda<PointCloudDensificationAlgorithm>() },
+        { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::MeshReconstructionAlgorithm, GetAlgorithmLambda<MeshReconstructionAlgorithm>() },
+        { Config::ConfigNodes::AlgorithmsConfig::AlgorithmsNames::MeshTexturingAlgorithm, GetAlgorithmLambda<MeshTexturingAlgorithm>() }
 
     };
 }
